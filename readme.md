@@ -5,7 +5,7 @@
 <h1 align="center">简阅</h1>
 
 <p align="center">
-  简而阅之 • 简而记之
+  一款本地电子书阅读器与笔记工具，所有数据离线存储，隐私安全。
 </p>
 
 <p align="center">
@@ -22,6 +22,21 @@
   <img src="https://img.shields.io/badge/vue-3.3-42b883.svg" alt="vue" />
   <img src="https://img.shields.io/badge/typescript-5.0-3178c6.svg" alt="typescript" />
 </p>
+
+---
+
+## 截图预览
+
+<table align="center">
+  <tr>
+    <td><img src="screenshots/书架.png" alt="书架" style="height:300px; width:100%; object-fit:contain;" /></td>
+    <td><img src="screenshots/阅读.png" alt="阅读器（日间模式）" style="height:300px; width:100%; object-fit:contain;" /></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/笔记.png" alt="笔记" style="height:300px; width:100%; object-fit:contain;" /></td>
+    <td><img src="screenshots/悬浮.png" alt="镜像悬浮" style="height:300px; width:100%; object-fit:contain;" /></td>
+  </tr>
+</table>
 
 ---
 
