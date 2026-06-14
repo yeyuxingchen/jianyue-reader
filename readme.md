@@ -5,7 +5,7 @@
 <h1 align="center">简阅</h1>
 
 <p align="center">
-  一款本地电子书阅读器与笔记工具，所有数据离线存储，隐私安全。
+  简而阅之 • 简而记之
 </p>
 
 <p align="center">
