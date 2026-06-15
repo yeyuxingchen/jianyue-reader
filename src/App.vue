@@ -4,6 +4,7 @@ import { useReaderStore } from '@/stores/reader'
 import { useLibraryStore } from '@/stores/library'
 import { useSettingsStore } from '@/stores/settings'
 import { useAppModeStore } from '@/stores/appMode'
+import { useNoteEditorStore } from '@/stores/appMode'
 import { getCoverUrl, revokeCoverUrl } from '@/utils/cover'
 import Bookshelf from '@/pages/Bookshelf.vue'
 import Reader from '@/pages/Reader.vue'
@@ -20,6 +21,7 @@ const reader = useReaderStore()
 const library = useLibraryStore()
 const settings = useSettingsStore()
 const appModeStore = useAppModeStore()
+const noteEditorStore = useNoteEditorStore()
 
 const currentPage = ref<'bookshelf' | 'reader'>('bookshelf')
 
@@ -75,6 +77,9 @@ onMounted(() => {
 
   // 监听"发送备注到简记"事件
   window.addEventListener('send-to-note', handleSendToNote)
+
+  // 监听外部文件打开事件（"打开方式"选择本软件时触发）
+  setupExternalFileOpen()
 })
 
 onBeforeUnmount(() => {
@@ -83,6 +88,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('note-save-file', () => {})
   window.removeEventListener('note-save-as-file', () => {})
   window.removeEventListener('send-to-note', handleSendToNote)
+  cleanupExternalFileOpen?.()
 })
 
 // ===== 打开书籍动画 =====
@@ -180,6 +186,64 @@ async function handleSendToNote(e: Event) {
   // 将内容填入编辑器（receiveContent 内部会等待 Milkdown 就绪）
   if (noteEditorRef.value) {
     await noteEditorRef.value.receiveContent(content, bookTitle || '书籍')
+  }
+}
+
+// ===== 外部文件打开支持（"打开方式"选择本软件）=====
+const BOOK_EXTS = new Set(['.epub', '.txt', '.mobi', '.azw3', '.cbz', '.cbr'])
+let cleanupExternalFileOpen: (() => void) | null = null
+
+async function handleExternalFileOpen(filePath: string) {
+  const ext = filePath.substring(filePath.lastIndexOf('.')).toLowerCase()
+
+  if (ext === '.md') {
+    // Markdown 文件 → 切换到简记模式并打开
+    if (appModeStore.isReaderMode) {
+      appModeStore.switchToNote()
+      await nextTick()
+    }
+    // 等待 NoteEditor 组件挂载和 Milkdown 初始化
+    const maxWait = 3000
+    const start = Date.now()
+    while (!noteEditorRef.value && Date.now() - start < maxWait) {
+      await new Promise(r => setTimeout(r, 100))
+    }
+    if (noteEditorRef.value) {
+      await noteEditorRef.value.openFileFromExternal(filePath)
+    }
+  } else if (BOOK_EXTS.has(ext)) {
+    // 书籍文件 → 切换到简阅模式，导入并打开
+    if (appModeStore.isNoteMode) {
+      appModeStore.switchToReader()
+      await nextTick()
+    }
+    try {
+      await library.importBook([filePath])
+      // 导入后自动打开书籍（无动画）
+      const { hashPath } = await import('@/services/fileService')
+      const bookId = hashPath(filePath)
+      const book = library.books.find(b => b.id === bookId)
+      if (book && !book.invalid) {
+        reader.openBook(book)
+        currentPage.value = 'reader'
+      }
+    } catch (err) {
+      console.error('外部打开书籍失败:', err)
+    }
+  }
+}
+
+function setupExternalFileOpen() {
+  // 监听后续文件打开事件（app 已运行时，再次通过"打开方式"打开文件）
+  if (window.electronAPI?.onFileOpen) {
+    cleanupExternalFileOpen = window.electronAPI.onFileOpen(handleExternalFileOpen)
+  }
+
+  // 首次启动：获取待处理的文件路径（app 未运行时通过"打开方式"打开文件）
+  if (window.electronAPI?.app?.getPendingFilePath) {
+    window.electronAPI.app.getPendingFilePath().then((fp: string | null) => {
+      if (fp) handleExternalFileOpen(fp)
+    })
   }
 }
 </script>

@@ -102,7 +102,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // ===== 镜像笔记浮窗（可编辑）=====
   floatNote: {
     create: (text: string, fileName: string, opacity: number) => ipcRenderer.invoke('floatNote:create', text, fileName, opacity),
-    close: () => ipcRenderer.invoke('floatNote:close'),
+    close: (returnToMain?: boolean) => ipcRenderer.invoke('floatNote:close', returnToMain !== false),
     isOpen: () => ipcRenderer.invoke('floatNote:isOpen'),
     syncContent: (content: string) => ipcRenderer.invoke('floatNote:syncContent', content),
     togglePin: () => ipcRenderer.invoke('floatNote:togglePin'),
@@ -132,6 +132,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getPath: (name: string) => ipcRenderer.invoke('app:getPath', name),
     getVersion: () => ipcRenderer.invoke('app:getVersion'),
     openCacheFolder: () => ipcRenderer.invoke('app:openCacheFolder'),
+    getPendingFilePath: () => ipcRenderer.invoke('app:pendingFilePath'),
+  },
+
+  // ===== 外部文件打开 =====
+  onFileOpen: (callback: (filePath: string) => void) => {
+    const handler = (_event: any, filePath: string) => callback(filePath)
+    ipcRenderer.on('file-open', handler)
+    return () => { ipcRenderer.removeListener('file-open', handler) }
   },
 })
 
@@ -176,12 +184,17 @@ contextBridge.exposeInMainWorld('services', {
   closeFloatReader: () => ipcRenderer.invoke('floatReader:close'),
   isFloatReaderOpen: () => ipcRenderer.invoke('floatReader:isOpen'),
   createFloatNote: (text: string, fileName: string, opacity: number) => ipcRenderer.invoke('floatNote:create', text, fileName, opacity),
-  closeFloatNote: () => ipcRenderer.invoke('floatNote:close'),
+  closeFloatNote: (returnToMain?: boolean) => ipcRenderer.invoke('floatNote:close', returnToMain !== false),
   isFloatNoteOpen: () => ipcRenderer.invoke('floatNote:isOpen'),
   syncFloatNoteContent: (content: string) => ipcRenderer.invoke('floatNote:syncContent', content),
   onFloatNoteContentUpdate: (callback: (content: string) => void) => {
     const handler = (_event: any, content: string) => callback(content)
     ipcRenderer.on('floatNote:contentUpdate', handler)
     return () => { ipcRenderer.removeListener('floatNote:contentUpdate', handler) }
+  },
+  onFileOpen: (callback: (filePath: string) => void) => {
+    const handler = (_event: any, filePath: string) => callback(filePath)
+    ipcRenderer.on('file-open', handler)
+    return () => { ipcRenderer.removeListener('file-open', handler) }
   },
 })

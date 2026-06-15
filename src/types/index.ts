@@ -200,7 +200,7 @@ declare global {
       }
       floatNote: {
         create: (text: string, fileName: string, opacity: number) => Promise<boolean>
-        close: () => Promise<void>
+        close: (returnToMain?: boolean) => Promise<void>
         isOpen: () => Promise<boolean>
         syncContent: (content: string) => Promise<void>
         onContentUpdate: (callback: (content: string) => void) => () => void
@@ -223,7 +223,9 @@ declare global {
         getPath: (name: string) => Promise<string>
         getVersion: () => Promise<string>
         openCacheFolder: () => Promise<void>
+        getPendingFilePath: () => Promise<string | null>
       }
+      onFileOpen: (callback: (filePath: string) => void) => () => void
     }
   }
 
@@ -270,5 +272,6 @@ declare global {
     syncFloatNoteContent: (content: string) => Promise<void>
     onFloatNoteContentUpdate: (callback: (content: string) => void) => () => void
     extractEpubAll: (filePath: string) => Promise<{ name: string; data: number[] }[] | null>
+    onFileOpen: (callback: (filePath: string) => void) => () => void
   }
 }

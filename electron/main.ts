@@ -173,6 +173,33 @@ let floatReaderWin: BrowserWindow | null = null
 let floatReaderReturnToMain: boolean = true
 
 let floatNoteWin: BrowserWindow | null = null
+let floatNoteReturnToMain: boolean = true
+
+// ===== 外部文件打开支持 =====
+let pendingFilePath: string | null = null
+
+/** 从命令行参数中提取支持的文件路径 */
+function parseFilePathFromArgs(argv: string[]): string | null {
+  const supportedExts = new Set(['.md', '.epub', '.txt', '.mobi', '.azw3', '.cbz', '.cbr'])
+  for (let i = 1; i < argv.length; i++) {
+    const arg = argv[i]
+    if (arg && !arg.startsWith('-')) {
+      const ext = path.extname(arg).toLowerCase()
+      if (supportedExts.has(ext)) {
+        return arg
+      }
+    }
+  }
+  return null
+}
+
+/** 将待处理文件路径发送给渲染进程 */
+function processPendingFile() {
+  if (pendingFilePath && mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('file-open', pendingFilePath)
+    pendingFilePath = null
+  }
+}
 
 function createMainWindow() {
   mainWindow = new BrowserWindow({
@@ -826,10 +853,16 @@ function registerIpcHandlers() {
     // 监听浮动窗口关闭
     floatNoteWin.on('closed', () => {
       floatNoteWin = null
-      // 显示主窗口
-      if (mainWindow && !mainWindow.isDestroyed()) {
-        mainWindow.show()
+      // 根据标志决定是显示主窗口还是退出应用
+      if (floatNoteReturnToMain) {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.show()
+        }
+      } else {
+        app.quit()
       }
+      // 重置标志
+      floatNoteReturnToMain = true
     })
 
     // 隐藏主窗口
@@ -840,7 +873,8 @@ function registerIpcHandlers() {
     return true
   })
 
-  ipcMain.handle('floatNote:close', () => {
+  ipcMain.handle('floatNote:close', (_event, returnToMain: boolean = true) => {
+    floatNoteReturnToMain = returnToMain
     if (floatNoteWin && !floatNoteWin.isDestroyed()) {
       floatNoteWin.close()
     }
@@ -1010,6 +1044,13 @@ function registerIpcHandlers() {
     return app.getPath(name as any)
   })
 
+  // ===== 获取待处理的外部文件路径（首次启动时由渲染进程调用）=====
+  ipcMain.handle('app:pendingFilePath', () => {
+    const fp = pendingFilePath
+    pendingFilePath = null
+    return fp
+  })
+
   // ===== 打开缓存目录 =====
   ipcMain.handle('app:openCacheFolder', () => {
     try {
@@ -1026,12 +1067,49 @@ protocol.registerSchemesAsPrivileged([
   { scheme: 'cacheimg', privileges: { standard: true, secure: true, supportFetchAPI: true } },
 ])
 
+// ===== 单实例锁 + 外部文件打开处理 =====
+const gotTheLock = app.requestSingleInstanceLock()
+
+if (!gotTheLock) {
+  app.quit()
+} else {
+  app.on('second-instance', (_event, commandLine) => {
+    // 第二个实例通过命令行参数传入文件路径
+    const filePath = parseFilePathFromArgs(commandLine)
+    if (filePath && mainWindow && !mainWindow.isDestroyed()) {
+      if (mainWindow.isMinimized()) mainWindow.restore()
+      mainWindow.focus()
+      mainWindow.webContents.send('file-open', filePath)
+    }
+  })
+}
+
+// macOS: 从 Finder 打开文件
+app.on('open-file', (_event, filePath) => {
+  _event.preventDefault()
+  const ext = path.extname(filePath).toLowerCase()
+  const supportedExts = new Set(['.md', '.epub', '.txt', '.mobi', '.azw3', '.cbz', '.cbr'])
+  if (!supportedExts.has(ext)) return
+
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('file-open', filePath)
+  } else {
+    pendingFilePath = filePath
+  }
+})
+
 // 应用准备就绪
 app.whenReady().then(() => {
   initDirs()
   // 初始化 electron-store 的 renderer 支持（注册 IPC 处理器供 preload 使用）
   Store.initRenderer()
   registerIpcHandlers()
+
+  // 检查首次启动时是否通过命令行传入了文件路径（Windows/Linux "打开方式"）
+  if (!pendingFilePath) {
+    const filePath = parseFilePathFromArgs(process.argv)
+    if (filePath) pendingFilePath = filePath
+  }
 
   // 注册 cacheimg:// 协议，映射到缓存目录下的图片文件
   protocol.handle('cacheimg', (request) => {

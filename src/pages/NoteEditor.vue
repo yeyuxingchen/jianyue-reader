@@ -407,6 +407,41 @@ async function receiveContent(content: string, bookTitle: string) {
   }
 }
 
+// 从外部路径打开文件（"打开方式"触发）
+async function openFileFromExternal(filePath: string) {
+  if (noteStore.isModified) {
+    const result = await showUnsavedDialog()
+    if (result === 'cancel') return
+    if (result === 'save') {
+      if (noteStore.currentFilePath) {
+        await handleSaveFile()
+      } else {
+        await handleSaveAsFile()
+      }
+    }
+  }
+
+  try {
+    const content = await window.services.readFileAsText(filePath)
+    const fileName = await window.services.getFileName(filePath)
+
+    noteStore.openFile(filePath, fileName, content)
+    sidebar.parseOutline(content)
+    sidebar.addToHistory(filePath, fileName, content)
+
+    // 等待 Milkdown 编辑器实例就绪
+    const ready = await waitForEditor()
+    if (ready) {
+      await replaceContent(content)
+    }
+
+    toast.show(`已打开: ${fileName}`)
+  } catch (err) {
+    console.error('外部打开文件失败:', err)
+    toast.show('打开文件失败')
+  }
+}
+
 // 暴露方法给外部调用
 defineExpose({
   handleNewFile,
@@ -416,6 +451,7 @@ defineExpose({
   getMarkdownContent,
   replaceContent,
   receiveContent,
+  openFileFromExternal,
 })
 
 // ===== 侧边栏交互 =====

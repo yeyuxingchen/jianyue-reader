@@ -110,7 +110,7 @@ function closeWindow() {
   if (autoSyncTimer) clearTimeout(autoSyncTimer)
   try {
     if (window.electronAPI?.floatNote) {
-      window.electronAPI.floatNote.close()
+      window.electronAPI.floatNote.close(false)
     }
   } catch {}
   setTimeout(() => { try { window.close() } catch {} }, 100)

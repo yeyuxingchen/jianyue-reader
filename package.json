@@ -9,7 +9,7 @@
     "build": "cross-env ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/ ELECTRON_BUILDER_BINARIES_MIRROR=https://npmmirror.com/mirrors/electron-builder-binaries/ vue-tsc --noEmit && vite build && electron-builder",
     "preview": "vite preview",
     "electron:dev": "vite",
-    "electron:build": "cross-env ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/ ELECTRON_BUILDER_BINARIES_MIRROR=https://npmmirror.com/mirrors/electron-builder-binaries/ vue-tsc --noEmit && vite build && electron-builder --win",
+    "electron:build": "cross-env ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/ ELECTRON_BUILDER_BINARIES_MIRROR=https://npmmirror.com/mirrors/electron-builder-binaries/ vue-tsc --noEmit && vite build && electron-builder --win && node scripts/cleanup-combined.js",
     "electron:build:all": "cross-env ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/ ELECTRON_BUILDER_BINARIES_MIRROR=https://npmmirror.com/mirrors/electron-builder-binaries/ vue-tsc --noEmit && vite build && electron-builder --win --linux",
     "electron:build:mac": "cross-env ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/ ELECTRON_BUILDER_BINARIES_MIRROR=https://npmmirror.com/mirrors/electron-builder-binaries/ vue-tsc --noEmit && vite build && electron-builder --mac",
     "electron:build:linux": "cross-env ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/ ELECTRON_BUILDER_BINARIES_MIRROR=https://npmmirror.com/mirrors/electron-builder-binaries/ vue-tsc --noEmit && vite build && electron-builder --linux",
@@ -71,11 +71,18 @@
       "target": [
         {
           "target": "nsis",
-          "arch": [
-            "x64",
-            "ia32",
-            "arm64"
-          ]
+          "arch": ["x64"],
+          "artifactName": "${productName} Setup ${version}-x64.${ext}"
+        },
+        {
+          "target": "nsis",
+          "arch": ["ia32"],
+          "artifactName": "${productName} Setup ${version}-ia32.${ext}"
+        },
+        {
+          "target": "nsis",
+          "arch": ["arm64"],
+          "artifactName": "${productName} Setup ${version}-arm64.${ext}"
         }
       ],
       "icon": "public/logo.png"
@@ -114,8 +121,53 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
-      "shortcutName": "简阅"
+      "shortcutName": "简阅",
+      "artifactName": "${productName} Setup ${version}-${arch}.${ext}"
     },
+    "fileAssociations": [
+      {
+        "ext": "md",
+        "name": "Markdown",
+        "description": "Markdown 文档",
+        "role": "Editor"
+      },
+      {
+        "ext": "epub",
+        "name": "EPUB",
+        "description": "EPUB 电子书",
+        "role": "Viewer"
+      },
+      {
+        "ext": "txt",
+        "name": "TXT",
+        "description": "文本文档",
+        "role": "Viewer"
+      },
+      {
+        "ext": "mobi",
+        "name": "MOBI",
+        "description": "MOBI 电子书",
+        "role": "Viewer"
+      },
+      {
+        "ext": "azw3",
+        "name": "AZW3",
+        "description": "AZW3 电子书",
+        "role": "Viewer"
+      },
+      {
+        "ext": "cbz",
+        "name": "CBZ",
+        "description": "CBZ 漫画",
+        "role": "Viewer"
+      },
+      {
+        "ext": "cbr",
+        "name": "CBR",
+        "description": "CBR 漫画",
+        "role": "Viewer"
+      }
+    ],
     "electronDownload": {
       "mirror": "https://npmmirror.com/mirrors/electron/"
     }
