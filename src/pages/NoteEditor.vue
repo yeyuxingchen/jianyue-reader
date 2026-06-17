@@ -631,12 +631,18 @@ onMounted(() => {
   window.addEventListener('beforeunload', handleBeforeUnload)
   // 加载历史记录
   sidebar.loadHistory()
+  // 暴露保存函数到全局，供 TitleBar 调用
+  (window as any).__noteEditorSave = handleSaveFile
+  ;(window as any).__noteEditorSaveAs = handleSaveAsFile
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleKeydown)
   window.removeEventListener('paste', handlePaste)
   window.removeEventListener('beforeunload', handleBeforeUnload)
+  // 清除全局暴露的保存函数
+  delete (window as any).__noteEditorSave
+  delete (window as any).__noteEditorSaveAs
   // 退出时保存草稿
   saveCurrentDraft()
   if (draftTimer) {

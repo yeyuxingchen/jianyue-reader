@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, reactive, onMounted, onBeforeUnmount } from 'vue'
 import { useSettingsStore } from '@/stores/settings'
 import { useLibraryStore } from '@/stores/library'
 import { useToastStore } from '@/stores/toast'
 import { useAppModeStore, useNoteEditorStore } from '@/stores/appMode'
 import { Minus, Square, X, Copy } from 'lucide-vue-next'
+import UnsavedChangesDialog from './UnsavedChangesDialog.vue'
 import type { ThemeMode } from '@/types'
 
 const settings = useSettingsStore()
@@ -12,6 +13,13 @@ const library = useLibraryStore()
 const toast = useToastStore()
 const appModeStore = useAppModeStore()
 const noteStore = useNoteEditorStore()
+
+// 未保存更改对话框状态
+const unsavedDialog = reactive({
+  visible: false,
+  message: '',
+  _resolve: null as ((result: string) => void) | null,
+})
 
 const themeList: ThemeMode[] = [
   'parchment', 'bamboo', 'sand', 'sky', 'nightgreen', 'inkgold',
@@ -36,12 +44,52 @@ const themeNames: Record<ThemeMode, string> = {
 const isMaximized = ref(false)
 
 // ===== 图标点击切换模式 =====
-function toggleMode() {
+async function toggleMode() {
+  // 如果当前是简记模式，切换到简阅模式前检查未保存的更改
   if (appModeStore.isNoteMode) {
+    const hasUnsavedChanges = noteStore.isModified || !noteStore.currentFilePath
+    if (hasUnsavedChanges) {
+      // 显示未保存更改对话框
+      const result = await showUnsavedDialog()
+      if (result === 'save') {
+        // 用户选择保存
+        if (!noteStore.currentFilePath) {
+          // 临时文件：使用“另存为”
+          if ((window as any).__noteEditorSaveAs) {
+            await (window as any).__noteEditorSaveAs()
+          }
+        } else {
+          // 已有文件：直接保存
+          if ((window as any).__noteEditorSave) {
+            await (window as any).__noteEditorSave()
+          }
+        }
+        // 保存后标记为已保存
+        noteStore.markSaved()
+        noteStore.clearDraft()
+      } else if (result === 'discard') {
+        // 用户选择放弃修改
+        noteStore.markSaved()
+        noteStore.clearDraft()
+      } else {
+        // 用户选择取消
+        return
+      }
+    }
     appModeStore.switchToReader()
   } else {
     appModeStore.switchToNote()
   }
+}
+
+function showUnsavedDialog(): Promise<string> {
+  return new Promise((resolve) => {
+    unsavedDialog.message = noteStore.currentFilePath
+      ? '当前文件已修改但尚未保存，是否保存？'
+      : '当前文件是临时文件，尚未保存到磁盘，是否保存？'
+    unsavedDialog.visible = true
+    unsavedDialog._resolve = resolve
+  })
 }
 
 // ===== 菜单定义 =====
@@ -520,6 +568,15 @@ async function handleSaveAsFile() {
       </button>
     </div>
   </div>
+
+  <!-- 未保存更改对话框 -->
+  <UnsavedChangesDialog
+    v-if="unsavedDialog.visible"
+    :message="unsavedDialog.message"
+    @save="unsavedDialog._resolve?.('save')"
+    @discard="unsavedDialog._resolve?.('discard')"
+    @cancel="unsavedDialog._resolve?.('cancel')"
+  />
 </template>
 
 <style lang="scss" scoped>
