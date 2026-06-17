@@ -630,7 +630,7 @@ onMounted(() => {
   window.addEventListener('paste', handlePaste)
   window.addEventListener('beforeunload', handleBeforeUnload)
   // 加载历史记录
-  sidebar.loadHistory()
+  sidebar.loadHistory?.()
   // 暴露保存函数到全局，供 TitleBar 调用
   (window as any).__noteEditorSave = handleSaveFile
   ;(window as any).__noteEditorSaveAs = handleSaveAsFile
