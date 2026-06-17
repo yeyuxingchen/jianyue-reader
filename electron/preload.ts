@@ -7,7 +7,7 @@ const store = new Store({
 })
 
 // 通过 contextBridge 安全地暴露 API 到渲染进程
-contextBridge.exposeInMainWorld('electronAPI', {
+const electronAPI = {
   // ===== electron-store 键值存储（同步版本） =====
   store: {
     get: (key: string) => store.get(key),
@@ -54,11 +54,23 @@ contextBridge.exposeInMainWorld('electronAPI', {
     findEpubCover: (bookId: string, filePath: string) => ipcRenderer.invoke('cover:findEpubCover', bookId, filePath),
   },
 
+  // ===== EPUB 操作 =====
+  epub: {
+    // 旧接口（兼容）
+    extractAll: (filePath: string) => ipcRenderer.invoke('epub:extractAll', filePath),
+    // 新接口（按需加载）
+    listEntries: (filePath: string) => ipcRenderer.invoke('epub:listEntries', filePath),
+    getEntry: (filePath: string, entryName: string) => ipcRenderer.invoke('epub:getEntry', filePath, entryName),
+    getEntries: (filePath: string, entryNames: string[]) => ipcRenderer.invoke('epub:getEntries', filePath, entryNames),
+    clearCache: (filePath?: string) => ipcRenderer.invoke('epub:clearCache', filePath),
+  },
+
   // ===== 字体管理 =====
   font: {
     copyToCache: (srcPath: string) => ipcRenderer.invoke('font:copyToCache', srcPath),
     delete: (filePath: string) => ipcRenderer.invoke('font:delete', filePath),
     getFiles: () => ipcRenderer.invoke('font:getFiles'),
+    getBase64: (filePath: string) => ipcRenderer.invoke('font:getBase64', filePath),
   },
 
   // ===== AI 缓存管理 =====
@@ -93,7 +105,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // ===== 浮动阅读窗口 =====
   floatReader: {
-    create: (text: string, chapterTitle: string, opacity: number) => ipcRenderer.invoke('floatReader:create', text, chapterTitle, opacity),
+    create: (text: string, bookTitle: string, chapterTitle: string, opacity: number) => ipcRenderer.invoke('floatReader:create', text, bookTitle, chapterTitle, opacity),
     close: (returnToMain?: boolean) => ipcRenderer.invoke('floatReader:close', returnToMain !== false),
     isOpen: () => ipcRenderer.invoke('floatReader:isOpen'),
     togglePin: () => ipcRenderer.invoke('floatReader:togglePin'),
@@ -135,16 +147,46 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getPendingFilePath: () => ipcRenderer.invoke('app:pendingFilePath'),
   },
 
+  // ===== 安全相关 =====
+  security: {
+    getAuthorizedDirs: () => ipcRenderer.invoke('security:getAuthorizedDirs'),
+    addAuthorizedDir: (dirPath: string) => ipcRenderer.invoke('security:addAuthorizedDir', dirPath),
+    removeAuthorizedDir: (dirPath: string) => ipcRenderer.invoke('security:removeAuthorizedDir', dirPath),
+    isPathAllowed: (filePath: string) => ipcRenderer.invoke('security:isPathAllowed', filePath),
+    isEncryptionAvailable: () => ipcRenderer.invoke('security:isEncryptionAvailable'),
+    encryptData: (data: string) => ipcRenderer.invoke('security:encryptData', data),
+    decryptData: (encryptedData: string) => ipcRenderer.invoke('security:decryptData', encryptedData),
+  },
+
+  // ===== IPC 通信（通用） =====
+  send: (channel: string, ...args: any[]): void => {
+    ipcRenderer.send(channel, ...args)
+  },
+
+  on: (channel: string, callback: (...args: any[]) => void): (() => void) => {
+    const subscription = (_event: any, ...args: any[]) => callback(...args)
+    ipcRenderer.on(channel, subscription)
+    return () => {
+      ipcRenderer.removeListener(channel, subscription)
+    }
+  },
+
+  removeAllListeners: (channel: string): void => {
+    ipcRenderer.removeAllListeners(channel)
+  },
+
   // ===== 外部文件打开 =====
   onFileOpen: (callback: (filePath: string) => void) => {
     const handler = (_event: any, filePath: string) => callback(filePath)
     ipcRenderer.on('file-open', handler)
     return () => { ipcRenderer.removeListener('file-open', handler) }
   },
-})
+}
+
+contextBridge.exposeInMainWorld('electronAPI', electronAPI)
 
 // 暴露兼容层：将新的 electronAPI 映射到旧的 window.services 接口
-// 这样可以减少对 Vue 组件的修改
+// 逐步迁移后可移除此兼容层
 contextBridge.exposeInMainWorld('services', {
   readFileAsBuffer: (filePath: string) => ipcRenderer.invoke('fs:readFileAsBuffer', filePath),
   readFileAsText: (filePath: string) => ipcRenderer.invoke('fs:readFileAsText', filePath),

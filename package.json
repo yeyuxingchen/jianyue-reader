@@ -28,12 +28,12 @@
     "@milkdown/vue": "^7.21.2",
     "adm-zip": "^0.5.17",
     "electron-store": "^7.0.0",
-    "epubjs": "^0.3.93",
     "lucide-vue-next": "^0.263.0",
     "marked": "^9.0.0",
     "pinia": "^2.1.0",
     "sass": "^1.62.0",
-    "vue": "^3.3.0"
+    "vue": "^3.3.0",
+    "vue-router": "^4.3.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
@@ -71,18 +71,15 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"],
-          "artifactName": "${productName} Setup ${version}-x64.${ext}"
+          "arch": ["x64"]
         },
         {
           "target": "nsis",
-          "arch": ["ia32"],
-          "artifactName": "${productName} Setup ${version}-ia32.${ext}"
+          "arch": ["ia32"]
         },
         {
           "target": "nsis",
-          "arch": ["arm64"],
-          "artifactName": "${productName} Setup ${version}-arm64.${ext}"
+          "arch": ["arm64"]
         }
       ],
       "icon": "public/logo.png"

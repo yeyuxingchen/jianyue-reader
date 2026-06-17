@@ -283,8 +283,35 @@ const THEME_READER_COLORS: Record<string, { bg: string; text: string }> = {
 
 const FONT_FACE_STYLE_ID = 'custom-reader-font-face'
 
+// 字体 base64 缓存，避免重复读取文件
+const fontBase64Cache = new Map<string, { data: string; mimeType: string }>()
+
+/**
+ * 预加载字体数据到缓存（在设置加载时调用）
+ */
+export async function preloadFontData(customFonts: { name: string; path: string }[], fontFamily: string): Promise<void> {
+  const matchedFont = customFonts.find(f => f.name === fontFamily)
+  if (!matchedFont || fontBase64Cache.has(matchedFont.path)) return
+  try {
+    const fontData = await (window as any).electronAPI?.font?.getBase64(matchedFont.path)
+    if (fontData) {
+      fontBase64Cache.set(matchedFont.path, fontData)
+    }
+  } catch (err) {
+    console.error('Failed to preload font:', err)
+  }
+}
+
 function buildFontFaceCss(fontPath: string): string {
-  return `@font-face { font-family: 'CustomReaderFont'; src: url('file://${fontPath.replace(/\\/g, '/')}'); }`
+  // 从缓存获取字体数据（同步）
+  const fontData = fontBase64Cache.get(fontPath)
+  if (fontData) {
+    return `@font-face { font-family: 'CustomReaderFont'; src: url('data:${fontData.mimeType};base64,${fontData.data}'); }`
+  }
+  // 缓存未命中时回退到 fontfile 协议
+  const normalizedPath = fontPath.replace(/\\/g, '/')
+  const encodedPath = encodeURIComponent(normalizedPath)
+  return `@font-face { font-family: 'CustomReaderFont'; src: url('fontfile:///?path=${encodedPath}'); }`
 }
 
 export function injectFontFaceToDoc(doc: Document, customFonts: { name: string; path: string }[] | undefined, fontFamily: string) {
@@ -305,7 +332,12 @@ export function injectFontFaceToDoc(doc: Document, customFonts: { name: string; 
   }
 }
 
-export function injectCustomFontFace(view: any, customFonts: { name: string; path: string }[] | undefined, fontFamily: string) {
+export async function injectCustomFontFace(view: any, customFonts: { name: string; path: string }[] | undefined, fontFamily: string) {
+  // 先预加载字体数据到缓存
+  if (customFonts) {
+    await preloadFontData(customFonts, fontFamily)
+  }
+  // 同步注入字体（使用缓存数据）
   injectFontFaceToDoc(document, customFonts, fontFamily)
   if (!view?.renderer?.getContents) return
   try {
@@ -340,12 +372,22 @@ ${isDark ? `svg:not(#_):not(#_) { filter: invert(1) hue-rotate(180deg); } img:no
     const matchedFont = customFonts?.find(f => f.name === settings.fontFamily)
     const fontFamilyValue = matchedFont ? "'CustomReaderFont', system-ui, sans-serif" : (settings.fontFamily !== 'system-ui' ? settings.fontFamily : 'system-ui')
     const css = `
-html, body, html *, body * {
+html, body {
   font-size: ${settings.fontSize}px !important;
   line-height: ${settings.lineHeight} !important;
   ${settings.letterSpacing > 0 ? `letter-spacing: ${settings.letterSpacing}px !important;` : ''}
   font-family: ${fontFamilyValue} !important;
   ${settings.fontBold ? 'font-weight: bold !important;' : ''}
+}
+p, div, span, a, li, td, th, h1, h2, h3, h4, h5, h6, blockquote, pre, code, em, strong, i, b, u, s, del, ins, mark, small, sub, sup {
+  font-size: ${settings.fontSize}px !important;
+  line-height: ${settings.lineHeight} !important;
+  ${settings.letterSpacing > 0 ? `letter-spacing: ${settings.letterSpacing}px !important;` : ''}
+  font-family: ${fontFamilyValue} !important;
+  ${settings.fontBold ? 'font-weight: bold !important;' : ''}
+}
+img, svg, ruby, rt, rp, sup, sub {
+  font-size: initial !important;
 }
 *:not(#_):not(#_) {
   margin-top: initial !important;

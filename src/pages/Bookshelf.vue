@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted, computed, nextTick, onBeforeUnmount, watch } from 'vue'
+import { ref, onMounted, computed, nextTick, onBeforeUnmount, onActivated, watch } from 'vue'
 import { useLibraryStore } from '@/stores/library'
 import { useToastStore } from '@/stores/toast'
 import BookCard from '@/components/book/BookCard.vue'
@@ -37,6 +37,11 @@ onMounted(() => {
       resizeObserver.observe(gridRef.value)
     }
   })
+})
+
+onActivated(() => {
+  // 组件被 keep-alive 缓存后重新激活时刷新书籍列表
+  library.loadBooks()
 })
 
 onBeforeUnmount(() => {

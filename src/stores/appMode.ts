@@ -3,6 +3,7 @@ import { ref, computed, watch, toRaw } from 'vue'
 import type { AppMode } from '@/types'
 import { db } from '@/services/dbService'
 import { electronStore } from '@/services/electronStore'
+import { router } from '@/router'
 
 export const useAppModeStore = defineStore('appMode', () => {
   const appMode = ref<AppMode>('reader')
@@ -14,6 +15,12 @@ export const useAppModeStore = defineStore('appMode', () => {
     const saved = db.getSettings<AppMode>()
     if (saved === 'note' || saved === 'reader') {
       appMode.value = saved
+      // 根据保存的模式导航到对应路由
+      if (saved === 'note') {
+        router.push('/note')
+      } else {
+        router.push('/')
+      }
     }
   }
 
@@ -23,14 +30,20 @@ export const useAppModeStore = defineStore('appMode', () => {
 
   function switchToNote() {
     appMode.value = 'note'
+    router.push('/note')
   }
 
   function switchToReader() {
     appMode.value = 'reader'
+    router.push('/')
   }
 
   function toggleMode() {
-    appMode.value = appMode.value === 'reader' ? 'note' : 'reader'
+    if (appMode.value === 'reader') {
+      switchToNote()
+    } else {
+      switchToReader()
+    }
   }
 
   // 模式变化时自动持久化

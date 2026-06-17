@@ -1,14 +1,12 @@
 <script lang="ts" setup>
-import { onMounted, onBeforeUnmount, ref, computed, nextTick } from 'vue'
+import { onMounted, onBeforeUnmount, ref, nextTick } from 'vue'
+import { useRoute } from 'vue-router'
 import { useReaderStore } from '@/stores/reader'
-import { useLibraryStore } from '@/stores/library'
 import { useSettingsStore } from '@/stores/settings'
 import { useAppModeStore } from '@/stores/appMode'
 import { useNoteEditorStore } from '@/stores/appMode'
-import { getCoverUrl, revokeCoverUrl } from '@/utils/cover'
-import Bookshelf from '@/pages/Bookshelf.vue'
-import Reader from '@/pages/Reader.vue'
-import NoteEditor from '@/pages/NoteEditor.vue'
+import { useBookAnimation } from '@/composables/useBookAnimation'
+import { useExternalFileOpen } from '@/composables/useExternalFileOpen'
 import FloatNote from '@/pages/FloatNote.vue'
 import FloatReader from '@/pages/FloatReader.vue'
 import TitleBar from '@/components/common/TitleBar.vue'
@@ -17,45 +15,29 @@ import Toast from '@/components/common/Toast.vue'
 // 检测浮窗模式
 const floatMode = new URLSearchParams(window.location.search).get('float')
 
+const route = useRoute()
 const reader = useReaderStore()
-const library = useLibraryStore()
 const settings = useSettingsStore()
 const appModeStore = useAppModeStore()
 const noteEditorStore = useNoteEditorStore()
 
-const currentPage = ref<'bookshelf' | 'reader'>('bookshelf')
+// 使用 composables
+const {
+  animating,
+  animDirection,
+  animPhase,
+  animCoverUrl,
+  animBookTitle,
+  flyStyle,
+  startBookOpenAnimation,
+  startBookCloseAnimation,
+} = useBookAnimation()
 
-// 动画状态
-const animating = ref(false)
-const animDirection = ref<'open' | 'close'>('open')
-const animPhase = ref<'fly' | 'open' | 'fade' | 'unfade' | 'close-book' | 'fly-back'>('fly')
-const animCoverUrl = ref('')
-const animCoverKey = ref('')
-const animRect = ref<{ left: number; top: number; width: number; height: number } | null>(null)
-const animBookTitle = ref('')
-
-const flyStyle = computed(() => {
-  const r = animRect.value
-  return {
-    '--start-x': (r ? r.left + r.width / 2 : 400) + 'px',
-    '--start-y': (r ? r.top + r.height / 2 : 350) + 'px',
-    '--start-w': (r ? r.width : 130) + 'px',
-    '--start-h': (r ? r.height : 175) + 'px',
-  }
-})
-
-const activePage = computed(() => {
-  if (animating.value) {
-    // 动画期间根据方向决定显示哪个页面
-    return animDirection.value === 'open' ? currentPage.value : 'reader'
-  }
-  if (reader.currentBook) return 'reader'
-  return currentPage.value
-})
+// 简记编辑器引用
+const noteEditorRef = ref<any>(null)
 
 onMounted(() => {
   settings.loadSettings()
-  library.loadBooks()
   appModeStore.loadMode()
 
   // 监听打开书籍动画事件
@@ -77,9 +59,6 @@ onMounted(() => {
 
   // 监听"发送备注到简记"事件
   window.addEventListener('send-to-note', handleSendToNote)
-
-  // 监听外部文件打开事件（"打开方式"选择本软件时触发）
-  setupExternalFileOpen()
 })
 
 onBeforeUnmount(() => {
@@ -88,93 +67,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('note-save-file', () => {})
   window.removeEventListener('note-save-as-file', () => {})
   window.removeEventListener('send-to-note', handleSendToNote)
-  cleanupExternalFileOpen?.()
 })
-
-// ===== 打开书籍动画 =====
-async function startBookOpenAnimation(bookId: string, _coverUrl: string, rect: { left: number; top: number; width: number; height: number }, title: string) {
-  const book = library.books.find((b) => b.id === bookId)
-  if (!book || book.invalid) return
-
-  // 保存 coverKey 供关闭动画使用，为动画创建独立的 blob URL
-  animCoverKey.value = book.coverKey || ''
-  // 释放之前的动画 blob URL
-  revokeCoverUrl(animCoverUrl.value)
-  // 为动画创建新的 blob URL（与 BookCard 的生命周期解耦）
-  animCoverUrl.value = book.coverKey ? await getCoverUrl(book.coverKey) : ''
-  animRect.value = rect
-  animBookTitle.value = title
-  animating.value = true
-  animDirection.value = 'open'
-  animPhase.value = 'fly'
-
-  // 先打开书籍（但 activePage 仍显示书架）
-  reader.openBook(book)
-
-  // Phase 1: 飞到中央 (250ms)
-  await delay(260)
-  animPhase.value = 'open'
-
-  // Phase 2: 翻书展开 (320ms)
-  await delay(340)
-  animPhase.value = 'fade'
-
-  // Phase 3: 淡入阅读器 (200ms)
-  await delay(220)
-
-  animating.value = false
-  currentPage.value = 'reader'
-  // 打开动画结束，释放 blob URL
-  revokeCoverUrl(animCoverUrl.value)
-  animCoverUrl.value = ''
-}
-
-// ===== 关闭书籍动画 =====
-async function startBookCloseAnimation() {
-  if (!reader.currentBook) return
-
-  // 在动画开始前保存进度（避免动画期间做 IO）
-  reader.saveProgress()
-
-  // 从 coverKey 重新生成 blob URL（打开动画时已释放旧的）
-  revokeCoverUrl(animCoverUrl.value)
-  animCoverUrl.value = animCoverKey.value ? await getCoverUrl(animCoverKey.value) : ''
-
-  animating.value = true
-  animDirection.value = 'close'
-
-  // Phase 1: 阅读器淡出 (180ms)
-  animPhase.value = 'unfade'
-  await delay(200)
-
-  // 关闭书籍数据（轻量操作，阅读器已不可见）
-  reader.closeBook()
-
-  // Phase 2: 合书 (300ms)
-  animPhase.value = 'close-book'
-  await delay(320)
-
-  // Phase 3: 封面飞回书架 (250ms)
-  animPhase.value = 'fly-back'
-  await delay(270)
-
-  animating.value = false
-  currentPage.value = 'bookshelf'
-
-  // 动画结束后再重新加载书架数据（重操作，不影响动画流畅度）
-  library.loadBooks()
-
-  // 释放 blob URL
-  revokeCoverUrl(animCoverUrl.value)
-  animCoverUrl.value = ''
-}
-
-function delay(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
-
-// 简记编辑器引用
-const noteEditorRef = ref<InstanceType<typeof NoteEditor> | null>(null)
 
 // 处理"发送备注到简记"
 async function handleSendToNote(e: Event) {
@@ -183,69 +76,17 @@ async function handleSendToNote(e: Event) {
   appModeStore.switchToNote()
   // 等待 NoteEditor 组件挂载
   await nextTick()
-  // 将内容填入编辑器（receiveContent 内部会等待 Milkdown 就绪）
+  // 将内容填入编辑器
   if (noteEditorRef.value) {
     await noteEditorRef.value.receiveContent(content, bookTitle || '书籍')
   }
 }
 
-// ===== 外部文件打开支持（"打开方式"选择本软件）=====
-const BOOK_EXTS = new Set(['.epub', '.txt', '.mobi', '.azw3', '.cbz', '.cbr'])
-let cleanupExternalFileOpen: (() => void) | null = null
+// 判断是否为浮动窗口模式
+const isFloat = floatMode === 'reader' || floatMode === 'note'
 
-async function handleExternalFileOpen(filePath: string) {
-  const ext = filePath.substring(filePath.lastIndexOf('.')).toLowerCase()
-
-  if (ext === '.md') {
-    // Markdown 文件 → 切换到简记模式并打开
-    if (appModeStore.isReaderMode) {
-      appModeStore.switchToNote()
-      await nextTick()
-    }
-    // 等待 NoteEditor 组件挂载和 Milkdown 初始化
-    const maxWait = 3000
-    const start = Date.now()
-    while (!noteEditorRef.value && Date.now() - start < maxWait) {
-      await new Promise(r => setTimeout(r, 100))
-    }
-    if (noteEditorRef.value) {
-      await noteEditorRef.value.openFileFromExternal(filePath)
-    }
-  } else if (BOOK_EXTS.has(ext)) {
-    // 书籍文件 → 切换到简阅模式，导入并打开
-    if (appModeStore.isNoteMode) {
-      appModeStore.switchToReader()
-      await nextTick()
-    }
-    try {
-      await library.importBook([filePath])
-      // 导入后自动打开书籍（无动画）
-      const { hashPath } = await import('@/services/fileService')
-      const bookId = hashPath(filePath)
-      const book = library.books.find(b => b.id === bookId)
-      if (book && !book.invalid) {
-        reader.openBook(book)
-        currentPage.value = 'reader'
-      }
-    } catch (err) {
-      console.error('外部打开书籍失败:', err)
-    }
-  }
-}
-
-function setupExternalFileOpen() {
-  // 监听后续文件打开事件（app 已运行时，再次通过"打开方式"打开文件）
-  if (window.electronAPI?.onFileOpen) {
-    cleanupExternalFileOpen = window.electronAPI.onFileOpen(handleExternalFileOpen)
-  }
-
-  // 首次启动：获取待处理的文件路径（app 未运行时通过"打开方式"打开文件）
-  if (window.electronAPI?.app?.getPendingFilePath) {
-    window.electronAPI.app.getPendingFilePath().then((fp: string | null) => {
-      if (fp) handleExternalFileOpen(fp)
-    })
-  }
-}
+// 判断是否为简记模式（基于路由或 appMode）
+const isNoteMode = () => appModeStore.isNoteMode || route.name === 'note'
 </script>
 
 <template>
@@ -265,91 +106,91 @@ function setupExternalFileOpen() {
 
     <!-- 主内容区 -->
     <div class="app-content">
-      <!-- 简记模式 -->
-      <NoteEditor v-if="appModeStore.isNoteMode" ref="noteEditorRef" />
+      <!-- 使用 router-view 渲染页面，使用 keep-alive 缓存组件 -->
+      <router-view v-slot="{ Component, route: currentRoute }">
+        <keep-alive>
+          <component
+            :is="Component"
+            :ref="(el: any) => {
+              if (currentRoute.name === 'note') noteEditorRef = el
+            }"
+          />
+        </keep-alive>
+      </router-view>
 
-      <!-- 简阅模式 -->
-      <template v-else>
-      <!-- 书架页：正常显示或关闭动画的合书/飞回阶段作为背景 -->
-      <Bookshelf v-if="activePage === 'bookshelf' || (animating && animDirection === 'close' && animPhase !== 'unfade')" />
+      <!-- ===== 打开动画 ===== -->
+      <div v-if="animating && animDirection === 'open'" class="book-anim-overlay">
+        <!-- Phase 1: 封面飞到中央 -->
+        <div
+          v-if="animPhase === 'fly'"
+          class="book-anim-cover fly-phase"
+          :style="flyStyle"
+        >
+          <img v-if="animCoverUrl" :src="animCoverUrl" class="cover-fly-img" />
+          <div v-else class="cover-fly-placeholder">{{ animBookTitle }}</div>
+        </div>
 
-    <!-- 阅读器页：正常显示或关闭动画淡出阶段保持显示 -->
-    <Reader v-if="activePage === 'reader' && (!animating || (animating && animDirection === 'close' && animPhase === 'unfade'))" />
-      </template>
-
-    <!-- ===== 打开动画 ===== -->
-    <div v-if="animating && animDirection === 'open'" class="book-anim-overlay">
-      <!-- Phase 1: 封面飞到中央 -->
-      <div
-        v-if="animPhase === 'fly'"
-        class="book-anim-cover fly-phase"
-        :style="flyStyle"
-      >
-        <img v-if="animCoverUrl" :src="animCoverUrl" class="cover-fly-img" />
-        <div v-else class="cover-fly-placeholder">{{ animBookTitle }}</div>
-      </div>
-
-      <!-- Phase 2: 翻书展开 -->
-      <div v-if="animPhase === 'open'" class="book-anim-open">
-        <div class="book-3d-scene">
-          <div class="book-3d">
-            <div class="book-page book-page-left">
-              <img v-if="animCoverUrl" :src="animCoverUrl" class="page-img" />
-              <div v-else class="page-placeholder">{{ animBookTitle }}</div>
-            </div>
-            <div class="book-page book-page-right">
-              <div class="page-lines">
-                <div class="fake-line" v-for="i in 8" :key="i" :style="{ width: (60 + Math.random() * 30) + '%', animationDelay: i * 0.03 + 's' }"></div>
+        <!-- Phase 2: 翻书展开 -->
+        <div v-if="animPhase === 'open'" class="book-anim-open">
+          <div class="book-3d-scene">
+            <div class="book-3d">
+              <div class="book-page book-page-left">
+                <img v-if="animCoverUrl" :src="animCoverUrl" class="page-img" />
+                <div v-else class="page-placeholder">{{ animBookTitle }}</div>
               </div>
-            </div>
-            <div class="book-page book-page-flip">
-              <img v-if="animCoverUrl" :src="animCoverUrl" class="page-img" />
-              <div v-else class="page-placeholder">{{ animBookTitle }}</div>
+              <div class="book-page book-page-right">
+                <div class="page-lines">
+                  <div class="fake-line" v-for="i in 8" :key="i" :style="{ width: (60 + Math.random() * 30) + '%', animationDelay: i * 0.03 + 's' }"></div>
+                </div>
+              </div>
+              <div class="book-page book-page-flip">
+                <img v-if="animCoverUrl" :src="animCoverUrl" class="page-img" />
+                <div v-else class="page-placeholder">{{ animBookTitle }}</div>
+              </div>
             </div>
           </div>
         </div>
+
+        <!-- Phase 3: 全屏淡入 -->
+        <div v-if="animPhase === 'fade'" class="book-anim-fade"></div>
       </div>
 
-      <!-- Phase 3: 全屏淡入 -->
-      <div v-if="animPhase === 'fade'" class="book-anim-fade"></div>
-    </div>
+      <!-- ===== 关闭动画 ===== -->
+      <div v-if="animating && animDirection === 'close'" class="book-anim-overlay">
+        <!-- Phase 1: 阅读器淡出 -->
+        <div v-if="animPhase === 'unfade'" class="book-anim-unfade"></div>
 
-    <!-- ===== 关闭动画 ===== -->
-    <div v-if="animating && animDirection === 'close'" class="book-anim-overlay">
-      <!-- Phase 1: 阅读器淡出 -->
-      <div v-if="animPhase === 'unfade'" class="book-anim-unfade"></div>
-
-      <!-- Phase 2: 合书 -->
-      <div v-if="animPhase === 'close-book'" class="book-anim-close-book">
-        <div class="book-3d-scene">
-          <div class="book-3d">
-            <div class="book-page book-page-left-close">
-              <img v-if="animCoverUrl" :src="animCoverUrl" class="page-img" />
-              <div v-else class="page-placeholder">{{ animBookTitle }}</div>
-            </div>
-            <div class="book-page book-page-right-close">
-              <div class="page-lines-close">
-                <div class="fake-line-close" v-for="i in 6" :key="i" :style="{ width: (50 + Math.random() * 40) + '%' }"></div>
+        <!-- Phase 2: 合书 -->
+        <div v-if="animPhase === 'close-book'" class="book-anim-close-book">
+          <div class="book-3d-scene">
+            <div class="book-3d">
+              <div class="book-page book-page-left-close">
+                <img v-if="animCoverUrl" :src="animCoverUrl" class="page-img" />
+                <div v-else class="page-placeholder">{{ animBookTitle }}</div>
               </div>
-            </div>
-            <div class="book-page book-page-flip-close">
-              <img v-if="animCoverUrl" :src="animCoverUrl" class="page-img" />
-              <div v-else class="page-placeholder">{{ animBookTitle }}</div>
+              <div class="book-page book-page-right-close">
+                <div class="page-lines-close">
+                  <div class="fake-line-close" v-for="i in 6" :key="i" :style="{ width: (50 + Math.random() * 40) + '%' }"></div>
+                </div>
+              </div>
+              <div class="book-page book-page-flip-close">
+                <img v-if="animCoverUrl" :src="animCoverUrl" class="page-img" />
+                <div v-else class="page-placeholder">{{ animBookTitle }}</div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Phase 3: 封面飞回书架 -->
-      <div
-        v-if="animPhase === 'fly-back'"
-        class="book-anim-cover fly-back-phase"
-        :style="flyStyle"
-      >
-        <img v-if="animCoverUrl" :src="animCoverUrl" class="cover-fly-img" />
-        <div v-else class="cover-fly-placeholder">{{ animBookTitle }}</div>
+        <!-- Phase 3: 封面飞回书架 -->
+        <div
+          v-if="animPhase === 'fly-back'"
+          class="book-anim-cover fly-back-phase"
+          :style="flyStyle"
+        >
+          <img v-if="animCoverUrl" :src="animCoverUrl" class="cover-fly-img" />
+          <div v-else class="cover-fly-placeholder">{{ animBookTitle }}</div>
+        </div>
       </div>
-    </div>
     </div><!-- /app-content -->
   </div>
 </template>
@@ -704,5 +545,16 @@ function setupExternalFileOpen() {
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   }
+}
+
+/* ==================== 路由过渡 ==================== */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.15s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

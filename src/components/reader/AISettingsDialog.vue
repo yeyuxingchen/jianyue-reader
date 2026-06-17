@@ -20,8 +20,8 @@ const form = ref<AISettings>({
 // 朗读风格编辑模式（展开提示词编辑区）
 const editingStyle = ref(false)
 
-onMounted(() => {
-  form.value = aiService.getSettings()
+onMounted(async () => {
+  form.value = await aiService.getSettingsAsync()
   ttsStore.loadSettings()
 })
 
@@ -36,8 +36,8 @@ const selectedStyle = computed(() => {
   return findStyleById(ttsStore.settings.styleId)
 })
 
-function handleSave() {
-  aiService.saveSettings({ ...form.value })
+async function handleSave() {
+  await aiService.saveSettings({ ...form.value })
   ttsStore.saveSettings()
   emit('close')
 }

@@ -11,6 +11,7 @@ const DEFAULT_SETTINGS: ReaderSettings = {
   theme: 'parchment',
   readerMode: 'scroll',
   fontBold: false,
+  defaultSystemFont: '',
 }
 
 export const useSettingsStore = defineStore('settings', () => {
@@ -107,6 +108,15 @@ export const useSettingsStore = defineStore('settings', () => {
     saveSettings()
   }
 
+  function setDefaultSystemFont(fontName: string) {
+    settings.value.defaultSystemFont = fontName
+    saveSettings()
+  }
+
+  function getDefaultFontDisplayName(): string {
+    return settings.value.defaultSystemFont || '系统默认'
+  }
+
   return {
     settings,
     customFonts,
@@ -124,5 +134,7 @@ export const useSettingsStore = defineStore('settings', () => {
     setTheme,
     setReaderMode,
     setFontBold,
+    setDefaultSystemFont,
+    getDefaultFontDisplayName,
   }
 })

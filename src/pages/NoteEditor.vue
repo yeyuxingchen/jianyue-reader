@@ -69,7 +69,45 @@ function saveCurrentDraft() {
   }
 }
 
-function handleBeforeUnload() {
+function handleBeforeUnload(e: BeforeUnloadEvent) {
+  // 检测是否有未保存的更改或临时文件
+  const hasUnsavedChanges = noteStore.isModified
+  const isTempFile = !noteStore.currentFilePath
+
+  if (hasUnsavedChanges || isTempFile) {
+    // 阻止窗口关闭
+    e.preventDefault()
+    e.returnValue = false
+
+    // 显示自定义未保存更改对话框
+    const message = isTempFile
+      ? '当前文件是临时文件，尚未保存到磁盘，是否保存？'
+      : '当前文件已修改但尚未保存，是否保存？'
+
+    unsavedDialog.message = message
+    unsavedDialog.visible = true
+    unsavedDialog._resolve = async (result) => {
+      if (result === 'save') {
+        // 用户选择保存
+        if (isTempFile) {
+          await handleSaveAsFile()
+        } else {
+          await handleSaveFile()
+        }
+        // 保存后标记为已保存，然后关闭
+        noteStore.markSaved()
+        window.close()
+      } else if (result === 'discard') {
+        // 用户选择放弃修改
+        noteStore.markSaved()
+        window.close()
+      }
+      // 如果是 cancel，什么都不做，窗口保持打开
+    }
+
+    return false
+  }
+  // 退出前保存草稿
   saveCurrentDraft()
 }
 

@@ -13,7 +13,7 @@ import TocPanel from '@/components/sidebar/TocPanel.vue'
 import BookmarkPanel from '@/components/sidebar/BookmarkPanel.vue'
 import NotePanel from '@/components/sidebar/NotePanel.vue'
 import SearchPanel from '@/components/sidebar/SearchPanel.vue'
-import { Upload, Download, Bold, X, FileText } from 'lucide-vue-next'
+import { Upload, Download, Bold, X, FileText, Type } from 'lucide-vue-next'
 import type { SidebarTab, ThemeMode } from '@/types'
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 
@@ -29,6 +29,91 @@ const aiSearchText = ref('')
 
 const showDeleteConfirm = ref(false)
 const pendingDeleteFont = ref<{ name: string; value: string } | null>(null)
+
+// 系统字体选择相关
+const showSystemFontDialog = ref(false)
+const systemFonts = ref<string[]>([])
+const loadingSystemFonts = ref(false)
+const selectedSystemFont = ref('')
+
+/**
+ * 获取系统字体列表
+ */
+async function loadSystemFonts() {
+  loadingSystemFonts.value = true
+  try {
+    // 使用 document.fonts API 获取已加载的字体
+    const fonts = new Set<string>()
+    
+    // 添加一些常见系统字体
+    const commonFonts = [
+      'Arial', 'Helvetica', 'Times New Roman', 'Times', 'Courier New', 'Courier',
+      'Verdana', 'Georgia', 'Palatino', 'Garamond', 'Bookman', 'Trebuchet MS',
+      'Comic Sans MS', 'Impact', 'Lucida Console', 'Monaco', 'Consolas',
+      'Microsoft YaHei', 'SimSun', 'SimHei', 'KaiTi', 'FangSong', 'STSong',
+      'STHeiti', 'STKaiti', 'STFangsong', 'PingFang SC', 'Hiragino Sans GB',
+      'Noto Sans CJK SC', 'Source Han Sans CN', 'WenQuanYi Micro Hei',
+      'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto',
+      'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+    ]
+    
+    commonFonts.forEach(f => fonts.add(f))
+    
+    // 尝试使用 queryLocalFonts API（如果可用）
+    if ('queryLocalFonts' in window) {
+      try {
+        const localFonts = await (window as any).queryLocalFonts()
+        for (const font of localFonts) {
+          fonts.add(font.family)
+        }
+      } catch (err) {
+        console.log('queryLocalFonts not available or denied:', err)
+      }
+    }
+    
+    systemFonts.value = Array.from(fonts).sort()
+  } catch (err) {
+    console.error('Failed to load system fonts:', err)
+  } finally {
+    loadingSystemFonts.value = false
+  }
+}
+
+/**
+ * 打开系统字体选择弹窗
+ */
+function openSystemFontDialog() {
+  showSystemFontDialog.value = true
+  selectedSystemFont.value = settings.settings.fontFamily
+  if (systemFonts.value.length === 0) {
+    loadSystemFonts()
+  }
+}
+
+/**
+ * 选择系统字体作为默认字体
+ */
+function selectSystemFont(fontName: string) {
+  selectedSystemFont.value = fontName
+}
+
+/**
+ * 确认设置系统字体
+ * 只更新默认字体设置，不立即切换当前字体
+ * 如果当前选中的是"默认字体"，则切换字体
+ */
+function confirmSystemFont() {
+  if (selectedSystemFont.value) {
+    // 保存默认系统字体设置
+    settings.setDefaultSystemFont(selectedSystemFont.value)
+    
+    // 如果当前选中的是"默认字体"，则切换字体
+    if (settings.settings.fontFamily === 'system-ui') {
+      settings.setFontFamily(selectedSystemFont.value)
+    }
+  }
+  showSystemFontDialog.value = false
+}
 
 const themeList: { id: ThemeMode; name: string; previewBg: string; lineColor: string; lineOpacity1: number; lineOpacity2: number; labelBg: string; labelColor: string }[] = [
   { id: 'parchment', name: '羊皮纸', previewBg: '#F5F0E8', lineColor: '#3A2E1E', lineOpacity1: 0.7, lineOpacity2: 0.4, labelBg: '#EDE8DF', labelColor: '#6B5740' },
@@ -147,7 +232,17 @@ async function handleUploadFont() {
 }
 
 function handleSelectFont(fontName: string) {
-  settings.setFontFamily(fontName)
+  // 如果选择的是"默认字体"，使用用户设置的系统字体
+  if (fontName === 'system-ui') {
+    const defaultFont = settings.settings.defaultSystemFont
+    if (defaultFont) {
+      settings.setFontFamily(defaultFont)
+    } else {
+      settings.setFontFamily('system-ui')
+    }
+  } else {
+    settings.setFontFamily(fontName)
+  }
 }
 
 function handleDeleteFont(opt: { name: string; value: string }) {
@@ -167,12 +262,26 @@ function confirmDeleteFont() {
 }
 
 const fontOptions = computed(() => {
-  const options = [{ name: '默认', value: 'system-ui' }]
+  const defaultName = settings.getDefaultFontDisplayName()
+  const options = [{ name: defaultName, value: 'system-ui', isDefault: true }]
   for (const font of settings.customFonts) {
-    options.push({ name: font.name, value: font.name })
+    options.push({ name: font.name, value: font.name, isDefault: false })
   }
   return options
 })
+
+/**
+ * 判断字体选项是否被选中
+ */
+function isFontActive(opt: { value: string; isDefault: boolean }): boolean {
+  if (opt.isDefault) {
+    // 默认字体选项：当 fontFamily 是 'system-ui' 或等于 defaultSystemFont 时都算选中
+    const defaultFont = settings.settings.defaultSystemFont
+    return settings.settings.fontFamily === 'system-ui' || 
+           (defaultFont && settings.settings.fontFamily === defaultFont)
+  }
+  return settings.settings.fontFamily === opt.value
+}
 
 async function handleExportNotes() {
   const anns = annotations.annotations
@@ -354,9 +463,14 @@ function handleOpenFloatReader() {
         </div>
         <div class="setting-row">
           <label>字体</label>
-          <button class="upload-font-btn" title="上传字体" @click="handleUploadFont">
-            <Upload :size="14" :stroke-width="1.5" />
-          </button>
+          <div class="font-actions">
+            <button class="upload-font-btn" title="上传字体" @click="handleUploadFont">
+              <Upload :size="14" :stroke-width="1.5" />
+            </button>
+            <button class="upload-font-btn" title="选择系统字体" @click="openSystemFontDialog">
+              <Type :size="14" :stroke-width="1.5" />
+            </button>
+          </div>
         </div>
         <div v-if="settings.hasCustomFonts" class="font-section">
           <div class="font-grid">
@@ -364,7 +478,7 @@ function handleOpenFloatReader() {
               v-for="opt in fontOptions"
               :key="opt.value"
               class="font-card"
-              :class="{ active: settings.settings.fontFamily === opt.value }"
+              :class="{ active: isFontActive(opt) }"
               :title="opt.name"
               @click="handleSelectFont(opt.value)"
             >
@@ -426,6 +540,34 @@ function handleOpenFloatReader() {
       @confirm="confirmDeleteFont"
       @cancel="showDeleteConfirm = false; pendingDeleteFont = null"
     />
+
+    <!-- 系统字体选择弹窗 -->
+    <div v-if="showSystemFontDialog" class="settings-overlay" @click="showSystemFontDialog = false">
+      <div class="system-font-dialog" @click.stop>
+        <h3>设置默认字体</h3>
+        <div class="system-font-content">
+          <div v-if="loadingSystemFonts" class="system-font-loading">
+            加载中...
+          </div>
+          <div v-else class="system-font-list custom-scrollbar">
+            <div
+              v-for="font in systemFonts"
+              :key="font"
+              class="system-font-item"
+              :class="{ active: selectedSystemFont === font }"
+              @click="selectSystemFont(font)"
+            >
+              <span class="system-font-preview" :style="{ fontFamily: font }">{{ font }}</span>
+              <span v-if="selectedSystemFont === font" class="system-font-check">✓</span>
+            </div>
+          </div>
+        </div>
+        <div class="system-font-actions">
+          <button class="system-font-btn cancel" @click="showSystemFontDialog = false">取消</button>
+          <button class="system-font-btn confirm" @click="confirmSystemFont">确定</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -860,6 +1002,110 @@ function handleOpenFloatReader() {
   &:hover {
     background: rgba(255, 255, 255, 0.2);
     color: #fff;
+  }
+}
+
+.font-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.system-font-dialog {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 20px 24px;
+  min-width: 380px;
+  max-width: 450px;
+  max-height: 70vh;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+
+  h3 {
+    margin: 0 0 16px;
+    font-size: 16px;
+    color: var(--text-primary);
+  }
+}
+
+.system-font-content {
+  flex: 1;
+  min-height: 0;
+  margin-bottom: 16px;
+}
+
+.system-font-loading {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.system-font-list {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+}
+
+.system-font-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: var(--bg-tertiary);
+  }
+
+  &.active {
+    background: rgba(55, 138, 221, 0.1);
+  }
+}
+
+.system-font-preview {
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.system-font-check {
+  color: #378ADD;
+  font-weight: bold;
+}
+
+.system-font-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.system-font-btn {
+  padding: 6px 16px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &.cancel {
+    border: 1px solid var(--border-color);
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+
+    &:hover {
+      background: var(--bg-secondary);
+    }
+  }
+
+  &.confirm {
+    border: none;
+    background: #378ADD;
+    color: #fff;
+
+    &:hover {
+      background: #2a7bc8;
+    }
   }
 }
 

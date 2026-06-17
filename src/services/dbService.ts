@@ -11,6 +11,23 @@ const KEY = {
   aiChatMeta: (bookId: string) => `reader:ai-chat:${bookId}`,
 }
 
+// 加密标记前缀
+const ENCRYPTED_PREFIX = 'ENCRYPTED:'
+
+/**
+ * 检查数据是否已加密
+ */
+function isEncrypted(data: string): boolean {
+  return data.startsWith(ENCRYPTED_PREFIX)
+}
+
+/**
+ * 获取安全 API（如果可用）
+ */
+function getSecurityAPI() {
+  return window.electronAPI?.security
+}
+
 export const db = {
   getBooks(): Book[] {
     const raw = electronStore.getItem(KEY.books)
@@ -65,13 +82,57 @@ export const db = {
     electronStore.setItem(KEY.fonts, JSON.stringify(fonts))
   },
 
-  getAISettings<T = any>(): T | null {
+  /**
+   * 获取 AI 设置（支持加密）
+   */
+  async getAISettings<T = any>(): Promise<T | null> {
     const raw = electronStore.getItem(KEY.aiSettings)
-    return raw ? JSON.parse(raw as string) : null
+    if (!raw) return null
+
+    const data = raw as string
+
+    // 检查是否已加密
+    if (isEncrypted(data)) {
+      const securityAPI = getSecurityAPI()
+      if (securityAPI) {
+        try {
+          const encryptedData = data.substring(ENCRYPTED_PREFIX.length)
+          const decrypted = await securityAPI.decryptData(encryptedData)
+          return JSON.parse(decrypted) as T
+        } catch (err) {
+          console.error('Failed to decrypt AI settings:', err)
+          return null
+        }
+      }
+    }
+
+    // 未加密或安全 API 不可用，直接解析
+    try {
+      return JSON.parse(data) as T
+    } catch {
+      return null
+    }
   },
 
-  saveAISettings(settings: any) {
-    electronStore.setItem(KEY.aiSettings, JSON.stringify(settings))
+  /**
+   * 保存 AI 设置（支持加密）
+   */
+  async saveAISettings(settings: any) {
+    const securityAPI = getSecurityAPI()
+    const jsonData = JSON.stringify(settings)
+
+    if (securityAPI) {
+      try {
+        const encrypted = await securityAPI.encryptData(jsonData)
+        electronStore.setItem(KEY.aiSettings, ENCRYPTED_PREFIX + encrypted)
+        return
+      } catch (err) {
+        console.error('Failed to encrypt AI settings, saving as plain text:', err)
+      }
+    }
+
+    // 降级：明文存储
+    electronStore.setItem(KEY.aiSettings, jsonData)
   },
 
   getAIChatMeta<T = any>(bookId: string): T | null {

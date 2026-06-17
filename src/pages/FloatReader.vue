@@ -1,13 +1,24 @@
 <script lang="ts" setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { Pin } from 'lucide-vue-next'
+import { useSettingsStore } from '@/stores/settings'
 
+const settings = useSettingsStore()
 const bookTitle = ref('简阅')
 const chapterTitle = ref('当前章节')
 const content = ref('')
 const opacity = ref(0.5)
 const hasContent = ref(false)
 const isPinned = ref(true) // 默认置顶
+
+// 计算字体样式
+const fontFamily = computed(() => {
+  const matchedFont = settings.customFonts.find(f => f.name === settings.settings.fontFamily)
+  if (matchedFont) {
+    return "'CustomReaderFont', system-ui, sans-serif"
+  }
+  return settings.settings.fontFamily !== 'system-ui' ? settings.settings.fontFamily : 'system-ui, sans-serif'
+})
 
 function onOpacityInput(e: Event) {
   opacity.value = Number((e.target as HTMLInputElement).value) / 100
@@ -28,7 +39,6 @@ function backToMain() {
       window.electronAPI.floatReader.close(true)
     }
   } catch {}
-  setTimeout(() => { try { window.close() } catch {} }, 100)
 }
 
 // 退出应用
@@ -38,11 +48,28 @@ function closeApp() {
       window.electronAPI.floatReader.close(false)
     }
   } catch {}
-  setTimeout(() => { try { window.close() } catch {} }, 100)
 }
 
-onMounted(() => {
-  // 暴露给主进程注入数据
+onMounted(async () => {
+  // 加载设置（包括字体配置）
+  settings.loadSettings()
+
+  // 注入自定义字体到文档（使用 base64 data URI 避免跨域问题）
+  const matchedFont = settings.customFonts.find(f => f.name === settings.settings.fontFamily)
+  if (matchedFont) {
+    try {
+      const fontData = await (window as any).electronAPI?.font?.getBase64(matchedFont.path)
+      if (fontData) {
+        const style = document.createElement('style')
+        style.textContent = `@font-face { font-family: 'CustomReaderFont'; src: url('data:${fontData.mimeType};base64,${fontData.data}'); }`
+        document.head.appendChild(style)
+      }
+    } catch (err) {
+      console.error('Failed to load font:', err)
+    }
+  }
+
+  // 暴露给主进程注入数据（兼容旧版 executeJavaScript 方式）
   ;(window as any).setFloatReaderContent = (data: {
     text: string
     bookTitle: string
@@ -62,6 +89,30 @@ onMounted(() => {
     if (typeof data.opacity === 'number') {
       opacity.value = data.opacity
     }
+  }
+
+  // 监听主进程通过 IPC 发送的数据
+  if (window.electronAPI?.on) {
+    window.electronAPI.on('float:reader:data', (data: any) => {
+      if (!data) return
+      if (data.text && data.text.trim()) {
+        content.value = data.text
+        hasContent.value = true
+      } else {
+        content.value = ''
+        hasContent.value = false
+      }
+      bookTitle.value = data.bookTitle || '简阅'
+      chapterTitle.value = data.chapterTitle || '当前章节'
+      if (typeof data.opacity === 'number') {
+        opacity.value = data.opacity
+      }
+    })
+  }
+
+  // 通知主进程渲染进程已就绪
+  if (window.electronAPI?.send) {
+    window.electronAPI.send('float:reader:ready')
   }
 })
 </script>
@@ -91,7 +142,7 @@ onMounted(() => {
 
     <!-- 阅读内容 -->
     <div class="float-content custom-scrollbar-dark">
-      <div v-if="hasContent" class="float-text">{{ content }}</div>
+      <div v-if="hasContent" class="float-text" :style="{ fontFamily, fontSize: settings.settings.fontSize + 'px', lineHeight: settings.settings.lineHeight }">{{ content }}</div>
       <div v-else class="float-empty">当前章节无文字内容</div>
     </div>
   </div>

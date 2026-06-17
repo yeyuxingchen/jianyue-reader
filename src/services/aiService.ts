@@ -2,6 +2,9 @@ import type { AISettings, AIChatMessage } from '@/types'
 import { db } from '@/services/dbService'
 import { electronStore } from '@/services/electronStore'
 
+// 缓存 AI 设置，避免频繁解密
+let cachedSettings: AISettings | null = null
+
 const DEFAULT_AI_SETTINGS: AISettings = {
   api_key: '',
   base_url: 'https://api.openai.com/v1',
@@ -20,13 +23,49 @@ export const LENGTH_LIMIT_OPTIONS = [
 export type LengthLimitValue = (typeof LENGTH_LIMIT_OPTIONS)[number]['value']
 
 export const aiService = {
+  /**
+   * 获取 AI 设置（同步版本，用于兼容）
+   * 注意：加密数据需要使用 getSettingsAsync
+   */
   getSettings(): AISettings {
-    const saved = db.getAISettings<AISettings>()
-    return saved ? { ...DEFAULT_AI_SETTINGS, ...saved } : { ...DEFAULT_AI_SETTINGS }
+    // 尝试从缓存获取
+    if (cachedSettings) {
+      return { ...DEFAULT_AI_SETTINGS, ...cachedSettings }
+    }
+    // 降级：尝试从 electronStore 直接读取（可能是未加密的数据）
+    const raw = electronStore.getItem('reader:ai-settings')
+    if (raw) {
+      try {
+        const data = typeof raw === 'string' ? raw : String(raw)
+        // 检查是否是加密数据
+        if (!data.startsWith('ENCRYPTED:')) {
+          const parsed = JSON.parse(data)
+          cachedSettings = parsed
+          return { ...DEFAULT_AI_SETTINGS, ...parsed }
+        }
+      } catch {}
+    }
+    return { ...DEFAULT_AI_SETTINGS }
   },
 
-  saveSettings(settings: AISettings) {
-    db.saveAISettings(settings)
+  /**
+   * 获取 AI 设置（异步版本，支持加密）
+   */
+  async getSettingsAsync(): Promise<AISettings> {
+    const saved = await db.getAISettings<AISettings>()
+    if (saved) {
+      cachedSettings = saved
+      return { ...DEFAULT_AI_SETTINGS, ...saved }
+    }
+    return { ...DEFAULT_AI_SETTINGS }
+  },
+
+  /**
+   * 保存 AI 设置（异步版本，支持加密）
+   */
+  async saveSettings(settings: AISettings) {
+    cachedSettings = settings
+    await db.saveAISettings(settings)
   },
 
   // 解析模型列表

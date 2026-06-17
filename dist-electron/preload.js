@@ -1,9 +1,11125 @@
-"use strict";const X=require("electron"),Nt=require("path"),Hr=require("fs"),Ti=require("crypto"),Pi=require("assert"),Ai=require("events"),ja=require("util"),bi=require("os");var rr=typeof globalThis<"u"?globalThis:typeof window<"u"?window:typeof global<"u"?global:typeof self<"u"?self:{};function Ci(e){return e&&e.__esModule&&Object.prototype.hasOwnProperty.call(e,"default")?e.default:e}var Rn={exports:{}},Di=e=>{const t=typeof e;return e!==null&&(t==="object"||t==="function")};const Ct=Di,Li=new Set(["__proto__","prototype","constructor"]),ki=e=>!e.some(t=>Li.has(t));function wr(e){const t=e.split("."),r=[];for(let n=0;n<t.length;n++){let a=t[n];for(;a[a.length-1]==="\\"&&t[n+1]!==void 0;)a=a.slice(0,-1)+".",a+=t[++n];r.push(a)}return ki(r)?r:[]}var ji={get(e,t,r){if(!Ct(e)||typeof t!="string")return r===void 0?e:r;const n=wr(t);if(n.length!==0){for(let a=0;a<n.length;a++)if(e=e[n[a]],e==null){if(a!==n.length-1)return r;break}return e===void 0?r:e}},set(e,t,r){if(!Ct(e)||typeof t!="string")return e;const n=e,a=wr(t);for(let o=0;o<a.length;o++){const d=a[o];Ct(e[d])||(e[d]={}),o===a.length-1&&(e[d]=r),e=e[d]}return n},delete(e,t){if(!Ct(e)||typeof t!="string")return!1;const r=wr(t);for(let n=0;n<r.length;n++){const a=r[n];if(n===r.length-1)return delete e[a],!0;if(e=e[a],!Ct(e))return!1}},has(e,t){if(!Ct(e)||typeof t!="string")return!1;const r=wr(t);if(r.length===0)return!1;for(let n=0;n<r.length;n++)if(Ct(e)){if(!(r[n]in e))return!1;e=e[r[n]]}else return!1;return!0}},kn={exports:{}},Sn={exports:{}};(function(e,t){t=e.exports=k;var r;typeof process=="object"&&process.env&&process.env.NODE_DEBUG&&/\bsemver\b/i.test(process.env.NODE_DEBUG)?r=function(){var h=Array.prototype.slice.call(arguments,0);h.unshift("SEMVER"),console.log.apply(console,h)}:r=function(){},t.SEMVER_SPEC_VERSION="2.0.0";var n=256,a=Number.MAX_SAFE_INTEGER||9007199254740991,o=16,d=n-6,w=t.re=[],l=t.safeRe=[],i=t.src=[],s=t.tokens={},g=0;function R(h){s[h]=g++}var c="[a-zA-Z0-9-]",E=[["\\s",1],["\\d",n],[c,d]];function f(h){for(var I=0;I<E.length;I++){var A=E[I][0],G=E[I][1];h=h.split(A+"*").join(A+"{0,"+G+"}").split(A+"+").join(A+"{1,"+G+"}")}return h}R("NUMERICIDENTIFIER"),i[s.NUMERICIDENTIFIER]="0|[1-9]\\d*",R("NUMERICIDENTIFIERLOOSE"),i[s.NUMERICIDENTIFIERLOOSE]="\\d+",R("NONNUMERICIDENTIFIER"),i[s.NONNUMERICIDENTIFIER]="\\d*[a-zA-Z-]"+c+"*",R("MAINVERSION"),i[s.MAINVERSION]="("+i[s.NUMERICIDENTIFIER]+")\\.("+i[s.NUMERICIDENTIFIER]+")\\.("+i[s.NUMERICIDENTIFIER]+")",R("MAINVERSIONLOOSE"),i[s.MAINVERSIONLOOSE]="("+i[s.NUMERICIDENTIFIERLOOSE]+")\\.("+i[s.NUMERICIDENTIFIERLOOSE]+")\\.("+i[s.NUMERICIDENTIFIERLOOSE]+")",R("PRERELEASEIDENTIFIER"),i[s.PRERELEASEIDENTIFIER]="(?:"+i[s.NUMERICIDENTIFIER]+"|"+i[s.NONNUMERICIDENTIFIER]+")",R("PRERELEASEIDENTIFIERLOOSE"),i[s.PRERELEASEIDENTIFIERLOOSE]="(?:"+i[s.NUMERICIDENTIFIERLOOSE]+"|"+i[s.NONNUMERICIDENTIFIER]+")",R("PRERELEASE"),i[s.PRERELEASE]="(?:-("+i[s.PRERELEASEIDENTIFIER]+"(?:\\."+i[s.PRERELEASEIDENTIFIER]+")*))",R("PRERELEASELOOSE"),i[s.PRERELEASELOOSE]="(?:-?("+i[s.PRERELEASEIDENTIFIERLOOSE]+"(?:\\."+i[s.PRERELEASEIDENTIFIERLOOSE]+")*))",R("BUILDIDENTIFIER"),i[s.BUILDIDENTIFIER]=c+"+",R("BUILD"),i[s.BUILD]="(?:\\+("+i[s.BUILDIDENTIFIER]+"(?:\\."+i[s.BUILDIDENTIFIER]+")*))",R("FULL"),R("FULLPLAIN"),i[s.FULLPLAIN]="v?"+i[s.MAINVERSION]+i[s.PRERELEASE]+"?"+i[s.BUILD]+"?",i[s.FULL]="^"+i[s.FULLPLAIN]+"$",R("LOOSEPLAIN"),i[s.LOOSEPLAIN]="[v=\\s]*"+i[s.MAINVERSIONLOOSE]+i[s.PRERELEASELOOSE]+"?"+i[s.BUILD]+"?",R("LOOSE"),i[s.LOOSE]="^"+i[s.LOOSEPLAIN]+"$",R("GTLT"),i[s.GTLT]="((?:<|>)?=?)",R("XRANGEIDENTIFIERLOOSE"),i[s.XRANGEIDENTIFIERLOOSE]=i[s.NUMERICIDENTIFIERLOOSE]+"|x|X|\\*",R("XRANGEIDENTIFIER"),i[s.XRANGEIDENTIFIER]=i[s.NUMERICIDENTIFIER]+"|x|X|\\*",R("XRANGEPLAIN"),i[s.XRANGEPLAIN]="[v=\\s]*("+i[s.XRANGEIDENTIFIER]+")(?:\\.("+i[s.XRANGEIDENTIFIER]+")(?:\\.("+i[s.XRANGEIDENTIFIER]+")(?:"+i[s.PRERELEASE]+")?"+i[s.BUILD]+"?)?)?",R("XRANGEPLAINLOOSE"),i[s.XRANGEPLAINLOOSE]="[v=\\s]*("+i[s.XRANGEIDENTIFIERLOOSE]+")(?:\\.("+i[s.XRANGEIDENTIFIERLOOSE]+")(?:\\.("+i[s.XRANGEIDENTIFIERLOOSE]+")(?:"+i[s.PRERELEASELOOSE]+")?"+i[s.BUILD]+"?)?)?",R("XRANGE"),i[s.XRANGE]="^"+i[s.GTLT]+"\\s*"+i[s.XRANGEPLAIN]+"$",R("XRANGELOOSE"),i[s.XRANGELOOSE]="^"+i[s.GTLT]+"\\s*"+i[s.XRANGEPLAINLOOSE]+"$",R("COERCE"),i[s.COERCE]="(^|[^\\d])(\\d{1,"+o+"})(?:\\.(\\d{1,"+o+"}))?(?:\\.(\\d{1,"+o+"}))?(?:$|[^\\d])",R("COERCERTL"),w[s.COERCERTL]=new RegExp(i[s.COERCE],"g"),l[s.COERCERTL]=new RegExp(f(i[s.COERCE]),"g"),R("LONETILDE"),i[s.LONETILDE]="(?:~>?)",R("TILDETRIM"),i[s.TILDETRIM]="(\\s*)"+i[s.LONETILDE]+"\\s+",w[s.TILDETRIM]=new RegExp(i[s.TILDETRIM],"g"),l[s.TILDETRIM]=new RegExp(f(i[s.TILDETRIM]),"g");var S="$1~";R("TILDE"),i[s.TILDE]="^"+i[s.LONETILDE]+i[s.XRANGEPLAIN]+"$",R("TILDELOOSE"),i[s.TILDELOOSE]="^"+i[s.LONETILDE]+i[s.XRANGEPLAINLOOSE]+"$",R("LONECARET"),i[s.LONECARET]="(?:\\^)",R("CARETTRIM"),i[s.CARETTRIM]="(\\s*)"+i[s.LONECARET]+"\\s+",w[s.CARETTRIM]=new RegExp(i[s.CARETTRIM],"g"),l[s.CARETTRIM]=new RegExp(f(i[s.CARETTRIM]),"g");var u="$1^";R("CARET"),i[s.CARET]="^"+i[s.LONECARET]+i[s.XRANGEPLAIN]+"$",R("CARETLOOSE"),i[s.CARETLOOSE]="^"+i[s.LONECARET]+i[s.XRANGEPLAINLOOSE]+"$",R("COMPARATORLOOSE"),i[s.COMPARATORLOOSE]="^"+i[s.GTLT]+"\\s*("+i[s.LOOSEPLAIN]+")$|^$",R("COMPARATOR"),i[s.COMPARATOR]="^"+i[s.GTLT]+"\\s*("+i[s.FULLPLAIN]+")$|^$",R("COMPARATORTRIM"),i[s.COMPARATORTRIM]="(\\s*)"+i[s.GTLT]+"\\s*("+i[s.LOOSEPLAIN]+"|"+i[s.XRANGEPLAIN]+")",w[s.COMPARATORTRIM]=new RegExp(i[s.COMPARATORTRIM],"g"),l[s.COMPARATORTRIM]=new RegExp(f(i[s.COMPARATORTRIM]),"g");var m="$1$2$3";R("HYPHENRANGE"),i[s.HYPHENRANGE]="^\\s*("+i[s.XRANGEPLAIN]+")\\s+-\\s+("+i[s.XRANGEPLAIN]+")\\s*$",R("HYPHENRANGELOOSE"),i[s.HYPHENRANGELOOSE]="^\\s*("+i[s.XRANGEPLAINLOOSE]+")\\s+-\\s+("+i[s.XRANGEPLAINLOOSE]+")\\s*$",R("STAR"),i[s.STAR]="(<|>)?=?\\s*\\*";for(var _=0;_<g;_++)r(_,i[_]),w[_]||(w[_]=new RegExp(i[_]),l[_]=new RegExp(f(i[_])));t.parse=C;function C(h,I){if((!I||typeof I!="object")&&(I={loose:!!I,includePrerelease:!1}),h instanceof k)return h;if(typeof h!="string"||h.length>n)return null;var A=I.loose?l[s.LOOSE]:l[s.FULL];if(!A.test(h))return null;try{return new k(h,I)}catch{return null}}t.valid=j;function j(h,I){var A=C(h,I);return A?A.version:null}t.clean=q;function q(h,I){var A=C(h.trim().replace(/^[=v]+/,""),I);return A?A.version:null}t.SemVer=k;function k(h,I){if((!I||typeof I!="object")&&(I={loose:!!I,includePrerelease:!1}),h instanceof k){if(h.loose===I.loose)return h;h=h.version}else if(typeof h!="string")throw new TypeError("Invalid Version: "+h);if(h.length>n)throw new TypeError("version is longer than "+n+" characters");if(!(this instanceof k))return new k(h,I);r("SemVer",h,I),this.options=I,this.loose=!!I.loose;var A=h.trim().match(I.loose?l[s.LOOSE]:l[s.FULL]);if(!A)throw new TypeError("Invalid Version: "+h);if(this.raw=h,this.major=+A[1],this.minor=+A[2],this.patch=+A[3],this.major>a||this.major<0)throw new TypeError("Invalid major version");if(this.minor>a||this.minor<0)throw new TypeError("Invalid minor version");if(this.patch>a||this.patch<0)throw new TypeError("Invalid patch version");A[4]?this.prerelease=A[4].split(".").map(function(G){if(/^[0-9]+$/.test(G)){var x=+G;if(x>=0&&x<a)return x}return G}):this.prerelease=[],this.build=A[5]?A[5].split("."):[],this.format()}k.prototype.format=function(){return this.version=this.major+"."+this.minor+"."+this.patch,this.prerelease.length&&(this.version+="-"+this.prerelease.join(".")),this.version},k.prototype.toString=function(){return this.version},k.prototype.compare=function(h){return r("SemVer.compare",this.version,this.options,h),h instanceof k||(h=new k(h,this.options)),this.compareMain(h)||this.comparePre(h)},k.prototype.compareMain=function(h){return h instanceof k||(h=new k(h,this.options)),ie(this.major,h.major)||ie(this.minor,h.minor)||ie(this.patch,h.patch)},k.prototype.comparePre=function(h){if(h instanceof k||(h=new k(h,this.options)),this.prerelease.length&&!h.prerelease.length)return-1;if(!this.prerelease.length&&h.prerelease.length)return 1;if(!this.prerelease.length&&!h.prerelease.length)return 0;var I=0;do{var A=this.prerelease[I],G=h.prerelease[I];if(r("prerelease compare",I,A,G),A===void 0&&G===void 0)return 0;if(G===void 0)return 1;if(A===void 0)return-1;if(A===G)continue;return ie(A,G)}while(++I)},k.prototype.compareBuild=function(h){h instanceof k||(h=new k(h,this.options));var I=0;do{var A=this.build[I],G=h.build[I];if(r("prerelease compare",I,A,G),A===void 0&&G===void 0)return 0;if(G===void 0)return 1;if(A===void 0)return-1;if(A===G)continue;return ie(A,G)}while(++I)},k.prototype.inc=function(h,I){switch(h){case"premajor":this.prerelease.length=0,this.patch=0,this.minor=0,this.major++,this.inc("pre",I);break;case"preminor":this.prerelease.length=0,this.patch=0,this.minor++,this.inc("pre",I);break;case"prepatch":this.prerelease.length=0,this.inc("patch",I),this.inc("pre",I);break;case"prerelease":this.prerelease.length===0&&this.inc("patch",I),this.inc("pre",I);break;case"major":(this.minor!==0||this.patch!==0||this.prerelease.length===0)&&this.major++,this.minor=0,this.patch=0,this.prerelease=[];break;case"minor":(this.patch!==0||this.prerelease.length===0)&&this.minor++,this.patch=0,this.prerelease=[];break;case"patch":this.prerelease.length===0&&this.patch++,this.prerelease=[];break;case"pre":if(this.prerelease.length===0)this.prerelease=[0];else{for(var A=this.prerelease.length;--A>=0;)typeof this.prerelease[A]=="number"&&(this.prerelease[A]++,A=-2);A===-1&&this.prerelease.push(0)}I&&(this.prerelease[0]===I?isNaN(this.prerelease[1])&&(this.prerelease=[I,0]):this.prerelease=[I,0]);break;default:throw new Error("invalid increment argument: "+h)}return this.format(),this.raw=this.version,this},t.inc=Y;function Y(h,I,A,G){typeof A=="string"&&(G=A,A=void 0);try{return new k(h,A).inc(I,G).version}catch{return null}}t.diff=Q;function Q(h,I){if(p(h,I))return null;var A=C(h),G=C(I),x="";if(A.prerelease.length||G.prerelease.length){x="pre";var Z="prerelease"}for(var ee in A)if((ee==="major"||ee==="minor"||ee==="patch")&&A[ee]!==G[ee])return x+ee;return Z}t.compareIdentifiers=ie;var te=/^[0-9]+$/;function ie(h,I){var A=te.test(h),G=te.test(I);return A&&G&&(h=+h,I=+I),h===I?0:A&&!G?-1:G&&!A?1:h<I?-1:1}t.rcompareIdentifiers=L;function L(h,I){return ie(I,h)}t.major=K;function K(h,I){return new k(h,I).major}t.minor=J;function J(h,I){return new k(h,I).minor}t.patch=le;function le(h,I){return new k(h,I).patch}t.compare=V;function V(h,I,A){return new k(h,A).compare(new k(I,A))}t.compareLoose=$;function $(h,I){return V(h,I,!0)}t.compareBuild=y;function y(h,I,A){var G=new k(h,A),x=new k(I,A);return G.compare(x)||G.compareBuild(x)}t.rcompare=P;function P(h,I,A){return V(I,h,A)}t.sort=b;function b(h,I){return h.sort(function(A,G){return t.compareBuild(A,G,I)})}t.rsort=z;function z(h,I){return h.sort(function(A,G){return t.compareBuild(G,A,I)})}t.gt=H;function H(h,I,A){return V(h,I,A)>0}t.lt=F;function F(h,I,A){return V(h,I,A)<0}t.eq=p;function p(h,I,A){return V(h,I,A)===0}t.neq=O;function O(h,I,A){return V(h,I,A)!==0}t.gte=D;function D(h,I,A){return V(h,I,A)>=0}t.lte=B;function B(h,I,A){return V(h,I,A)<=0}t.cmp=W;function W(h,I,A,G){switch(I){case"===":return typeof h=="object"&&(h=h.version),typeof A=="object"&&(A=A.version),h===A;case"!==":return typeof h=="object"&&(h=h.version),typeof A=="object"&&(A=A.version),h!==A;case"":case"=":case"==":return p(h,A,G);case"!=":return O(h,A,G);case">":return H(h,A,G);case">=":return D(h,A,G);case"<":return F(h,A,G);case"<=":return B(h,A,G);default:throw new TypeError("Invalid operator: "+I)}}t.Comparator=se;function se(h,I){if((!I||typeof I!="object")&&(I={loose:!!I,includePrerelease:!1}),h instanceof se){if(h.loose===!!I.loose)return h;h=h.value}if(!(this instanceof se))return new se(h,I);h=h.trim().split(/\s+/).join(" "),r("comparator",h,I),this.options=I,this.loose=!!I.loose,this.parse(h),this.semver===Fe?this.value="":this.value=this.operator+this.semver.version,r("comp",this)}var Fe={};se.prototype.parse=function(h){var I=this.options.loose?l[s.COMPARATORLOOSE]:l[s.COMPARATOR],A=h.match(I);if(!A)throw new TypeError("Invalid comparator: "+h);this.operator=A[1]!==void 0?A[1]:"",this.operator==="="&&(this.operator=""),A[2]?this.semver=new k(A[2],this.options.loose):this.semver=Fe},se.prototype.toString=function(){return this.value},se.prototype.test=function(h){if(r("Comparator.test",h,this.options.loose),this.semver===Fe||h===Fe)return!0;if(typeof h=="string")try{h=new k(h,this.options)}catch{return!1}return W(h,this.operator,this.semver,this.options)},se.prototype.intersects=function(h,I){if(!(h instanceof se))throw new TypeError("a Comparator is required");(!I||typeof I!="object")&&(I={loose:!!I,includePrerelease:!1});var A;if(this.operator==="")return this.value===""?!0:(A=new pe(h.value,I),Mt(this.value,A,I));if(h.operator==="")return h.value===""?!0:(A=new pe(this.value,I),Mt(h.semver,A,I));var G=(this.operator===">="||this.operator===">")&&(h.operator===">="||h.operator===">"),x=(this.operator==="<="||this.operator==="<")&&(h.operator==="<="||h.operator==="<"),Z=this.semver.version===h.semver.version,ee=(this.operator===">="||this.operator==="<=")&&(h.operator===">="||h.operator==="<="),fe=W(this.semver,"<",h.semver,I)&&(this.operator===">="||this.operator===">")&&(h.operator==="<="||h.operator==="<"),ae=W(this.semver,">",h.semver,I)&&(this.operator==="<="||this.operator==="<")&&(h.operator===">="||h.operator===">");return G||x||Z&&ee||fe||ae},t.Range=pe;function pe(h,I){if((!I||typeof I!="object")&&(I={loose:!!I,includePrerelease:!1}),h instanceof pe)return h.loose===!!I.loose&&h.includePrerelease===!!I.includePrerelease?h:new pe(h.raw,I);if(h instanceof se)return new pe(h.value,I);if(!(this instanceof pe))return new pe(h,I);if(this.options=I,this.loose=!!I.loose,this.includePrerelease=!!I.includePrerelease,this.raw=h.trim().split(/\s+/).join(" "),this.set=this.raw.split("||").map(function(A){return this.parseRange(A.trim())},this).filter(function(A){return A.length}),!this.set.length)throw new TypeError("Invalid SemVer Range: "+this.raw);this.format()}pe.prototype.format=function(){return this.range=this.set.map(function(h){return h.join(" ").trim()}).join("||").trim(),this.range},pe.prototype.toString=function(){return this.range},pe.prototype.parseRange=function(h){var I=this.options.loose,A=I?l[s.HYPHENRANGELOOSE]:l[s.HYPHENRANGE];h=h.replace(A,xe),r("hyphen replace",h),h=h.replace(l[s.COMPARATORTRIM],m),r("comparator trim",h,l[s.COMPARATORTRIM]),h=h.replace(l[s.TILDETRIM],S),h=h.replace(l[s.CARETTRIM],u),h=h.split(/\s+/).join(" ");var G=I?l[s.COMPARATORLOOSE]:l[s.COMPARATOR],x=h.split(" ").map(function(Z){return rn(Z,this.options)},this).join(" ").split(/\s+/);return this.options.loose&&(x=x.filter(function(Z){return!!Z.match(G)})),x=x.map(function(Z){return new se(Z,this.options)},this),x},pe.prototype.intersects=function(h,I){if(!(h instanceof pe))throw new TypeError("a Range is required");return this.set.some(function(A){return mt(A,I)&&h.set.some(function(G){return mt(G,I)&&A.every(function(x){return G.every(function(Z){return x.intersects(Z,I)})})})})};function mt(h,I){for(var A=!0,G=h.slice(),x=G.pop();A&&G.length;)A=G.every(function(Z){return x.intersects(Z,I)}),x=G.pop();return A}t.toComparators=dr;function dr(h,I){return new pe(h,I).set.map(function(A){return A.map(function(G){return G.value}).join(" ").trim().split(" ")})}function rn(h,I){return r("comp",h,I),h=hr(h,I),r("caret",h),h=Ze(h,I),r("tildes",h),h=mr(h,I),r("xrange",h),h=$t(h,I),r("stars",h),h}function Ce(h){return!h||h.toLowerCase()==="x"||h==="*"}function Ze(h,I){return h.trim().split(/\s+/).map(function(A){return nn(A,I)}).join(" ")}function nn(h,I){var A=I.loose?l[s.TILDELOOSE]:l[s.TILDE];return h.replace(A,function(G,x,Z,ee,fe){r("tilde",h,G,x,Z,ee,fe);var ae;return Ce(x)?ae="":Ce(Z)?ae=">="+x+".0.0 <"+(+x+1)+".0.0":Ce(ee)?ae=">="+x+"."+Z+".0 <"+x+"."+(+Z+1)+".0":fe?(r("replaceTilde pr",fe),ae=">="+x+"."+Z+"."+ee+"-"+fe+" <"+x+"."+(+Z+1)+".0"):ae=">="+x+"."+Z+"."+ee+" <"+x+"."+(+Z+1)+".0",r("tilde return",ae),ae})}function hr(h,I){return h.trim().split(/\s+/).map(function(A){return pr(A,I)}).join(" ")}function pr(h,I){r("caret",h,I);var A=I.loose?l[s.CARETLOOSE]:l[s.CARET];return h.replace(A,function(G,x,Z,ee,fe){r("caret",h,G,x,Z,ee,fe);var ae;return Ce(x)?ae="":Ce(Z)?ae=">="+x+".0.0 <"+(+x+1)+".0.0":Ce(ee)?x==="0"?ae=">="+x+"."+Z+".0 <"+x+"."+(+Z+1)+".0":ae=">="+x+"."+Z+".0 <"+(+x+1)+".0.0":fe?(r("replaceCaret pr",fe),x==="0"?Z==="0"?ae=">="+x+"."+Z+"."+ee+"-"+fe+" <"+x+"."+Z+"."+(+ee+1):ae=">="+x+"."+Z+"."+ee+"-"+fe+" <"+x+"."+(+Z+1)+".0":ae=">="+x+"."+Z+"."+ee+"-"+fe+" <"+(+x+1)+".0.0"):(r("no pr"),x==="0"?Z==="0"?ae=">="+x+"."+Z+"."+ee+" <"+x+"."+Z+"."+(+ee+1):ae=">="+x+"."+Z+"."+ee+" <"+x+"."+(+Z+1)+".0":ae=">="+x+"."+Z+"."+ee+" <"+(+x+1)+".0.0"),r("caret return",ae),ae})}function mr(h,I){return r("replaceXRanges",h,I),h.split(/\s+/).map(function(A){return sn(A,I)}).join(" ")}function sn(h,I){h=h.trim();var A=I.loose?l[s.XRANGELOOSE]:l[s.XRANGE];return h.replace(A,function(G,x,Z,ee,fe,ae){r("xRange",h,G,x,Z,ee,fe,ae);var We=Ce(Z),He=We||Ce(ee),ze=He||Ce(fe),De=ze;return x==="="&&De&&(x=""),ae=I.includePrerelease?"-0":"",We?x===">"||x==="<"?G="<0.0.0-0":G="*":x&&De?(He&&(ee=0),fe=0,x===">"?(x=">=",He?(Z=+Z+1,ee=0,fe=0):(ee=+ee+1,fe=0)):x==="<="&&(x="<",He?Z=+Z+1:ee=+ee+1),G=x+Z+"."+ee+"."+fe+ae):He?G=">="+Z+".0.0"+ae+" <"+(+Z+1)+".0.0"+ae:ze&&(G=">="+Z+"."+ee+".0"+ae+" <"+Z+"."+(+ee+1)+".0"+ae),r("xRange return",G),G})}function $t(h,I){return r("replaceStars",h,I),h.trim().replace(l[s.STAR],"")}function xe(h,I,A,G,x,Z,ee,fe,ae,We,He,ze,De){return Ce(A)?I="":Ce(G)?I=">="+A+".0.0":Ce(x)?I=">="+A+"."+G+".0":I=">="+I,Ce(ae)?fe="":Ce(We)?fe="<"+(+ae+1)+".0.0":Ce(He)?fe="<"+ae+"."+(+We+1)+".0":ze?fe="<="+ae+"."+We+"."+He+"-"+ze:fe="<="+fe,(I+" "+fe).trim()}pe.prototype.test=function(h){if(!h)return!1;if(typeof h=="string")try{h=new k(h,this.options)}catch{return!1}for(var I=0;I<this.set.length;I++)if(yr(this.set[I],h,this.options))return!0;return!1};function yr(h,I,A){for(var G=0;G<h.length;G++)if(!h[G].test(I))return!1;if(I.prerelease.length&&!A.includePrerelease){for(G=0;G<h.length;G++)if(r(h[G].semver),h[G].semver!==Fe&&h[G].semver.prerelease.length>0){var x=h[G].semver;if(x.major===I.major&&x.minor===I.minor&&x.patch===I.patch)return!0}return!1}return!0}t.satisfies=Mt;function Mt(h,I,A){try{I=new pe(I,A)}catch{return!1}return I.test(h)}t.maxSatisfying=an;function an(h,I,A){var G=null,x=null;try{var Z=new pe(I,A)}catch{return null}return h.forEach(function(ee){Z.test(ee)&&(!G||x.compare(ee)===-1)&&(G=ee,x=new k(G,A))}),G}t.minSatisfying=on;function on(h,I,A){var G=null,x=null;try{var Z=new pe(I,A)}catch{return null}return h.forEach(function(ee){Z.test(ee)&&(!G||x.compare(ee)===1)&&(G=ee,x=new k(G,A))}),G}t.minVersion=cn;function cn(h,I){h=new pe(h,I);var A=new k("0.0.0");if(h.test(A)||(A=new k("0.0.0-0"),h.test(A)))return A;A=null;for(var G=0;G<h.set.length;++G){var x=h.set[G];x.forEach(function(Z){var ee=new k(Z.semver.version);switch(Z.operator){case">":ee.prerelease.length===0?ee.patch++:ee.prerelease.push(0),ee.raw=ee.format();case"":case">=":(!A||H(A,ee))&&(A=ee);break;case"<":case"<=":break;default:throw new Error("Unexpected operation: "+Z.operator)}})}return A&&h.test(A)?A:null}t.validRange=et;function et(h,I){try{return new pe(h,I).range||"*"}catch{return null}}t.ltr=Tt;function Tt(h,I,A){return Ut(h,I,"<",A)}t.gtr=vr;function vr(h,I,A){return Ut(h,I,">",A)}t.outside=Ut;function Ut(h,I,A,G){h=new k(h,G),I=new pe(I,G);var x,Z,ee,fe,ae;switch(A){case">":x=H,Z=B,ee=F,fe=">",ae=">=";break;case"<":x=F,Z=D,ee=H,fe="<",ae="<=";break;default:throw new TypeError('Must provide a hilo val of "<" or ">"')}if(Mt(h,I,G))return!1;for(var We=0;We<I.set.length;++We){var He=I.set[We],ze=null,De=null;if(He.forEach(function(tt){tt.semver===Fe&&(tt=new se(">=0.0.0")),ze=ze||tt,De=De||tt,x(tt.semver,ze.semver,G)?ze=tt:ee(tt.semver,De.semver,G)&&(De=tt)}),ze.operator===fe||ze.operator===ae||(!De.operator||De.operator===fe)&&Z(h,De.semver))return!1;if(De.operator===ae&&ee(h,De.semver))return!1}return!0}t.prerelease=Pt;function Pt(h,I){var A=C(h,I);return A&&A.prerelease.length?A.prerelease:null}t.intersects=Er;function Er(h,I,A){return h=new pe(h,A),I=new pe(I,A),h.intersects(I)}t.coerce=ln;function ln(h,I){if(h instanceof k)return h;if(typeof h=="number"&&(h=String(h)),typeof h!="string")return null;I=I||{};var A=null;if(!I.rtl)A=h.match(l[s.COERCE]);else{for(var G;(G=l[s.COERCERTL].exec(h))&&(!A||A.index+A[0].length!==h.length);)(!A||G.index+G[0].length!==A.index+A[0].length)&&(A=G),l[s.COERCERTL].lastIndex=G.index+G[1].length+G[2].length;l[s.COERCERTL].lastIndex=-1}return A===null?null:C(A[2]+"."+(A[3]||"0")+"."+(A[4]||"0"),I)}})(Sn,Sn.exports);var Fi=Sn.exports;const Fr=Hr,vt=Nt,{promisify:Gs}=ja,Mi=Fi,Fa=Mi.satisfies(process.version,">=10.12.0"),Ma=e=>{if(process.platform==="win32"&&/[<>:"|?*]/.test(e.replace(vt.parse(e).root,""))){const r=new Error(`Path contains invalid characters: ${e}`);throw r.code="EINVAL",r}},Ua=e=>({...{mode:511,fs:Fr},...e}),Va=e=>{const t=new Error(`operation not permitted, mkdir '${e}'`);return t.code="EPERM",t.errno=-4048,t.path=e,t.syscall="mkdir",t},Ui=async(e,t)=>{Ma(e),t=Ua(t);const r=Gs(t.fs.mkdir),n=Gs(t.fs.stat);if(Fa&&t.fs.mkdir===Fr.mkdir){const o=vt.resolve(e);return await r(o,{mode:t.mode,recursive:!0}),o}const a=async o=>{try{return await r(o,t.mode),o}catch(d){if(d.code==="EPERM")throw d;if(d.code==="ENOENT"){if(vt.dirname(o)===o)throw Va(o);if(d.message.includes("null bytes"))throw d;return await a(vt.dirname(o)),a(o)}try{if(!(await n(o)).isDirectory())throw new Error("The path is not a directory")}catch{throw d}return o}};return a(vt.resolve(e))};kn.exports=Ui;kn.exports.sync=(e,t)=>{if(Ma(e),t=Ua(t),Fa&&t.fs.mkdirSync===Fr.mkdirSync){const n=vt.resolve(e);return Fr.mkdirSync(n,{mode:t.mode,recursive:!0}),n}const r=n=>{try{t.fs.mkdirSync(n,t.mode)}catch(a){if(a.code==="EPERM")throw a;if(a.code==="ENOENT"){if(vt.dirname(n)===n)throw Va(n);if(a.message.includes("null bytes"))throw a;return r(vt.dirname(n)),r(n)}try{if(!t.fs.statSync(n).isDirectory())throw new Error("The path is not a directory")}catch{throw a}}return n};return r(vt.resolve(e))};var Vi=kn.exports,jn={exports:{}},Fn={exports:{}},Mn={exports:{}},Un={exports:{}};const za=Hr;Un.exports=e=>new Promise(t=>{za.access(e,r=>{t(!r)})});Un.exports.sync=e=>{try{return za.accessSync(e),!0}catch{return!1}};var zi=Un.exports,Vn={exports:{}},zn={exports:{}};const Ga=(e,...t)=>new Promise(r=>{r(e(...t))});zn.exports=Ga;zn.exports.default=Ga;var Gi=zn.exports;const qi=Gi,qa=e=>{if(!((Number.isInteger(e)||e===1/0)&&e>0))return Promise.reject(new TypeError("Expected `concurrency` to be a number from 1 and up"));const t=[];let r=0;const n=()=>{r--,t.length>0&&t.shift()()},a=(w,l,...i)=>{r++;const s=qi(w,...i);l(s),s.then(n,n)},o=(w,l,...i)=>{r<e?a(w,l,...i):t.push(a.bind(null,w,l,...i))},d=(w,...l)=>new Promise(i=>o(w,i,...l));return Object.defineProperties(d,{activeCount:{get:()=>r},pendingCount:{get:()=>t.length},clearQueue:{value:()=>{t.length=0}}}),d};Vn.exports=qa;Vn.exports.default=qa;var Hi=Vn.exports;const qs=Hi;class Ha extends Error{constructor(t){super(),this.value=t}}const Xi=(e,t)=>Promise.resolve(e).then(t),Ki=e=>Promise.all(e).then(t=>t[1]===!0&&Promise.reject(new Ha(t[0])));var Bi=(e,t,r)=>{r=Object.assign({concurrency:1/0,preserveOrder:!0},r);const n=qs(r.concurrency),a=[...e].map(d=>[d,n(Xi,d,t)]),o=qs(r.preserveOrder?1:1/0);return Promise.all(a.map(d=>o(Ki,d))).then(()=>{}).catch(d=>d instanceof Ha?d.value:Promise.reject(d))};const Xa=Nt,Ka=zi,xi=Bi;Mn.exports=(e,t)=>(t=Object.assign({cwd:process.cwd()},t),xi(e,r=>Ka(Xa.resolve(t.cwd,r)),t));Mn.exports.sync=(e,t)=>{t=Object.assign({cwd:process.cwd()},t);for(const r of e)if(Ka.sync(Xa.resolve(t.cwd,r)))return r};var Wi=Mn.exports;const St=Nt,Ba=Wi;Fn.exports=(e,t={})=>{const r=St.resolve(t.cwd||""),{root:n}=St.parse(r),a=[].concat(e);return new Promise(o=>{(function d(w){Ba(a,{cwd:w}).then(l=>{l?o(St.join(w,l)):w===n?o(null):d(St.dirname(w))})})(r)})};Fn.exports.sync=(e,t={})=>{let r=St.resolve(t.cwd||"");const{root:n}=St.parse(r),a=[].concat(e);for(;;){const o=Ba.sync(a,{cwd:r});if(o)return St.join(r,o);if(r===n)return null;r=St.dirname(r)}};var Yi=Fn.exports;const xa=Yi;jn.exports=async({cwd:e}={})=>xa("package.json",{cwd:e});jn.exports.sync=({cwd:e}={})=>xa.sync("package.json",{cwd:e});var Ji=jn.exports,Gn={exports:{}};const Se=Nt,Wa=bi,Rt=Wa.homedir(),qn=Wa.tmpdir(),{env:Ht}=process,Qi=e=>{const t=Se.join(Rt,"Library");return{data:Se.join(t,"Application Support",e),config:Se.join(t,"Preferences",e),cache:Se.join(t,"Caches",e),log:Se.join(t,"Logs",e),temp:Se.join(qn,e)}},Zi=e=>{const t=Ht.APPDATA||Se.join(Rt,"AppData","Roaming"),r=Ht.LOCALAPPDATA||Se.join(Rt,"AppData","Local");return{data:Se.join(r,e,"Data"),config:Se.join(t,e,"Config"),cache:Se.join(r,e,"Cache"),log:Se.join(r,e,"Log"),temp:Se.join(qn,e)}},eo=e=>{const t=Se.basename(Rt);return{data:Se.join(Ht.XDG_DATA_HOME||Se.join(Rt,".local","share"),e),config:Se.join(Ht.XDG_CONFIG_HOME||Se.join(Rt,".config"),e),cache:Se.join(Ht.XDG_CACHE_HOME||Se.join(Rt,".cache"),e),log:Se.join(Ht.XDG_STATE_HOME||Se.join(Rt,".local","state"),e),temp:Se.join(qn,t,e)}},Ya=(e,t)=>{if(typeof e!="string")throw new TypeError(`Expected string, got ${typeof e}`);return t=Object.assign({suffix:"nodejs"},t),t.suffix&&(e+=`-${t.suffix}`),process.platform==="darwin"?Qi(e):process.platform==="win32"?Zi(e):eo(e)};Gn.exports=Ya;Gn.exports.default=Ya;var to=Gn.exports,ht={},ye={};Object.defineProperty(ye,"__esModule",{value:!0});ye.NOOP=ye.LIMIT_FILES_DESCRIPTORS=ye.LIMIT_BASENAME_LENGTH=ye.IS_USER_ROOT=ye.IS_POSIX=ye.DEFAULT_TIMEOUT_SYNC=ye.DEFAULT_TIMEOUT_ASYNC=ye.DEFAULT_WRITE_OPTIONS=ye.DEFAULT_READ_OPTIONS=ye.DEFAULT_FOLDER_MODE=ye.DEFAULT_FILE_MODE=ye.DEFAULT_ENCODING=void 0;const ro="utf8";ye.DEFAULT_ENCODING=ro;const no=438;ye.DEFAULT_FILE_MODE=no;const so=511;ye.DEFAULT_FOLDER_MODE=so;const ao={};ye.DEFAULT_READ_OPTIONS=ao;const io={};ye.DEFAULT_WRITE_OPTIONS=io;const oo=5e3;ye.DEFAULT_TIMEOUT_ASYNC=oo;const co=100;ye.DEFAULT_TIMEOUT_SYNC=co;const lo=!!process.getuid;ye.IS_POSIX=lo;const uo=process.getuid?!process.getuid():!1;ye.IS_USER_ROOT=uo;const fo=128;ye.LIMIT_BASENAME_LENGTH=fo;const ho=1e4;ye.LIMIT_FILES_DESCRIPTORS=ho;const po=()=>{};ye.NOOP=po;var Xr={},Xt={};Object.defineProperty(Xt,"__esModule",{value:!0});Xt.attemptifySync=Xt.attemptifyAsync=void 0;const Ja=ye,mo=(e,t=Ja.NOOP)=>function(){return e.apply(void 0,arguments).catch(t)};Xt.attemptifyAsync=mo;const yo=(e,t=Ja.NOOP)=>function(){try{return e.apply(void 0,arguments)}catch(r){return t(r)}};Xt.attemptifySync=yo;var Hn={};Object.defineProperty(Hn,"__esModule",{value:!0});const vo=ye,Qa={isChangeErrorOk:e=>{const{code:t}=e;return t==="ENOSYS"||!vo.IS_USER_ROOT&&(t==="EINVAL"||t==="EPERM")},isRetriableError:e=>{const{code:t}=e;return t==="EMFILE"||t==="ENFILE"||t==="EAGAIN"||t==="EBUSY"||t==="EACCESS"||t==="EACCS"||t==="EPERM"},onChangeError:e=>{if(!Qa.isChangeErrorOk(e))throw e}};Hn.default=Qa;var Kt={},Xn={};Object.defineProperty(Xn,"__esModule",{value:!0});const Eo=ye,ge={interval:25,intervalId:void 0,limit:Eo.LIMIT_FILES_DESCRIPTORS,queueActive:new Set,queueWaiting:new Set,init:()=>{ge.intervalId||(ge.intervalId=setInterval(ge.tick,ge.interval))},reset:()=>{ge.intervalId&&(clearInterval(ge.intervalId),delete ge.intervalId)},add:e=>{ge.queueWaiting.add(e),ge.queueActive.size<ge.limit/2?ge.tick():ge.init()},remove:e=>{ge.queueWaiting.delete(e),ge.queueActive.delete(e)},schedule:()=>new Promise(e=>{const t=()=>ge.remove(r),r=()=>e(t);ge.add(r)}),tick:()=>{if(!(ge.queueActive.size>=ge.limit)){if(!ge.queueWaiting.size)return ge.reset();for(const e of ge.queueWaiting){if(ge.queueActive.size>=ge.limit)break;ge.queueWaiting.delete(e),ge.queueActive.add(e),e()}}}};Xn.default=ge;Object.defineProperty(Kt,"__esModule",{value:!0});Kt.retryifySync=Kt.retryifyAsync=void 0;const $o=Xn,go=(e,t)=>function(r){return function n(){return $o.default.schedule().then(a=>e.apply(void 0,arguments).then(o=>(a(),o),o=>{if(a(),Date.now()>=r)throw o;if(t(o)){const d=Math.round(100+400*Math.random());return new Promise(l=>setTimeout(l,d)).then(()=>n.apply(void 0,arguments))}throw o}))}};Kt.retryifyAsync=go;const _o=(e,t)=>function(r){return function n(){try{return e.apply(void 0,arguments)}catch(a){if(Date.now()>r)throw a;if(t(a))return n.apply(void 0,arguments);throw a}}};Kt.retryifySync=_o;Object.defineProperty(Xr,"__esModule",{value:!0});const ve=Hr,Me=ja,Ue=Xt,Ae=Hn,Ge=Kt,wo={chmodAttempt:Ue.attemptifyAsync(Me.promisify(ve.chmod),Ae.default.onChangeError),chownAttempt:Ue.attemptifyAsync(Me.promisify(ve.chown),Ae.default.onChangeError),closeAttempt:Ue.attemptifyAsync(Me.promisify(ve.close)),fsyncAttempt:Ue.attemptifyAsync(Me.promisify(ve.fsync)),mkdirAttempt:Ue.attemptifyAsync(Me.promisify(ve.mkdir)),realpathAttempt:Ue.attemptifyAsync(Me.promisify(ve.realpath)),statAttempt:Ue.attemptifyAsync(Me.promisify(ve.stat)),unlinkAttempt:Ue.attemptifyAsync(Me.promisify(ve.unlink)),closeRetry:Ge.retryifyAsync(Me.promisify(ve.close),Ae.default.isRetriableError),fsyncRetry:Ge.retryifyAsync(Me.promisify(ve.fsync),Ae.default.isRetriableError),openRetry:Ge.retryifyAsync(Me.promisify(ve.open),Ae.default.isRetriableError),readFileRetry:Ge.retryifyAsync(Me.promisify(ve.readFile),Ae.default.isRetriableError),renameRetry:Ge.retryifyAsync(Me.promisify(ve.rename),Ae.default.isRetriableError),statRetry:Ge.retryifyAsync(Me.promisify(ve.stat),Ae.default.isRetriableError),writeRetry:Ge.retryifyAsync(Me.promisify(ve.write),Ae.default.isRetriableError),chmodSyncAttempt:Ue.attemptifySync(ve.chmodSync,Ae.default.onChangeError),chownSyncAttempt:Ue.attemptifySync(ve.chownSync,Ae.default.onChangeError),closeSyncAttempt:Ue.attemptifySync(ve.closeSync),mkdirSyncAttempt:Ue.attemptifySync(ve.mkdirSync),realpathSyncAttempt:Ue.attemptifySync(ve.realpathSync),statSyncAttempt:Ue.attemptifySync(ve.statSync),unlinkSyncAttempt:Ue.attemptifySync(ve.unlinkSync),closeSyncRetry:Ge.retryifySync(ve.closeSync,Ae.default.isRetriableError),fsyncSyncRetry:Ge.retryifySync(ve.fsyncSync,Ae.default.isRetriableError),openSyncRetry:Ge.retryifySync(ve.openSync,Ae.default.isRetriableError),readFileSyncRetry:Ge.retryifySync(ve.readFileSync,Ae.default.isRetriableError),renameSyncRetry:Ge.retryifySync(ve.renameSync,Ae.default.isRetriableError),statSyncRetry:Ge.retryifySync(ve.statSync,Ae.default.isRetriableError),writeSyncRetry:Ge.retryifySync(ve.writeSync,Ae.default.isRetriableError)};Xr.default=wo;var Kn={};Object.defineProperty(Kn,"__esModule",{value:!0});const Ro={isFunction:e=>typeof e=="function",isString:e=>typeof e=="string",isUndefined:e=>typeof e>"u"};Kn.default=Ro;var Bn={};Object.defineProperty(Bn,"__esModule",{value:!0});const Rr={},In={next:e=>{const t=Rr[e];if(!t)return;t.shift();const r=t[0];r?r(()=>In.next(e)):delete Rr[e]},schedule:e=>new Promise(t=>{let r=Rr[e];r||(r=Rr[e]=[]),r.push(t),!(r.length>1)&&t(()=>In.next(e))})};Bn.default=In;var xn={};Object.defineProperty(xn,"__esModule",{value:!0});const So=Nt,Hs=ye,Xs=Xr,Xe={store:{},create:e=>{const t=`000000${Math.floor(Math.random()*16777215).toString(16)}`.slice(-6),r=Date.now().toString().slice(-10),n="tmp-",a=`.${n}${r}${t}`;return`${e}${a}`},get:(e,t,r=!0)=>{const n=Xe.truncate(t(e));return n in Xe.store?Xe.get(e,t,r):(Xe.store[n]=r,[n,()=>delete Xe.store[n]])},purge:e=>{Xe.store[e]&&(delete Xe.store[e],Xs.default.unlinkAttempt(e))},purgeSync:e=>{Xe.store[e]&&(delete Xe.store[e],Xs.default.unlinkSyncAttempt(e))},purgeSyncAll:()=>{for(const e in Xe.store)Xe.purgeSync(e)},truncate:e=>{const t=So.basename(e);if(t.length<=Hs.LIMIT_BASENAME_LENGTH)return e;const r=/^(\.?)(.*?)((?:\.[^.]+)?(?:\.tmp-\d{10}[a-f0-9]{6})?)$/.exec(t);if(!r)return e;const n=t.length-Hs.LIMIT_BASENAME_LENGTH;return`${e.slice(0,-t.length)}${r[1]}${r[2].slice(0,-n)}${r[3]}`}};process.on("exit",Xe.purgeSyncAll);xn.default=Xe;Object.defineProperty(ht,"__esModule",{value:!0});ht.writeFileSync=ht.writeFile=ht.readFileSync=ht.readFile=void 0;const Za=Nt,Le=ye,me=Xr,Ke=Kn,Io=Bn,It=xn;function ei(e,t=Le.DEFAULT_READ_OPTIONS){var r;if(Ke.default.isString(t))return ei(e,{encoding:t});const n=Date.now()+((r=t.timeout)!==null&&r!==void 0?r:Le.DEFAULT_TIMEOUT_ASYNC);return me.default.readFileRetry(n)(e,t)}ht.readFile=ei;function ti(e,t=Le.DEFAULT_READ_OPTIONS){var r;if(Ke.default.isString(t))return ti(e,{encoding:t});const n=Date.now()+((r=t.timeout)!==null&&r!==void 0?r:Le.DEFAULT_TIMEOUT_SYNC);return me.default.readFileSyncRetry(n)(e,t)}ht.readFileSync=ti;const ri=(e,t,r,n)=>{if(Ke.default.isFunction(r))return ri(e,t,Le.DEFAULT_WRITE_OPTIONS,r);const a=ni(e,t,r);return n&&a.then(n,n),a};ht.writeFile=ri;const ni=async(e,t,r=Le.DEFAULT_WRITE_OPTIONS)=>{var n;if(Ke.default.isString(r))return ni(e,t,{encoding:r});const a=Date.now()+((n=r.timeout)!==null&&n!==void 0?n:Le.DEFAULT_TIMEOUT_ASYNC);let o=null,d=null,w=null,l=null,i=null;try{r.schedule&&(o=await r.schedule(e)),d=await Io.default.schedule(e),e=await me.default.realpathAttempt(e)||e,[l,w]=It.default.get(e,r.tmpCreate||It.default.create,r.tmpPurge!==!1);const s=Le.IS_POSIX&&Ke.default.isUndefined(r.chown),g=Ke.default.isUndefined(r.mode);if(s||g){const c=await me.default.statAttempt(e);c&&(r={...r},s&&(r.chown={uid:c.uid,gid:c.gid}),g&&(r.mode=c.mode))}const R=Za.dirname(e);await me.default.mkdirAttempt(R,{mode:Le.DEFAULT_FOLDER_MODE,recursive:!0}),i=await me.default.openRetry(a)(l,"w",r.mode||Le.DEFAULT_FILE_MODE),r.tmpCreated&&r.tmpCreated(l),Ke.default.isString(t)?await me.default.writeRetry(a)(i,t,0,r.encoding||Le.DEFAULT_ENCODING):Ke.default.isUndefined(t)||await me.default.writeRetry(a)(i,t,0,t.length,0),r.fsync!==!1&&(r.fsyncWait!==!1?await me.default.fsyncRetry(a)(i):me.default.fsyncAttempt(i)),await me.default.closeRetry(a)(i),i=null,r.chown&&await me.default.chownAttempt(l,r.chown.uid,r.chown.gid),r.mode&&await me.default.chmodAttempt(l,r.mode);try{await me.default.renameRetry(a)(l,e)}catch(c){if(c.code!=="ENAMETOOLONG")throw c;await me.default.renameRetry(a)(l,It.default.truncate(e))}w(),l=null}finally{i&&await me.default.closeAttempt(i),l&&It.default.purge(l),o&&o(),d&&d()}},si=(e,t,r=Le.DEFAULT_WRITE_OPTIONS)=>{var n;if(Ke.default.isString(r))return si(e,t,{encoding:r});const a=Date.now()+((n=r.timeout)!==null&&n!==void 0?n:Le.DEFAULT_TIMEOUT_SYNC);let o=null,d=null,w=null;try{e=me.default.realpathSyncAttempt(e)||e,[d,o]=It.default.get(e,r.tmpCreate||It.default.create,r.tmpPurge!==!1);const l=Le.IS_POSIX&&Ke.default.isUndefined(r.chown),i=Ke.default.isUndefined(r.mode);if(l||i){const g=me.default.statSyncAttempt(e);g&&(r={...r},l&&(r.chown={uid:g.uid,gid:g.gid}),i&&(r.mode=g.mode))}const s=Za.dirname(e);me.default.mkdirSyncAttempt(s,{mode:Le.DEFAULT_FOLDER_MODE,recursive:!0}),w=me.default.openSyncRetry(a)(d,"w",r.mode||Le.DEFAULT_FILE_MODE),r.tmpCreated&&r.tmpCreated(d),Ke.default.isString(t)?me.default.writeSyncRetry(a)(w,t,0,r.encoding||Le.DEFAULT_ENCODING):Ke.default.isUndefined(t)||me.default.writeSyncRetry(a)(w,t,0,t.length,0),r.fsync!==!1&&(r.fsyncWait!==!1?me.default.fsyncSyncRetry(a)(w):me.default.fsyncAttempt(w)),me.default.closeSyncRetry(a)(w),w=null,r.chown&&me.default.chownSyncAttempt(d,r.chown.uid,r.chown.gid),r.mode&&me.default.chmodSyncAttempt(d,r.mode);try{me.default.renameSyncRetry(a)(d,e)}catch(g){if(g.code!=="ENAMETOOLONG")throw g;me.default.renameSyncRetry(a)(d,It.default.truncate(e))}o(),d=null}finally{w&&me.default.closeSyncAttempt(w),d&&It.default.purge(d)}};ht.writeFileSync=si;var ai={},zt={},un={},kt={};Object.defineProperty(kt,"__esModule",{value:!0});kt.getRules=kt.isJSONType=void 0;const Oo=["string","number","integer","boolean","null","object","array"],No=new Set(Oo);function To(e){return typeof e=="string"&&No.has(e)}kt.isJSONType=To;function Po(){const e={number:{type:"number",rules:[]},string:{type:"string",rules:[]},array:{type:"array",rules:[]},object:{type:"object",rules:[]}};return{types:{...e,integer:!0,boolean:!0,null:!0},rules:[{rules:[]},e.number,e.string,e.array,e.object],post:{rules:[]},all:{},keywords:{}}}kt.getRules=Po;var Et={};Object.defineProperty(Et,"__esModule",{value:!0});Et.shouldUseRule=Et.shouldUseGroup=Et.schemaHasRulesForType=void 0;function Ao({schema:e,self:t},r){const n=t.RULES.types[r];return n&&n!==!0&&ii(e,n)}Et.schemaHasRulesForType=Ao;function ii(e,t){return t.rules.some(r=>oi(e,r))}Et.shouldUseGroup=ii;function oi(e,t){var r;return e[t.keyword]!==void 0||((r=t.definition.implements)===null||r===void 0?void 0:r.some(n=>e[n]!==void 0))}Et.shouldUseRule=oi;var or={},ce={},Mr={};(function(e){Object.defineProperty(e,"__esModule",{value:!0}),e.getProperty=e.safeStringify=e.stringify=e.strConcat=e.addCodeArg=e.str=e._=e.nil=e._Code=e.Name=e.IDENTIFIER=e._CodeOrName=void 0;class t{}e._CodeOrName=t,e.IDENTIFIER=/^[a-z$_][a-z$_0-9]*$/i;class r extends t{constructor(S){if(super(),!e.IDENTIFIER.test(S))throw new Error("CodeGen: name must be a valid identifier");this.str=S}toString(){return this.str}emptyStr(){return!1}get names(){return{[this.str]:1}}}e.Name=r;class n extends t{constructor(S){super(),this._items=typeof S=="string"?[S]:S}toString(){return this.str}emptyStr(){if(this._items.length>1)return!1;const S=this._items[0];return S===""||S==='""'}get str(){var S;return(S=this._str)!==null&&S!==void 0?S:this._str=this._items.reduce((u,m)=>`${u}${m}`,"")}get names(){var S;return(S=this._names)!==null&&S!==void 0?S:this._names=this._items.reduce((u,m)=>(m instanceof r&&(u[m.str]=(u[m.str]||0)+1),u),{})}}e._Code=n,e.nil=new n("");function a(f,...S){const u=[f[0]];let m=0;for(;m<S.length;)w(u,S[m]),u.push(f[++m]);return new n(u)}e._=a;const o=new n("+");function d(f,...S){const u=[c(f[0])];let m=0;for(;m<S.length;)u.push(o),w(u,S[m]),u.push(o,c(f[++m]));return l(u),new n(u)}e.str=d;function w(f,S){S instanceof n?f.push(...S._items):S instanceof r?f.push(S):f.push(g(S))}e.addCodeArg=w;function l(f){let S=1;for(;S<f.length-1;){if(f[S]===o){const u=i(f[S-1],f[S+1]);if(u!==void 0){f.splice(S-1,3,u);continue}f[S++]="+"}S++}}function i(f,S){if(S==='""')return f;if(f==='""')return S;if(typeof f=="string")return S instanceof r||f[f.length-1]!=='"'?void 0:typeof S!="string"?`${f.slice(0,-1)}${S}"`:S[0]==='"'?f.slice(0,-1)+S.slice(1):void 0;if(typeof S=="string"&&S[0]==='"'&&!(f instanceof r))return`"${f}${S.slice(1)}`}function s(f,S){return S.emptyStr()?f:f.emptyStr()?S:d`${f}${S}`}e.strConcat=s;function g(f){return typeof f=="number"||typeof f=="boolean"||f===null?f:c(Array.isArray(f)?f.join(","):f)}function R(f){return new n(c(f))}e.stringify=R;function c(f){return JSON.stringify(f).replace(/\u2028/g,"\\u2028").replace(/\u2029/g,"\\u2029")}e.safeStringify=c;function E(f){return typeof f=="string"&&e.IDENTIFIER.test(f)?new n(`.${f}`):a`[${f}]`}e.getProperty=E})(Mr);var On={};(function(e){Object.defineProperty(e,"__esModule",{value:!0}),e.ValueScope=e.ValueScopeName=e.Scope=e.varKinds=e.UsedValueState=void 0;const t=Mr;class r extends Error{constructor(i){super(`CodeGen: "code" for ${i} not defined`),this.value=i.value}}var n;(function(l){l[l.Started=0]="Started",l[l.Completed=1]="Completed"})(n=e.UsedValueState||(e.UsedValueState={})),e.varKinds={const:new t.Name("const"),let:new t.Name("let"),var:new t.Name("var")};class a{constructor({prefixes:i,parent:s}={}){this._names={},this._prefixes=i,this._parent=s}toName(i){return i instanceof t.Name?i:this.name(i)}name(i){return new t.Name(this._newName(i))}_newName(i){const s=this._names[i]||this._nameGroup(i);return`${i}${s.index++}`}_nameGroup(i){var s,g;if(!((g=(s=this._parent)===null||s===void 0?void 0:s._prefixes)===null||g===void 0)&&g.has(i)||this._prefixes&&!this._prefixes.has(i))throw new Error(`CodeGen: prefix "${i}" is not allowed in this scope`);return this._names[i]={prefix:i,index:0}}}e.Scope=a;class o extends t.Name{constructor(i,s){super(s),this.prefix=i}setValue(i,{property:s,itemIndex:g}){this.value=i,this.scopePath=t._`.${new t.Name(s)}[${g}]`}}e.ValueScopeName=o;const d=t._`\n`;class w extends a{constructor(i){super(i),this._values={},this._scope=i.scope,this.opts={...i,_n:i.lines?d:t.nil}}get(){return this._scope}name(i){return new o(i,this._newName(i))}value(i,s){var g;if(s.ref===void 0)throw new Error("CodeGen: ref must be passed in value");const R=this.toName(i),{prefix:c}=R,E=(g=s.key)!==null&&g!==void 0?g:s.ref;let f=this._values[c];if(f){const m=f.get(E);if(m)return m}else f=this._values[c]=new Map;f.set(E,R);const S=this._scope[c]||(this._scope[c]=[]),u=S.length;return S[u]=s.ref,R.setValue(s,{property:c,itemIndex:u}),R}getValue(i,s){const g=this._values[i];if(g)return g.get(s)}scopeRefs(i,s=this._values){return this._reduceValues(s,g=>{if(g.scopePath===void 0)throw new Error(`CodeGen: name "${g}" has no value`);return t._`${i}${g.scopePath}`})}scopeCode(i=this._values,s,g){return this._reduceValues(i,R=>{if(R.value===void 0)throw new Error(`CodeGen: name "${R}" has no value`);return R.value.code},s,g)}_reduceValues(i,s,g={},R){let c=t.nil;for(const E in i){const f=i[E];if(!f)continue;const S=g[E]=g[E]||new Map;f.forEach(u=>{if(S.has(u))return;S.set(u,n.Started);let m=s(u);if(m){const _=this.opts.es5?e.varKinds.var:e.varKinds.const;c=t._`${c}${_} ${u} = ${m};${this.opts._n}`}else if(m=R==null?void 0:R(u))c=t._`${c}${m}${this.opts._n}`;else throw new r(u);S.set(u,n.Completed)})}return c}}e.ValueScope=w})(On);(function(e){Object.defineProperty(e,"__esModule",{value:!0}),e.or=e.and=e.not=e.CodeGen=e.operators=e.varKinds=e.ValueScopeName=e.ValueScope=e.Scope=e.Name=e.stringify=e.getProperty=e.nil=e.strConcat=e.str=e._=void 0;const t=Mr,r=On;var n=Mr;Object.defineProperty(e,"_",{enumerable:!0,get:function(){return n._}}),Object.defineProperty(e,"str",{enumerable:!0,get:function(){return n.str}}),Object.defineProperty(e,"strConcat",{enumerable:!0,get:function(){return n.strConcat}}),Object.defineProperty(e,"nil",{enumerable:!0,get:function(){return n.nil}}),Object.defineProperty(e,"getProperty",{enumerable:!0,get:function(){return n.getProperty}}),Object.defineProperty(e,"stringify",{enumerable:!0,get:function(){return n.stringify}}),Object.defineProperty(e,"Name",{enumerable:!0,get:function(){return n.Name}});var a=On;Object.defineProperty(e,"Scope",{enumerable:!0,get:function(){return a.Scope}}),Object.defineProperty(e,"ValueScope",{enumerable:!0,get:function(){return a.ValueScope}}),Object.defineProperty(e,"ValueScopeName",{enumerable:!0,get:function(){return a.ValueScopeName}}),Object.defineProperty(e,"varKinds",{enumerable:!0,get:function(){return a.varKinds}}),e.operators={GT:new t._Code(">"),GTE:new t._Code(">="),LT:new t._Code("<"),LTE:new t._Code("<="),EQ:new t._Code("==="),NEQ:new t._Code("!=="),NOT:new t._Code("!"),OR:new t._Code("||"),AND:new t._Code("&&"),ADD:new t._Code("+")};class o{optimizeNodes(){return this}optimizeNames(p,O){return this}}class d extends o{constructor(p,O,D){super(),this.varKind=p,this.name=O,this.rhs=D}render({es5:p,_n:O}){const D=p?r.varKinds.var:this.varKind,B=this.rhs===void 0?"":` = ${this.rhs}`;return`${D} ${this.name}${B};`+O}optimizeNames(p,O){if(p[this.name.str])return this.rhs&&(this.rhs=J(this.rhs,p,O)),this}get names(){return this.rhs instanceof t._CodeOrName?this.rhs.names:{}}}class w extends o{constructor(p,O,D){super(),this.lhs=p,this.rhs=O,this.sideEffects=D}render({_n:p}){return`${this.lhs} = ${this.rhs};`+p}optimizeNames(p,O){if(!(this.lhs instanceof t.Name&&!p[this.lhs.str]&&!this.sideEffects))return this.rhs=J(this.rhs,p,O),this}get names(){const p=this.lhs instanceof t.Name?{}:{...this.lhs.names};return K(p,this.rhs)}}class l extends w{constructor(p,O,D,B){super(p,D,B),this.op=O}render({_n:p}){return`${this.lhs} ${this.op}= ${this.rhs};`+p}}class i extends o{constructor(p){super(),this.label=p,this.names={}}render({_n:p}){return`${this.label}:`+p}}class s extends o{constructor(p){super(),this.label=p,this.names={}}render({_n:p}){return`break${this.label?` ${this.label}`:""};`+p}}class g extends o{constructor(p){super(),this.error=p}render({_n:p}){return`throw ${this.error};`+p}get names(){return this.error.names}}class R extends o{constructor(p){super(),this.code=p}render({_n:p}){return`${this.code};`+p}optimizeNodes(){return`${this.code}`?this:void 0}optimizeNames(p,O){return this.code=J(this.code,p,O),this}get names(){return this.code instanceof t._CodeOrName?this.code.names:{}}}class c extends o{constructor(p=[]){super(),this.nodes=p}render(p){return this.nodes.reduce((O,D)=>O+D.render(p),"")}optimizeNodes(){const{nodes:p}=this;let O=p.length;for(;O--;){const D=p[O].optimizeNodes();Array.isArray(D)?p.splice(O,1,...D):D?p[O]=D:p.splice(O,1)}return p.length>0?this:void 0}optimizeNames(p,O){const{nodes:D}=this;let B=D.length;for(;B--;){const W=D[B];W.optimizeNames(p,O)||(le(p,W.names),D.splice(B,1))}return D.length>0?this:void 0}get names(){return this.nodes.reduce((p,O)=>L(p,O.names),{})}}class E extends c{render(p){return"{"+p._n+super.render(p)+"}"+p._n}}class f extends c{}class S extends E{}S.kind="else";class u extends E{constructor(p,O){super(O),this.condition=p}render(p){let O=`if(${this.condition})`+super.render(p);return this.else&&(O+="else "+this.else.render(p)),O}optimizeNodes(){super.optimizeNodes();const p=this.condition;if(p===!0)return this.nodes;let O=this.else;if(O){const D=O.optimizeNodes();O=this.else=Array.isArray(D)?new S(D):D}if(O)return p===!1?O instanceof u?O:O.nodes:this.nodes.length?this:new u(V(p),O instanceof u?[O]:O.nodes);if(!(p===!1||!this.nodes.length))return this}optimizeNames(p,O){var D;if(this.else=(D=this.else)===null||D===void 0?void 0:D.optimizeNames(p,O),!!(super.optimizeNames(p,O)||this.else))return this.condition=J(this.condition,p,O),this}get names(){const p=super.names;return K(p,this.condition),this.else&&L(p,this.else.names),p}}u.kind="if";class m extends E{}m.kind="for";class _ extends m{constructor(p){super(),this.iteration=p}render(p){return`for(${this.iteration})`+super.render(p)}optimizeNames(p,O){if(super.optimizeNames(p,O))return this.iteration=J(this.iteration,p,O),this}get names(){return L(super.names,this.iteration.names)}}class C extends m{constructor(p,O,D,B){super(),this.varKind=p,this.name=O,this.from=D,this.to=B}render(p){const O=p.es5?r.varKinds.var:this.varKind,{name:D,from:B,to:W}=this;return`for(${O} ${D}=${B}; ${D}<${W}; ${D}++)`+super.render(p)}get names(){const p=K(super.names,this.from);return K(p,this.to)}}class j extends m{constructor(p,O,D,B){super(),this.loop=p,this.varKind=O,this.name=D,this.iterable=B}render(p){return`for(${this.varKind} ${this.name} ${this.loop} ${this.iterable})`+super.render(p)}optimizeNames(p,O){if(super.optimizeNames(p,O))return this.iterable=J(this.iterable,p,O),this}get names(){return L(super.names,this.iterable.names)}}class q extends E{constructor(p,O,D){super(),this.name=p,this.args=O,this.async=D}render(p){return`${this.async?"async ":""}function ${this.name}(${this.args})`+super.render(p)}}q.kind="func";class k extends c{render(p){return"return "+super.render(p)}}k.kind="return";class Y extends E{render(p){let O="try"+super.render(p);return this.catch&&(O+=this.catch.render(p)),this.finally&&(O+=this.finally.render(p)),O}optimizeNodes(){var p,O;return super.optimizeNodes(),(p=this.catch)===null||p===void 0||p.optimizeNodes(),(O=this.finally)===null||O===void 0||O.optimizeNodes(),this}optimizeNames(p,O){var D,B;return super.optimizeNames(p,O),(D=this.catch)===null||D===void 0||D.optimizeNames(p,O),(B=this.finally)===null||B===void 0||B.optimizeNames(p,O),this}get names(){const p=super.names;return this.catch&&L(p,this.catch.names),this.finally&&L(p,this.finally.names),p}}class Q extends E{constructor(p){super(),this.error=p}render(p){return`catch(${this.error})`+super.render(p)}}Q.kind="catch";class te extends E{render(p){return"finally"+super.render(p)}}te.kind="finally";class ie{constructor(p,O={}){this._values={},this._blockStarts=[],this._constants={},this.opts={...O,_n:O.lines?`
-`:""},this._extScope=p,this._scope=new r.Scope({parent:p}),this._nodes=[new f]}toString(){return this._root.render(this.opts)}name(p){return this._scope.name(p)}scopeName(p){return this._extScope.name(p)}scopeValue(p,O){const D=this._extScope.value(p,O);return(this._values[D.prefix]||(this._values[D.prefix]=new Set)).add(D),D}getScopeValue(p,O){return this._extScope.getValue(p,O)}scopeRefs(p){return this._extScope.scopeRefs(p,this._values)}scopeCode(){return this._extScope.scopeCode(this._values)}_def(p,O,D,B){const W=this._scope.toName(O);return D!==void 0&&B&&(this._constants[W.str]=D),this._leafNode(new d(p,W,D)),W}const(p,O,D){return this._def(r.varKinds.const,p,O,D)}let(p,O,D){return this._def(r.varKinds.let,p,O,D)}var(p,O,D){return this._def(r.varKinds.var,p,O,D)}assign(p,O,D){return this._leafNode(new w(p,O,D))}add(p,O){return this._leafNode(new l(p,e.operators.ADD,O))}code(p){return typeof p=="function"?p():p!==t.nil&&this._leafNode(new R(p)),this}object(...p){const O=["{"];for(const[D,B]of p)O.length>1&&O.push(","),O.push(D),(D!==B||this.opts.es5)&&(O.push(":"),t.addCodeArg(O,B));return O.push("}"),new t._Code(O)}if(p,O,D){if(this._blockNode(new u(p)),O&&D)this.code(O).else().code(D).endIf();else if(O)this.code(O).endIf();else if(D)throw new Error('CodeGen: "else" body without "then" body');return this}elseIf(p){return this._elseNode(new u(p))}else(){return this._elseNode(new S)}endIf(){return this._endBlockNode(u,S)}_for(p,O){return this._blockNode(p),O&&this.code(O).endFor(),this}for(p,O){return this._for(new _(p),O)}forRange(p,O,D,B,W=this.opts.es5?r.varKinds.var:r.varKinds.let){const se=this._scope.toName(p);return this._for(new C(W,se,O,D),()=>B(se))}forOf(p,O,D,B=r.varKinds.const){const W=this._scope.toName(p);if(this.opts.es5){const se=O instanceof t.Name?O:this.var("_arr",O);return this.forRange("_i",0,t._`${se}.length`,Fe=>{this.var(W,t._`${se}[${Fe}]`),D(W)})}return this._for(new j("of",B,W,O),()=>D(W))}forIn(p,O,D,B=this.opts.es5?r.varKinds.var:r.varKinds.const){if(this.opts.ownProperties)return this.forOf(p,t._`Object.keys(${O})`,D);const W=this._scope.toName(p);return this._for(new j("in",B,W,O),()=>D(W))}endFor(){return this._endBlockNode(m)}label(p){return this._leafNode(new i(p))}break(p){return this._leafNode(new s(p))}return(p){const O=new k;if(this._blockNode(O),this.code(p),O.nodes.length!==1)throw new Error('CodeGen: "return" should have one node');return this._endBlockNode(k)}try(p,O,D){if(!O&&!D)throw new Error('CodeGen: "try" without "catch" and "finally"');const B=new Y;if(this._blockNode(B),this.code(p),O){const W=this.name("e");this._currNode=B.catch=new Q(W),O(W)}return D&&(this._currNode=B.finally=new te,this.code(D)),this._endBlockNode(Q,te)}throw(p){return this._leafNode(new g(p))}block(p,O){return this._blockStarts.push(this._nodes.length),p&&this.code(p).endBlock(O),this}endBlock(p){const O=this._blockStarts.pop();if(O===void 0)throw new Error("CodeGen: not in self-balancing block");const D=this._nodes.length-O;if(D<0||p!==void 0&&D!==p)throw new Error(`CodeGen: wrong number of nodes: ${D} vs ${p} expected`);return this._nodes.length=O,this}func(p,O=t.nil,D,B){return this._blockNode(new q(p,O,D)),B&&this.code(B).endFunc(),this}endFunc(){return this._endBlockNode(q)}optimize(p=1){for(;p-- >0;)this._root.optimizeNodes(),this._root.optimizeNames(this._root.names,this._constants)}_leafNode(p){return this._currNode.nodes.push(p),this}_blockNode(p){this._currNode.nodes.push(p),this._nodes.push(p)}_endBlockNode(p,O){const D=this._currNode;if(D instanceof p||O&&D instanceof O)return this._nodes.pop(),this;throw new Error(`CodeGen: not in block "${O?`${p.kind}/${O.kind}`:p.kind}"`)}_elseNode(p){const O=this._currNode;if(!(O instanceof u))throw new Error('CodeGen: "else" without "if"');return this._currNode=O.else=p,this}get _root(){return this._nodes[0]}get _currNode(){const p=this._nodes;return p[p.length-1]}set _currNode(p){const O=this._nodes;O[O.length-1]=p}}e.CodeGen=ie;function L(F,p){for(const O in p)F[O]=(F[O]||0)+(p[O]||0);return F}function K(F,p){return p instanceof t._CodeOrName?L(F,p.names):F}function J(F,p,O){if(F instanceof t.Name)return D(F);if(!B(F))return F;return new t._Code(F._items.reduce((W,se)=>(se instanceof t.Name&&(se=D(se)),se instanceof t._Code?W.push(...se._items):W.push(se),W),[]));function D(W){const se=O[W.str];return se===void 0||p[W.str]!==1?W:(delete p[W.str],se)}function B(W){return W instanceof t._Code&&W._items.some(se=>se instanceof t.Name&&p[se.str]===1&&O[se.str]!==void 0)}}function le(F,p){for(const O in p)F[O]=(F[O]||0)-(p[O]||0)}function V(F){return typeof F=="boolean"||typeof F=="number"||F===null?!F:t._`!${H(F)}`}e.not=V;const $=z(e.operators.AND);function y(...F){return F.reduce($)}e.and=y;const P=z(e.operators.OR);function b(...F){return F.reduce(P)}e.or=b;function z(F){return(p,O)=>p===t.nil?O:O===t.nil?p:t._`${H(p)} ${F} ${H(O)}`}function H(F){return F instanceof t.Name?F:t._`(${F})`}})(ce);var Je={};Object.defineProperty(Je,"__esModule",{value:!0});const ke=ce,bo={data:new ke.Name("data"),valCxt:new ke.Name("valCxt"),dataPath:new ke.Name("dataPath"),parentData:new ke.Name("parentData"),parentDataProperty:new ke.Name("parentDataProperty"),rootData:new ke.Name("rootData"),dynamicAnchors:new ke.Name("dynamicAnchors"),vErrors:new ke.Name("vErrors"),errors:new ke.Name("errors"),this:new ke.Name("this"),self:new ke.Name("self"),scope:new ke.Name("scope"),json:new ke.Name("json"),jsonPos:new ke.Name("jsonPos"),jsonLen:new ke.Name("jsonLen"),jsonPart:new ke.Name("jsonPart")};Je.default=bo;(function(e){Object.defineProperty(e,"__esModule",{value:!0}),e.extendErrors=e.resetErrorsCount=e.reportExtraError=e.reportError=e.keyword$DataError=e.keywordError=void 0;const t=ce,r=Je;e.keywordError={message:({keyword:c})=>t.str`should pass "${c}" keyword validation`},e.keyword$DataError={message:({keyword:c,schemaType:E})=>E?t.str`"${c}" keyword must be ${E} ($data)`:t.str`"${c}" keyword is invalid ($data)`};function n(c,E=e.keywordError,f){const{it:S}=c,{gen:u,compositeRule:m,allErrors:_}=S,C=s(c,E);f??(m||_)?w(u,C):l(S,t._`[${C}]`)}e.reportError=n;function a(c,E=e.keywordError){const{it:f}=c,{gen:S,compositeRule:u,allErrors:m}=f,_=s(c,E);w(S,_),u||m||l(f,r.default.vErrors)}e.reportExtraError=a;function o(c,E){c.assign(r.default.errors,E),c.if(t._`${r.default.vErrors} !== null`,()=>c.if(E,()=>c.assign(t._`${r.default.vErrors}.length`,E),()=>c.assign(r.default.vErrors,null)))}e.resetErrorsCount=o;function d({gen:c,keyword:E,schemaValue:f,data:S,errsCount:u,it:m}){if(u===void 0)throw new Error("ajv implementation error");const _=c.name("err");c.forRange("i",u,r.default.errors,C=>{c.const(_,t._`${r.default.vErrors}[${C}]`),c.if(t._`${_}.dataPath === undefined`,()=>c.assign(t._`${_}.dataPath`,t.strConcat(r.default.dataPath,m.errorPath))),c.assign(t._`${_}.schemaPath`,t.str`${m.errSchemaPath}/${E}`),m.opts.verbose&&(c.assign(t._`${_}.schema`,f),c.assign(t._`${_}.data`,S))})}e.extendErrors=d;function w(c,E){const f=c.const("err",E);c.if(t._`${r.default.vErrors} === null`,()=>c.assign(r.default.vErrors,t._`[${f}]`),t._`${r.default.vErrors}.push(${f})`),c.code(t._`${r.default.errors}++`)}function l(c,E){const{gen:f,validateName:S,schemaEnv:u}=c;u.$async?f.throw(t._`new ${c.ValidationError}(${E})`):(f.assign(t._`${S}.errors`,E),f.return(!1))}const i={keyword:new t.Name("keyword"),schemaPath:new t.Name("schemaPath"),params:new t.Name("params"),propertyName:new t.Name("propertyName"),message:new t.Name("message"),schema:new t.Name("schema"),parentSchema:new t.Name("parentSchema"),instancePath:new t.Name("instancePath")};function s(c,E){const{createErrors:f,opts:S}=c.it;return f===!1?t._`{}`:(S.jtd&&!S.ajvErrors?g:R)(c,E)}function g(c,{message:E}){const{gen:f,keyword:S,it:u}=c,{errorPath:m,errSchemaPath:_,opts:C}=u,j=[[i.instancePath,t.strConcat(r.default.dataPath,m)],[i.schemaPath,t.str`${_}/${S}`]];return C.messages&&j.push([i.message,typeof E=="function"?E(c):E]),f.object(...j)}function R(c,E){const{gen:f,keyword:S,data:u,schemaValue:m,it:_}=c,{topSchemaRef:C,schemaPath:j,errorPath:q,errSchemaPath:k,propertyName:Y,opts:Q}=_,{params:te,message:ie}=E,L=[[i.keyword,S],[r.default.dataPath,t.strConcat(r.default.dataPath,q)],[i.schemaPath,t.str`${k}/${S}`],[i.params,typeof te=="function"?te(c):te||t._`{}`]];return Y&&L.push([i.propertyName,Y]),Q.messages&&L.push([i.message,typeof ie=="function"?ie(c):ie]),Q.verbose&&L.push([i.schema,m],[i.parentSchema,t._`${C}${j}`],[r.default.data,u]),f.object(...L)}})(or);var he={},rt={},Bt={};Object.defineProperty(Bt,"__esModule",{value:!0});Bt.boolOrEmptySchema=Bt.topBoolOrEmptySchema=void 0;const Co=or,Do=ce,Lo=Je,ko={message:"boolean schema is false"};function jo(e){const{gen:t,schema:r,validateName:n}=e;r===!1?ci(e,!1):typeof r=="object"&&r.$async===!0?t.return(Lo.default.data):(t.assign(Do._`${n}.errors`,null),t.return(!0))}Bt.topBoolOrEmptySchema=jo;function Fo(e,t){const{gen:r,schema:n}=e;n===!1?(r.var(t,!1),ci(e)):r.var(t,!0)}Bt.boolOrEmptySchema=Fo;function ci(e,t){const{gen:r,data:n}=e,a={gen:r,keyword:"false schema",data:n,schema:!1,schemaCode:!1,schemaValue:!1,params:{},it:e};Co.reportError(a,ko,t)}var Qt={},Zt={},Ks;function Mo(){if(Ks)return Zt;Ks=1,Object.defineProperty(Zt,"__esModule",{value:!0}),Zt.assignDefaults=void 0;const e=ce,t=Qe();function r(a,o){const{properties:d,items:w}=a.schema;if(o==="object"&&d)for(const l in d)n(a,l,d[l].default);else o==="array"&&Array.isArray(w)&&w.forEach((l,i)=>n(a,i,l.default))}Zt.assignDefaults=r;function n(a,o,d){const{gen:w,compositeRule:l,data:i,opts:s}=a;if(d===void 0)return;const g=e._`${i}${e.getProperty(o)}`;if(l){t.checkStrictMode(a,`default is ignored for: ${g}`);return}let R=e._`${g} === undefined`;s.useDefaults==="empty"&&(R=e._`${R} || ${g} === null || ${g} === ""`),w.if(R,e._`${g} = ${e.stringify(d)}`)}return Zt}var er={},Ee={},fn={},Bs;function Wt(){return Bs||(Bs=1,function(e){Object.defineProperty(e,"__esModule",{value:!0}),e.applySubschema=e.Type=void 0;const t=Qe(),r=Ie(),n=ce;var a;(function(s){s[s.Num=0]="Num",s[s.Str=1]="Str"})(a=e.Type||(e.Type={}));function o(s,g,R){const c=d(s,g);w(c,s,g),l(c,g);const E={...s,...c,items:void 0,props:void 0};return t.subschemaCode(E,R),E}e.applySubschema=o;function d(s,{keyword:g,schemaProp:R,schema:c,schemaPath:E,errSchemaPath:f,topSchemaRef:S}){if(g!==void 0&&c!==void 0)throw new Error('both "keyword" and "schema" passed, only one allowed');if(g!==void 0){const u=s.schema[g];return R===void 0?{schema:u,schemaPath:n._`${s.schemaPath}${n.getProperty(g)}`,errSchemaPath:`${s.errSchemaPath}/${g}`}:{schema:u[R],schemaPath:n._`${s.schemaPath}${n.getProperty(g)}${n.getProperty(R)}`,errSchemaPath:`${s.errSchemaPath}/${g}/${r.escapeFragment(R)}`}}if(c!==void 0){if(E===void 0||f===void 0||S===void 0)throw new Error('"schemaPath", "errSchemaPath" and "topSchemaRef" are required with "schema"');return{schema:c,schemaPath:E,topSchemaRef:S,errSchemaPath:f}}throw new Error('either "keyword" or "schema" must be passed')}function w(s,g,{dataProp:R,dataPropType:c,data:E,dataTypes:f,propertyName:S}){if(E!==void 0&&R!==void 0)throw new Error('both "data" and "dataProp" passed, only one allowed');const{gen:u}=g;if(R!==void 0){const{errorPath:_,dataPathArr:C,opts:j}=g,q=u.let("data",n._`${g.data}${n.getProperty(R)}`,!0);m(q),s.errorPath=n.str`${_}${i(R,c,j.jsPropertySyntax)}`,s.parentDataProperty=n._`${R}`,s.dataPathArr=[...C,s.parentDataProperty]}if(E!==void 0){const _=E instanceof n.Name?E:u.let("data",E,!0);m(_),S!==void 0&&(s.propertyName=S)}f&&(s.dataTypes=f);function m(_){s.data=_,s.dataLevel=g.dataLevel+1,s.dataTypes=[],g.definedProperties=new Set,s.parentData=g.data,s.dataNames=[...g.dataNames,_]}}function l(s,{jtdDiscriminator:g,jtdMetadata:R,compositeRule:c,createErrors:E,allErrors:f}){c!==void 0&&(s.compositeRule=c),E!==void 0&&(s.createErrors=E),f!==void 0&&(s.allErrors=f),s.jtdDiscriminator=g,s.jtdMetadata=R}function i(s,g,R){if(s instanceof n.Name){const c=g===a.Num;return R?c?n._`"[" + ${s} + "]"`:n._`"['" + ${s} + "']"`:c?n._`"/" + ${s}`:n._`"/" + ${s}.replace(/~/g, "~0").replace(/\\//g, "~1")`}return R?n.getProperty(s).toString():"/"+r.escapeJsonPointer(s)}}(fn)),fn}var xs;function pt(){if(xs)return Ee;xs=1,Object.defineProperty(Ee,"__esModule",{value:!0}),Ee.validateUnion=Ee.validateArray=Ee.usePattern=Ee.callValidateCode=Ee.schemaProperties=Ee.allSchemaProperties=Ee.noPropertyInData=Ee.propertyInData=Ee.isOwnProperty=Ee.hasPropFunc=Ee.reportMissingProp=Ee.checkMissingProp=Ee.checkReportMissingProp=void 0;const e=ce,t=Ie(),r=Wt(),n=Je;function a(u,m){const{gen:_,data:C,it:j}=u;_.if(s(_,C,m,j.opts.ownProperties),()=>{u.setParams({missingProperty:e._`${m}`},!0),u.error()})}Ee.checkReportMissingProp=a;function o({gen:u,data:m,it:{opts:_}},C,j){return e.or(...C.map(q=>e.and(s(u,m,q,_.ownProperties),e._`${j} = ${q}`)))}Ee.checkMissingProp=o;function d(u,m){u.setParams({missingProperty:m},!0),u.error()}Ee.reportMissingProp=d;function w(u){return u.scopeValue("func",{ref:Object.prototype.hasOwnProperty,code:e._`Object.prototype.hasOwnProperty`})}Ee.hasPropFunc=w;function l(u,m,_){return e._`${w(u)}.call(${m}, ${_})`}Ee.isOwnProperty=l;function i(u,m,_,C){const j=e._`${m}${e.getProperty(_)} !== undefined`;return C?e._`${j} && ${l(u,m,_)}`:j}Ee.propertyInData=i;function s(u,m,_,C){const j=e._`${m}${e.getProperty(_)} === undefined`;return C?e.or(j,e.not(l(u,m,_))):j}Ee.noPropertyInData=s;function g(u){return u?Object.keys(u).filter(m=>m!=="__proto__"):[]}Ee.allSchemaProperties=g;function R(u,m){return g(m).filter(_=>!t.alwaysValidSchema(u,m[_]))}Ee.schemaProperties=R;function c({schemaCode:u,data:m,it:{gen:_,topSchemaRef:C,schemaPath:j,errorPath:q},it:k},Y,Q,te){const ie=te?e._`${u}, ${m}, ${C}${j}`:m,L=[[n.default.dataPath,e.strConcat(n.default.dataPath,q)],[n.default.parentData,k.parentData],[n.default.parentDataProperty,k.parentDataProperty],[n.default.rootData,n.default.rootData]];k.opts.dynamicRef&&L.push([n.default.dynamicAnchors,n.default.dynamicAnchors]);const K=e._`${ie}, ${_.object(...L)}`;return Q!==e.nil?e._`${Y}.call(${Q}, ${K})`:e._`${Y}(${K})`}Ee.callValidateCode=c;function E(u,m){return u.scopeValue("pattern",{key:m,ref:new RegExp(m,"u"),code:e._`new RegExp(${m}, "u")`})}Ee.usePattern=E;function f(u){const{gen:m,data:_,keyword:C,it:j}=u,q=m.name("valid");if(j.allErrors){const Y=m.let("valid",!0);return k(()=>m.assign(Y,!1)),Y}return m.var(q,!0),k(()=>m.break()),q;function k(Y){const Q=m.const("len",e._`${_}.length`);m.forRange("i",0,Q,te=>{u.subschema({keyword:C,dataProp:te,dataPropType:r.Type.Num},q),m.if(e.not(q),Y)})}}Ee.validateArray=f;function S(u){const{gen:m,schema:_,keyword:C,it:j}=u;if(!Array.isArray(_))throw new Error("ajv implementation error");if(_.some(Q=>t.alwaysValidSchema(j,Q))&&!j.opts.unevaluated)return;const k=m.let("valid",!1),Y=m.name("_valid");m.block(()=>_.forEach((Q,te)=>{const ie=u.subschema({keyword:C,schemaProp:te,compositeRule:!0},Y);m.assign(k,e._`${k} || ${Y}`),u.mergeValidEvaluated(ie,Y)||m.if(e.not(k))})),u.result(k,()=>u.reset(),()=>u.error(!0))}return Ee.validateUnion=S,Ee}var Ws;function Uo(){if(Ws)return er;Ws=1,Object.defineProperty(er,"__esModule",{value:!0}),er.keywordCode=void 0;const e=lr(),t=or,r=pt(),n=ce,a=Je;function o(R,c,E,f){const S=new e.default(R,E,c);"code"in E?E.code(S,f):S.$data&&E.validate?w(S,E):"macro"in E?d(S,E):(E.compile||E.validate)&&w(S,E)}er.keywordCode=o;function d(R,c){const{gen:E,keyword:f,schema:S,parentSchema:u,it:m}=R,_=c.macro.call(m.self,S,u,m),C=g(E,f,_);m.opts.validateSchema!==!1&&m.self.validateSchema(_,!0);const j=E.name("valid");R.subschema({schema:_,schemaPath:n.nil,errSchemaPath:`${m.errSchemaPath}/${f}`,topSchemaRef:C,compositeRule:!0},j),R.pass(j,()=>R.error(!0))}function w(R,c){var E;const{gen:f,keyword:S,schema:u,parentSchema:m,$data:_,it:C}=R;s(C,c);const j=!_&&c.compile?c.compile.call(C.self,u,m,C):c.validate,q=g(f,S,j),k=f.let("valid");R.block$data(k,Y),R.ok((E=c.valid)!==null&&E!==void 0?E:k);function Y(){if(c.errors===!1)ie(),c.modifying&&l(R),L(()=>R.error());else{const K=c.async?Q():te();c.modifying&&l(R),L(()=>i(R,K))}}function Q(){const K=f.let("ruleErrs",null);return f.try(()=>ie(n._`await `),J=>f.assign(k,!1).if(n._`${J} instanceof ${C.ValidationError}`,()=>f.assign(K,n._`${J}.errors`),()=>f.throw(J))),K}function te(){const K=n._`${q}.errors`;return f.assign(K,null),ie(n.nil),K}function ie(K=c.async?n._`await `:n.nil){const J=C.opts.passContext?a.default.this:a.default.self,le=!("compile"in c&&!_||c.schema===!1);f.assign(k,n._`${K}${r.callValidateCode(R,q,J,le)}`,c.modifying)}function L(K){var J;f.if(n.not((J=c.valid)!==null&&J!==void 0?J:k),K)}}function l(R){const{gen:c,data:E,it:f}=R;c.if(f.parentData,()=>c.assign(E,n._`${f.parentData}[${f.parentDataProperty}]`))}function i(R,c){const{gen:E}=R;E.if(n._`Array.isArray(${c})`,()=>{E.assign(a.default.vErrors,n._`${a.default.vErrors} === null ? ${c} : ${a.default.vErrors}.concat(${c})`).assign(a.default.errors,n._`${a.default.vErrors}.length`),t.extendErrors(R)},()=>R.error())}function s({schemaEnv:R},c){if(c.async&&!R.$async)throw new Error("async keyword in sync schema")}function g(R,c,E){if(E===void 0)throw new Error(`keyword "${c}" failed to compile`);return R.scopeValue("keyword",typeof E=="function"?{ref:E}:{ref:E,code:n.stringify(E)})}return er}var Ys;function Vo(){if(Ys)return Qt;Ys=1,Object.defineProperty(Qt,"__esModule",{value:!0}),Qt.schemaKeywords=void 0;const e=Et,t=cr(),r=Mo(),n=Uo(),a=Ie(),o=Qe(),d=ce,w=Je;function l(u,m,_,C){const{gen:j,schema:q,data:k,allErrors:Y,opts:Q,self:te}=u,{RULES:ie}=te;if(q.$ref&&(Q.ignoreKeywordsWithRef||!a.schemaHasRulesButRef(q,ie))){j.block(()=>n.keywordCode(u,"$ref",ie.all.$ref.definition));return}Q.jtd||s(u,m),j.block(()=>{for(const K of ie.rules)L(K);L(ie.post)});function L(K){e.shouldUseGroup(q,K)&&(K.type?(j.if(t.checkDataType(K.type,k,Q.strict)),i(u,K),m.length===1&&m[0]===K.type&&_&&(j.else(),t.reportTypeError(u)),j.endIf()):i(u,K),Y||j.if(d._`${w.default.errors} === ${C||0}`))}}Qt.schemaKeywords=l;function i(u,m){const{gen:_,schema:C,opts:{useDefaults:j}}=u;j&&r.assignDefaults(u,m.type),_.block(()=>{for(const q of m.rules)e.shouldUseRule(C,q)&&n.keywordCode(u,q.keyword,q.definition,m.type)})}function s(u,m){u.schemaEnv.meta||!u.opts.strictTypes||(g(u,m),u.opts.allowUnionTypes||R(u,m),c(u,u.dataTypes))}function g(u,m){if(m.length){if(!u.dataTypes.length){u.dataTypes=m;return}m.forEach(_=>{f(u.dataTypes,_)||S(u,`type "${_}" not allowed by context "${u.dataTypes.join(",")}"`)}),u.dataTypes=u.dataTypes.filter(_=>f(m,_))}}function R(u,m){m.length>1&&!(m.length===2&&m.includes("null"))&&S(u,"use allowUnionTypes to allow union type keyword")}function c(u,m){const _=u.self.RULES.all;for(const C in _){const j=_[C];if(typeof j=="object"&&e.shouldUseRule(u.schema,j)){const{type:q}=j.definition;q.length&&!q.some(k=>E(m,k))&&S(u,`missing type "${q.join(",")}" for keyword "${C}"`)}}}function E(u,m){return u.includes(m)||m==="number"&&u.includes("integer")}function f(u,m){return u.includes(m)||m==="integer"&&u.includes("number")}function S(u,m){const _=u.schemaEnv.baseId+u.errSchemaPath;m+=` at "${_}" (strictTypes)`,o.checkStrictMode(u,m,u.opts.strictTypes)}return Qt}var Ve={},Kr=function e(t,r){if(t===r)return!0;if(t&&r&&typeof t=="object"&&typeof r=="object"){if(t.constructor!==r.constructor)return!1;var n,a,o;if(Array.isArray(t)){if(n=t.length,n!=r.length)return!1;for(a=n;a--!==0;)if(!e(t[a],r[a]))return!1;return!0}if(t.constructor===RegExp)return t.source===r.source&&t.flags===r.flags;if(t.valueOf!==Object.prototype.valueOf)return t.valueOf()===r.valueOf();if(t.toString!==Object.prototype.toString)return t.toString()===r.toString();if(o=Object.keys(t),n=o.length,n!==Object.keys(r).length)return!1;for(a=n;a--!==0;)if(!Object.prototype.hasOwnProperty.call(r,o[a]))return!1;for(a=n;a--!==0;){var d=o[a];if(!e(t[d],r[d]))return!1}return!0}return t!==t&&r!==r},li={exports:{}},Ot=li.exports=function(e,t,r){typeof t=="function"&&(r=t,t={}),r=t.cb||r;var n=typeof r=="function"?r:r.pre||function(){},a=r.post||function(){};Dr(t,n,a,e,"",e)};Ot.keywords={additionalItems:!0,items:!0,contains:!0,additionalProperties:!0,propertyNames:!0,not:!0,if:!0,then:!0,else:!0};Ot.arrayKeywords={items:!0,allOf:!0,anyOf:!0,oneOf:!0};Ot.propsKeywords={$defs:!0,definitions:!0,properties:!0,patternProperties:!0,dependencies:!0};Ot.skipKeywords={default:!0,enum:!0,const:!0,required:!0,maximum:!0,minimum:!0,exclusiveMaximum:!0,exclusiveMinimum:!0,multipleOf:!0,maxLength:!0,minLength:!0,pattern:!0,format:!0,maxItems:!0,minItems:!0,uniqueItems:!0,maxProperties:!0,minProperties:!0};function Dr(e,t,r,n,a,o,d,w,l,i){if(n&&typeof n=="object"&&!Array.isArray(n)){t(n,a,o,d,w,l,i);for(var s in n){var g=n[s];if(Array.isArray(g)){if(s in Ot.arrayKeywords)for(var R=0;R<g.length;R++)Dr(e,t,r,g[R],a+"/"+s+"/"+R,o,a,s,n,R)}else if(s in Ot.propsKeywords){if(g&&typeof g=="object")for(var c in g)Dr(e,t,r,g[c],a+"/"+s+"/"+zo(c),o,a,s,n,c)}else(s in Ot.keywords||e.allKeys&&!(s in Ot.skipKeywords))&&Dr(e,t,r,g,a+"/"+s,o,a,s,n)}r(n,a,o,d,w,l,i)}}function zo(e){return e.replace(/~/g,"~0").replace(/\//g,"~1")}var Go=li.exports,Nn={exports:{}};/** @license URI.js v4.4.1 (c) 2011 Gary Court. License: http://github.com/garycourt/uri-js */(function(e,t){(function(r,n){n(t)})(rr,function(r){function n(){for(var N=arguments.length,v=Array(N),T=0;T<N;T++)v[T]=arguments[T];if(v.length>1){v[0]=v[0].slice(0,-1);for(var U=v.length-1,M=1;M<U;++M)v[M]=v[M].slice(1,-1);return v[U]=v[U].slice(1),v.join("")}else return v[0]}function a(N){return"(?:"+N+")"}function o(N){return N===void 0?"undefined":N===null?"null":Object.prototype.toString.call(N).split(" ").pop().split("]").shift().toLowerCase()}function d(N){return N.toUpperCase()}function w(N){return N!=null?N instanceof Array?N:typeof N.length!="number"||N.split||N.setInterval||N.call?[N]:Array.prototype.slice.call(N):[]}function l(N,v){var T=N;if(v)for(var U in v)T[U]=v[U];return T}function i(N){var v="[A-Za-z]",T="[0-9]",U=n(T,"[A-Fa-f]"),M=a(a("%[EFef]"+U+"%"+U+U+"%"+U+U)+"|"+a("%[89A-Fa-f]"+U+"%"+U+U)+"|"+a("%"+U+U)),re="[\\:\\/\\?\\#\\[\\]\\@]",ne="[\\!\\$\\&\\'\\(\\)\\*\\+\\,\\;\\=]",de=n(re,ne),_e=N?"[\\xA0-\\u200D\\u2010-\\u2029\\u202F-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF]":"[]",Oe=N?"[\\uE000-\\uF8FF]":"[]",ue=n(v,T,"[\\-\\.\\_\\~]",_e);a(v+n(v,T,"[\\+\\-\\.]")+"*"),a(a(M+"|"+n(ue,ne,"[\\:]"))+"*");var $e=a(a("25[0-5]")+"|"+a("2[0-4]"+T)+"|"+a("1"+T+T)+"|"+a("0?[1-9]"+T)+"|0?0?"+T),Ne=a($e+"\\."+$e+"\\."+$e+"\\."+$e),oe=a(U+"{1,4}"),we=a(a(oe+"\\:"+oe)+"|"+Ne),Te=a(a(oe+"\\:")+"{6}"+we),Re=a("\\:\\:"+a(oe+"\\:")+"{5}"+we),gt=a(a(oe)+"?\\:\\:"+a(oe+"\\:")+"{4}"+we),lt=a(a(a(oe+"\\:")+"{0,1}"+oe)+"?\\:\\:"+a(oe+"\\:")+"{3}"+we),ut=a(a(a(oe+"\\:")+"{0,2}"+oe)+"?\\:\\:"+a(oe+"\\:")+"{2}"+we),Vt=a(a(a(oe+"\\:")+"{0,3}"+oe)+"?\\:\\:"+oe+"\\:"+we),At=a(a(a(oe+"\\:")+"{0,4}"+oe)+"?\\:\\:"+we),Ye=a(a(a(oe+"\\:")+"{0,5}"+oe)+"?\\:\\:"+oe),ft=a(a(a(oe+"\\:")+"{0,6}"+oe)+"?\\:\\:"),bt=a([Te,Re,gt,lt,ut,Vt,At,Ye,ft].join("|")),yt=a(a(ue+"|"+M)+"+");a("[vV]"+U+"+\\."+n(ue,ne,"[\\:]")+"+"),a(a(M+"|"+n(ue,ne))+"*");var Yt=a(M+"|"+n(ue,ne,"[\\:\\@]"));return a(a(M+"|"+n(ue,ne,"[\\@]"))+"+"),a(a(Yt+"|"+n("[\\/\\?]",Oe))+"*"),{NOT_SCHEME:new RegExp(n("[^]",v,T,"[\\+\\-\\.]"),"g"),NOT_USERINFO:new RegExp(n("[^\\%\\:]",ue,ne),"g"),NOT_HOST:new RegExp(n("[^\\%\\[\\]\\:]",ue,ne),"g"),NOT_PATH:new RegExp(n("[^\\%\\/\\:\\@]",ue,ne),"g"),NOT_PATH_NOSCHEME:new RegExp(n("[^\\%\\/\\@]",ue,ne),"g"),NOT_QUERY:new RegExp(n("[^\\%]",ue,ne,"[\\:\\@\\/\\?]",Oe),"g"),NOT_FRAGMENT:new RegExp(n("[^\\%]",ue,ne,"[\\:\\@\\/\\?]"),"g"),ESCAPE:new RegExp(n("[^]",ue,ne),"g"),UNRESERVED:new RegExp(ue,"g"),OTHER_CHARS:new RegExp(n("[^\\%]",ue,de),"g"),PCT_ENCODED:new RegExp(M,"g"),IPV4ADDRESS:new RegExp("^("+Ne+")$"),IPV6ADDRESS:new RegExp("^\\[?("+bt+")"+a(a("\\%25|\\%(?!"+U+"{2})")+"("+yt+")")+"?\\]?$")}}var s=i(!1),g=i(!0),R=function(){function N(v,T){var U=[],M=!0,re=!1,ne=void 0;try{for(var de=v[Symbol.iterator](),_e;!(M=(_e=de.next()).done)&&(U.push(_e.value),!(T&&U.length===T));M=!0);}catch(Oe){re=!0,ne=Oe}finally{try{!M&&de.return&&de.return()}finally{if(re)throw ne}}return U}return function(v,T){if(Array.isArray(v))return v;if(Symbol.iterator in Object(v))return N(v,T);throw new TypeError("Invalid attempt to destructure non-iterable instance")}}(),c=function(N){if(Array.isArray(N)){for(var v=0,T=Array(N.length);v<N.length;v++)T[v]=N[v];return T}else return Array.from(N)},E=2147483647,f=36,S=1,u=26,m=38,_=700,C=72,j=128,q="-",k=/^xn--/,Y=/[^\0-\x7E]/,Q=/[\x2E\u3002\uFF0E\uFF61]/g,te={overflow:"Overflow: input needs wider integers to process","not-basic":"Illegal input >= 0x80 (not a basic code point)","invalid-input":"Invalid input"},ie=f-S,L=Math.floor,K=String.fromCharCode;function J(N){throw new RangeError(te[N])}function le(N,v){for(var T=[],U=N.length;U--;)T[U]=v(N[U]);return T}function V(N,v){var T=N.split("@"),U="";T.length>1&&(U=T[0]+"@",N=T[1]),N=N.replace(Q,".");var M=N.split("."),re=le(M,v).join(".");return U+re}function $(N){for(var v=[],T=0,U=N.length;T<U;){var M=N.charCodeAt(T++);if(M>=55296&&M<=56319&&T<U){var re=N.charCodeAt(T++);(re&64512)==56320?v.push(((M&1023)<<10)+(re&1023)+65536):(v.push(M),T--)}else v.push(M)}return v}var y=function(v){return String.fromCodePoint.apply(String,c(v))},P=function(v){return v-48<10?v-22:v-65<26?v-65:v-97<26?v-97:f},b=function(v,T){return v+22+75*(v<26)-((T!=0)<<5)},z=function(v,T,U){var M=0;for(v=U?L(v/_):v>>1,v+=L(v/T);v>ie*u>>1;M+=f)v=L(v/ie);return L(M+(ie+1)*v/(v+m))},H=function(v){var T=[],U=v.length,M=0,re=j,ne=C,de=v.lastIndexOf(q);de<0&&(de=0);for(var _e=0;_e<de;++_e)v.charCodeAt(_e)>=128&&J("not-basic"),T.push(v.charCodeAt(_e));for(var Oe=de>0?de+1:0;Oe<U;){for(var ue=M,$e=1,Ne=f;;Ne+=f){Oe>=U&&J("invalid-input");var oe=P(v.charCodeAt(Oe++));(oe>=f||oe>L((E-M)/$e))&&J("overflow"),M+=oe*$e;var we=Ne<=ne?S:Ne>=ne+u?u:Ne-ne;if(oe<we)break;var Te=f-we;$e>L(E/Te)&&J("overflow"),$e*=Te}var Re=T.length+1;ne=z(M-ue,Re,ue==0),L(M/Re)>E-re&&J("overflow"),re+=L(M/Re),M%=Re,T.splice(M++,0,re)}return String.fromCodePoint.apply(String,T)},F=function(v){var T=[];v=$(v);var U=v.length,M=j,re=0,ne=C,de=!0,_e=!1,Oe=void 0;try{for(var ue=v[Symbol.iterator](),$e;!(de=($e=ue.next()).done);de=!0){var Ne=$e.value;Ne<128&&T.push(K(Ne))}}catch(Jt){_e=!0,Oe=Jt}finally{try{!de&&ue.return&&ue.return()}finally{if(_e)throw Oe}}var oe=T.length,we=oe;for(oe&&T.push(q);we<U;){var Te=E,Re=!0,gt=!1,lt=void 0;try{for(var ut=v[Symbol.iterator](),Vt;!(Re=(Vt=ut.next()).done);Re=!0){var At=Vt.value;At>=M&&At<Te&&(Te=At)}}catch(Jt){gt=!0,lt=Jt}finally{try{!Re&&ut.return&&ut.return()}finally{if(gt)throw lt}}var Ye=we+1;Te-M>L((E-re)/Ye)&&J("overflow"),re+=(Te-M)*Ye,M=Te;var ft=!0,bt=!1,yt=void 0;try{for(var Yt=v[Symbol.iterator](),Ms;!(ft=(Ms=Yt.next()).done);ft=!0){var Us=Ms.value;if(Us<M&&++re>E&&J("overflow"),Us==M){for(var $r=re,gr=f;;gr+=f){var _r=gr<=ne?S:gr>=ne+u?u:gr-ne;if($r<_r)break;var Vs=$r-_r,zs=f-_r;T.push(K(b(_r+Vs%zs,0))),$r=L(Vs/zs)}T.push(K(b($r,0))),ne=z(re,Ye,we==oe),re=0,++we}}}catch(Jt){bt=!0,yt=Jt}finally{try{!ft&&Yt.return&&Yt.return()}finally{if(bt)throw yt}}++re,++M}return T.join("")},p=function(v){return V(v,function(T){return k.test(T)?H(T.slice(4).toLowerCase()):T})},O=function(v){return V(v,function(T){return Y.test(T)?"xn--"+F(T):T})},D={version:"2.1.0",ucs2:{decode:$,encode:y},decode:H,encode:F,toASCII:O,toUnicode:p},B={};function W(N){var v=N.charCodeAt(0),T=void 0;return v<16?T="%0"+v.toString(16).toUpperCase():v<128?T="%"+v.toString(16).toUpperCase():v<2048?T="%"+(v>>6|192).toString(16).toUpperCase()+"%"+(v&63|128).toString(16).toUpperCase():T="%"+(v>>12|224).toString(16).toUpperCase()+"%"+(v>>6&63|128).toString(16).toUpperCase()+"%"+(v&63|128).toString(16).toUpperCase(),T}function se(N){for(var v="",T=0,U=N.length;T<U;){var M=parseInt(N.substr(T+1,2),16);if(M<128)v+=String.fromCharCode(M),T+=3;else if(M>=194&&M<224){if(U-T>=6){var re=parseInt(N.substr(T+4,2),16);v+=String.fromCharCode((M&31)<<6|re&63)}else v+=N.substr(T,6);T+=6}else if(M>=224){if(U-T>=9){var ne=parseInt(N.substr(T+4,2),16),de=parseInt(N.substr(T+7,2),16);v+=String.fromCharCode((M&15)<<12|(ne&63)<<6|de&63)}else v+=N.substr(T,9);T+=9}else v+=N.substr(T,3),T+=3}return v}function Fe(N,v){function T(U){var M=se(U);return M.match(v.UNRESERVED)?M:U}return N.scheme&&(N.scheme=String(N.scheme).replace(v.PCT_ENCODED,T).toLowerCase().replace(v.NOT_SCHEME,"")),N.userinfo!==void 0&&(N.userinfo=String(N.userinfo).replace(v.PCT_ENCODED,T).replace(v.NOT_USERINFO,W).replace(v.PCT_ENCODED,d)),N.host!==void 0&&(N.host=String(N.host).replace(v.PCT_ENCODED,T).toLowerCase().replace(v.NOT_HOST,W).replace(v.PCT_ENCODED,d)),N.path!==void 0&&(N.path=String(N.path).replace(v.PCT_ENCODED,T).replace(N.scheme?v.NOT_PATH:v.NOT_PATH_NOSCHEME,W).replace(v.PCT_ENCODED,d)),N.query!==void 0&&(N.query=String(N.query).replace(v.PCT_ENCODED,T).replace(v.NOT_QUERY,W).replace(v.PCT_ENCODED,d)),N.fragment!==void 0&&(N.fragment=String(N.fragment).replace(v.PCT_ENCODED,T).replace(v.NOT_FRAGMENT,W).replace(v.PCT_ENCODED,d)),N}function pe(N){return N.replace(/^0*(.*)/,"$1")||"0"}function mt(N,v){var T=N.match(v.IPV4ADDRESS)||[],U=R(T,2),M=U[1];return M?M.split(".").map(pe).join("."):N}function dr(N,v){var T=N.match(v.IPV6ADDRESS)||[],U=R(T,3),M=U[1],re=U[2];if(M){for(var ne=M.toLowerCase().split("::").reverse(),de=R(ne,2),_e=de[0],Oe=de[1],ue=Oe?Oe.split(":").map(pe):[],$e=_e.split(":").map(pe),Ne=v.IPV4ADDRESS.test($e[$e.length-1]),oe=Ne?7:8,we=$e.length-oe,Te=Array(oe),Re=0;Re<oe;++Re)Te[Re]=ue[Re]||$e[we+Re]||"";Ne&&(Te[oe-1]=mt(Te[oe-1],v));var gt=Te.reduce(function(Ye,ft,bt){if(!ft||ft==="0"){var yt=Ye[Ye.length-1];yt&&yt.index+yt.length===bt?yt.length++:Ye.push({index:bt,length:1})}return Ye},[]),lt=gt.sort(function(Ye,ft){return ft.length-Ye.length})[0],ut=void 0;if(lt&&lt.length>1){var Vt=Te.slice(0,lt.index),At=Te.slice(lt.index+lt.length);ut=Vt.join(":")+"::"+At.join(":")}else ut=Te.join(":");return re&&(ut+="%"+re),ut}else return N}var rn=/^(?:([^:\/?#]+):)?(?:\/\/((?:([^\/?#@]*)@)?(\[[^\/?#\]]+\]|[^\/?#:]*)(?:\:(\d*))?))?([^?#]*)(?:\?([^#]*))?(?:#((?:.|\n|\r)*))?/i,Ce="".match(/(){0}/)[1]===void 0;function Ze(N){var v=arguments.length>1&&arguments[1]!==void 0?arguments[1]:{},T={},U=v.iri!==!1?g:s;v.reference==="suffix"&&(N=(v.scheme?v.scheme+":":"")+"//"+N);var M=N.match(rn);if(M){Ce?(T.scheme=M[1],T.userinfo=M[3],T.host=M[4],T.port=parseInt(M[5],10),T.path=M[6]||"",T.query=M[7],T.fragment=M[8],isNaN(T.port)&&(T.port=M[5])):(T.scheme=M[1]||void 0,T.userinfo=N.indexOf("@")!==-1?M[3]:void 0,T.host=N.indexOf("//")!==-1?M[4]:void 0,T.port=parseInt(M[5],10),T.path=M[6]||"",T.query=N.indexOf("?")!==-1?M[7]:void 0,T.fragment=N.indexOf("#")!==-1?M[8]:void 0,isNaN(T.port)&&(T.port=N.match(/\/\/(?:.|\n)*\:(?:\/|\?|\#|$)/)?M[4]:void 0)),T.host&&(T.host=dr(mt(T.host,U),U)),T.scheme===void 0&&T.userinfo===void 0&&T.host===void 0&&T.port===void 0&&!T.path&&T.query===void 0?T.reference="same-document":T.scheme===void 0?T.reference="relative":T.fragment===void 0?T.reference="absolute":T.reference="uri",v.reference&&v.reference!=="suffix"&&v.reference!==T.reference&&(T.error=T.error||"URI is not a "+v.reference+" reference.");var re=B[(v.scheme||T.scheme||"").toLowerCase()];if(!v.unicodeSupport&&(!re||!re.unicodeSupport)){if(T.host&&(v.domainHost||re&&re.domainHost))try{T.host=D.toASCII(T.host.replace(U.PCT_ENCODED,se).toLowerCase())}catch(ne){T.error=T.error||"Host's domain name can not be converted to ASCII via punycode: "+ne}Fe(T,s)}else Fe(T,U);re&&re.parse&&re.parse(T,v)}else T.error=T.error||"URI can not be parsed.";return T}function nn(N,v){var T=v.iri!==!1?g:s,U=[];return N.userinfo!==void 0&&(U.push(N.userinfo),U.push("@")),N.host!==void 0&&U.push(dr(mt(String(N.host),T),T).replace(T.IPV6ADDRESS,function(M,re,ne){return"["+re+(ne?"%25"+ne:"")+"]"})),(typeof N.port=="number"||typeof N.port=="string")&&(U.push(":"),U.push(String(N.port))),U.length?U.join(""):void 0}var hr=/^\.\.?\//,pr=/^\/\.(\/|$)/,mr=/^\/\.\.(\/|$)/,sn=/^\/?(?:.|\n)*?(?=\/|$)/;function $t(N){for(var v=[];N.length;)if(N.match(hr))N=N.replace(hr,"");else if(N.match(pr))N=N.replace(pr,"/");else if(N.match(mr))N=N.replace(mr,"/"),v.pop();else if(N==="."||N==="..")N="";else{var T=N.match(sn);if(T){var U=T[0];N=N.slice(U.length),v.push(U)}else throw new Error("Unexpected dot segment condition")}return v.join("")}function xe(N){var v=arguments.length>1&&arguments[1]!==void 0?arguments[1]:{},T=v.iri?g:s,U=[],M=B[(v.scheme||N.scheme||"").toLowerCase()];if(M&&M.serialize&&M.serialize(N,v),N.host&&!T.IPV6ADDRESS.test(N.host)){if(v.domainHost||M&&M.domainHost)try{N.host=v.iri?D.toUnicode(N.host):D.toASCII(N.host.replace(T.PCT_ENCODED,se).toLowerCase())}catch(de){N.error=N.error||"Host's domain name can not be converted to "+(v.iri?"Unicode":"ASCII")+" via punycode: "+de}}Fe(N,T),v.reference!=="suffix"&&N.scheme&&(U.push(N.scheme),U.push(":"));var re=nn(N,v);if(re!==void 0&&(v.reference!=="suffix"&&U.push("//"),U.push(re),N.path&&N.path.charAt(0)!=="/"&&U.push("/")),N.path!==void 0){var ne=N.path;!v.absolutePath&&(!M||!M.absolutePath)&&(ne=$t(ne)),re===void 0&&(ne=ne.replace(/^\/\//,"/%2F")),U.push(ne)}return N.query!==void 0&&(U.push("?"),U.push(N.query)),N.fragment!==void 0&&(U.push("#"),U.push(N.fragment)),U.join("")}function yr(N,v){var T=arguments.length>2&&arguments[2]!==void 0?arguments[2]:{},U=arguments[3],M={};return U||(N=Ze(xe(N,T),T),v=Ze(xe(v,T),T)),T=T||{},!T.tolerant&&v.scheme?(M.scheme=v.scheme,M.userinfo=v.userinfo,M.host=v.host,M.port=v.port,M.path=$t(v.path||""),M.query=v.query):(v.userinfo!==void 0||v.host!==void 0||v.port!==void 0?(M.userinfo=v.userinfo,M.host=v.host,M.port=v.port,M.path=$t(v.path||""),M.query=v.query):(v.path?(v.path.charAt(0)==="/"?M.path=$t(v.path):((N.userinfo!==void 0||N.host!==void 0||N.port!==void 0)&&!N.path?M.path="/"+v.path:N.path?M.path=N.path.slice(0,N.path.lastIndexOf("/")+1)+v.path:M.path=v.path,M.path=$t(M.path)),M.query=v.query):(M.path=N.path,v.query!==void 0?M.query=v.query:M.query=N.query),M.userinfo=N.userinfo,M.host=N.host,M.port=N.port),M.scheme=N.scheme),M.fragment=v.fragment,M}function Mt(N,v,T){var U=l({scheme:"null"},T);return xe(yr(Ze(N,U),Ze(v,U),U,!0),U)}function an(N,v){return typeof N=="string"?N=xe(Ze(N,v),v):o(N)==="object"&&(N=Ze(xe(N,v),v)),N}function on(N,v,T){return typeof N=="string"?N=xe(Ze(N,T),T):o(N)==="object"&&(N=xe(N,T)),typeof v=="string"?v=xe(Ze(v,T),T):o(v)==="object"&&(v=xe(v,T)),N===v}function cn(N,v){return N&&N.toString().replace(!v||!v.iri?s.ESCAPE:g.ESCAPE,W)}function et(N,v){return N&&N.toString().replace(!v||!v.iri?s.PCT_ENCODED:g.PCT_ENCODED,se)}var Tt={scheme:"http",domainHost:!0,parse:function(v,T){return v.host||(v.error=v.error||"HTTP URIs must have a host."),v},serialize:function(v,T){var U=String(v.scheme).toLowerCase()==="https";return(v.port===(U?443:80)||v.port==="")&&(v.port=void 0),v.path||(v.path="/"),v}},vr={scheme:"https",domainHost:Tt.domainHost,parse:Tt.parse,serialize:Tt.serialize};function Ut(N){return typeof N.secure=="boolean"?N.secure:String(N.scheme).toLowerCase()==="wss"}var Pt={scheme:"ws",domainHost:!0,parse:function(v,T){var U=v;return U.secure=Ut(U),U.resourceName=(U.path||"/")+(U.query?"?"+U.query:""),U.path=void 0,U.query=void 0,U},serialize:function(v,T){if((v.port===(Ut(v)?443:80)||v.port==="")&&(v.port=void 0),typeof v.secure=="boolean"&&(v.scheme=v.secure?"wss":"ws",v.secure=void 0),v.resourceName){var U=v.resourceName.split("?"),M=R(U,2),re=M[0],ne=M[1];v.path=re&&re!=="/"?re:void 0,v.query=ne,v.resourceName=void 0}return v.fragment=void 0,v}},Er={scheme:"wss",domainHost:Pt.domainHost,parse:Pt.parse,serialize:Pt.serialize},ln={},h="[A-Za-z0-9\\-\\.\\_\\~\\xA0-\\u200D\\u2010-\\u2029\\u202F-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF]",I="[0-9A-Fa-f]",A=a(a("%[EFef]"+I+"%"+I+I+"%"+I+I)+"|"+a("%[89A-Fa-f]"+I+"%"+I+I)+"|"+a("%"+I+I)),G="[A-Za-z0-9\\!\\$\\%\\'\\*\\+\\-\\^\\_\\`\\{\\|\\}\\~]",x="[\\!\\$\\%\\'\\(\\)\\*\\+\\,\\-\\.0-9\\<\\>A-Z\\x5E-\\x7E]",Z=n(x,'[\\"\\\\]'),ee="[\\!\\$\\'\\(\\)\\*\\+\\,\\;\\:\\@]",fe=new RegExp(h,"g"),ae=new RegExp(A,"g"),We=new RegExp(n("[^]",G,"[\\.]",'[\\"]',Z),"g"),He=new RegExp(n("[^]",h,ee),"g"),ze=He;function De(N){var v=se(N);return v.match(fe)?v:N}var tt={scheme:"mailto",parse:function(v,T){var U=v,M=U.to=U.path?U.path.split(","):[];if(U.path=void 0,U.query){for(var re=!1,ne={},de=U.query.split("&"),_e=0,Oe=de.length;_e<Oe;++_e){var ue=de[_e].split("=");switch(ue[0]){case"to":for(var $e=ue[1].split(","),Ne=0,oe=$e.length;Ne<oe;++Ne)M.push($e[Ne]);break;case"subject":U.subject=et(ue[1],T);break;case"body":U.body=et(ue[1],T);break;default:re=!0,ne[et(ue[0],T)]=et(ue[1],T);break}}re&&(U.headers=ne)}U.query=void 0;for(var we=0,Te=M.length;we<Te;++we){var Re=M[we].split("@");if(Re[0]=et(Re[0]),T.unicodeSupport)Re[1]=et(Re[1],T).toLowerCase();else try{Re[1]=D.toASCII(et(Re[1],T).toLowerCase())}catch(gt){U.error=U.error||"Email address's domain name can not be converted to ASCII via punycode: "+gt}M[we]=Re.join("@")}return U},serialize:function(v,T){var U=v,M=w(v.to);if(M){for(var re=0,ne=M.length;re<ne;++re){var de=String(M[re]),_e=de.lastIndexOf("@"),Oe=de.slice(0,_e).replace(ae,De).replace(ae,d).replace(We,W),ue=de.slice(_e+1);try{ue=T.iri?D.toUnicode(ue):D.toASCII(et(ue,T).toLowerCase())}catch(we){U.error=U.error||"Email address's domain name can not be converted to "+(T.iri?"Unicode":"ASCII")+" via punycode: "+we}M[re]=Oe+"@"+ue}U.path=M.join(",")}var $e=v.headers=v.headers||{};v.subject&&($e.subject=v.subject),v.body&&($e.body=v.body);var Ne=[];for(var oe in $e)$e[oe]!==ln[oe]&&Ne.push(oe.replace(ae,De).replace(ae,d).replace(He,W)+"="+$e[oe].replace(ae,De).replace(ae,d).replace(ze,W));return Ne.length&&(U.query=Ne.join("&")),U}},Oi=/^([^\:]+)\:(.*)/,js={scheme:"urn",parse:function(v,T){var U=v.path&&v.path.match(Oi),M=v;if(U){var re=T.scheme||M.scheme||"urn",ne=U[1].toLowerCase(),de=U[2],_e=re+":"+(T.nid||ne),Oe=B[_e];M.nid=ne,M.nss=de,M.path=void 0,Oe&&(M=Oe.parse(M,T))}else M.error=M.error||"URN can not be parsed.";return M},serialize:function(v,T){var U=T.scheme||v.scheme||"urn",M=v.nid,re=U+":"+(T.nid||M),ne=B[re];ne&&(v=ne.serialize(v,T));var de=v,_e=v.nss;return de.path=(M||T.nid)+":"+_e,de}},Ni=/^[0-9A-Fa-f]{8}(?:\-[0-9A-Fa-f]{4}){3}\-[0-9A-Fa-f]{12}$/,Fs={scheme:"urn:uuid",parse:function(v,T){var U=v;return U.uuid=U.nss,U.nss=void 0,!T.tolerant&&(!U.uuid||!U.uuid.match(Ni))&&(U.error=U.error||"UUID is not valid."),U},serialize:function(v,T){var U=v;return U.nss=(v.uuid||"").toLowerCase(),U}};B[Tt.scheme]=Tt,B[vr.scheme]=vr,B[Pt.scheme]=Pt,B[Er.scheme]=Er,B[tt.scheme]=tt,B[js.scheme]=js,B[Fs.scheme]=Fs,r.SCHEMES=B,r.pctEncChar=W,r.pctDecChars=se,r.parse=Ze,r.removeDotSegments=$t,r.serialize=xe,r.resolveComponents=yr,r.resolve=Mt,r.normalize=an,r.equal=on,r.escapeComponent=cn,r.unescapeComponent=et,Object.defineProperty(r,"__esModule",{value:!0})})})(Nn,Nn.exports);var ui=Nn.exports,Js;function Br(){if(Js)return Ve;Js=1,Object.defineProperty(Ve,"__esModule",{value:!0}),Ve.getSchemaRefs=Ve.resolveUrl=Ve.normalizeId=Ve._getFullPath=Ve.getFullPath=Ve.inlineRef=void 0;const e=Ie(),t=Kr,r=Go,n=ui,a=new Set(["type","format","pattern","maxLength","minLength","maxProperties","minProperties","maxItems","minItems","maximum","minimum","uniqueItems","multipleOf","required","enum","const"]);function o(S,u=!0){return typeof S=="boolean"?!0:u===!0?!w(S):u?l(S)<=u:!1}Ve.inlineRef=o;const d=new Set(["$ref","$recursiveRef","$recursiveAnchor","$dynamicRef","$dynamicAnchor"]);function w(S){for(const u in S){if(d.has(u))return!0;const m=S[u];if(Array.isArray(m)&&m.some(w)||typeof m=="object"&&w(m))return!0}return!1}function l(S){let u=0;for(const m in S){if(m==="$ref")return 1/0;if(u++,!a.has(m)&&(typeof S[m]=="object"&&e.eachItem(S[m],_=>u+=l(_)),u===1/0))return 1/0}return u}function i(S="",u){u!==!1&&(S=R(S));const m=n.parse(S);return s(m)}Ve.getFullPath=i;function s(S){return n.serialize(S).split("#")[0]+"#"}Ve._getFullPath=s;const g=/#\/?$/;function R(S){return S?S.replace(g,""):""}Ve.normalizeId=R;function c(S,u){return u=R(u),n.resolve(S,u)}Ve.resolveUrl=c;const E=/^[a-z_][-a-z0-9._]*$/i;function f(S){if(typeof S=="boolean")return{};const u=R(S.$id),m={"":u},_=i(u,!1),C={},j=new Set;return r(S,{allKeys:!0},(Y,Q,te,ie)=>{if(ie===void 0)return;const L=_+Q;let K=m[ie];typeof Y.$id=="string"&&(K=J.call(this,Y.$id)),le.call(this,Y.$anchor),le.call(this,Y.$dynamicAnchor),m[Q]=K;function J(V){if(V=R(K?n.resolve(K,V):V),j.has(V))throw k(V);j.add(V);let $=this.refs[V];return typeof $=="string"&&($=this.refs[$]),typeof $=="object"?q(Y,$.schema,V):V!==R(L)&&(V[0]==="#"?(q(Y,C[V],V),C[V]=Y):this.refs[V]=L),V}function le(V){if(typeof V=="string"){if(!E.test(V))throw new Error(`invalid anchor "${V}"`);J.call(this,`#${V}`)}}}),C;function q(Y,Q,te){if(Q!==void 0&&!t(Y,Q))throw k(te)}function k(Y){return new Error(`reference "${Y}" resolves to more than one schema`)}}return Ve.getSchemaRefs=f,Ve}var Qs;function Qe(){if(Qs)return rt;Qs=1,Object.defineProperty(rt,"__esModule",{value:!0}),rt.checkStrictMode=rt.schemaCxtHasRules=rt.subschemaCode=rt.validateFunctionCode=void 0;const e=Bt,t=cr(),r=Vo(),n=ce,a=Je,o=Br(),d=Ie();function w(L){if(S(L)&&(m(L),f(L))){g(L);return}l(L,()=>e.topBoolOrEmptySchema(L))}rt.validateFunctionCode=w;function l({gen:L,validateName:K,schema:J,schemaEnv:le,opts:V},$){V.code.es5?L.func(K,n._`${a.default.data}, ${a.default.valCxt}`,le.$async,()=>{L.code(n._`"use strict"; ${c(J,V)}`),s(L,V),L.code($)}):L.func(K,n._`${a.default.data}, ${i(V)}`,le.$async,()=>L.code(c(J,V)).code($))}function i(L){return n._`{${a.default.dataPath}="", ${a.default.parentData}, ${a.default.parentDataProperty}, ${a.default.rootData}=${a.default.data}${L.dynamicRef?n._`, ${a.default.dynamicAnchors}={}`:n.nil}}={}`}function s(L,K){L.if(a.default.valCxt,()=>{L.var(a.default.dataPath,n._`${a.default.valCxt}.${a.default.dataPath}`),L.var(a.default.parentData,n._`${a.default.valCxt}.${a.default.parentData}`),L.var(a.default.parentDataProperty,n._`${a.default.valCxt}.${a.default.parentDataProperty}`),L.var(a.default.rootData,n._`${a.default.valCxt}.${a.default.rootData}`),K.dynamicRef&&L.var(a.default.dynamicAnchors,n._`${a.default.valCxt}.${a.default.dynamicAnchors}`)},()=>{L.var(a.default.dataPath,n._`""`),L.var(a.default.parentData,n._`undefined`),L.var(a.default.parentDataProperty,n._`undefined`),L.var(a.default.rootData,a.default.data),K.dynamicRef&&L.var(a.default.dynamicAnchors,n._`{}`)})}function g(L){const{schema:K,opts:J,gen:le}=L;l(L,()=>{J.$comment&&K.$comment&&Y(L),j(L),le.let(a.default.vErrors,null),le.let(a.default.errors,0),J.unevaluated&&R(L),_(L),Q(L)})}function R(L){const{gen:K,validateName:J}=L;L.evaluated=K.const("evaluated",n._`${J}.evaluated`),K.if(n._`${L.evaluated}.dynamicProps`,()=>K.assign(n._`${L.evaluated}.props`,n._`undefined`)),K.if(n._`${L.evaluated}.dynamicItems`,()=>K.assign(n._`${L.evaluated}.items`,n._`undefined`))}function c(L,K){return typeof L=="object"&&L.$id&&(K.code.source||K.code.process)?n._`/*# sourceURL=${L.$id} */`:n.nil}function E(L,K){if(S(L)&&(m(L),f(L))){u(L,K);return}e.boolOrEmptySchema(L,K)}rt.subschemaCode=E;function f({schema:L,self:K}){if(typeof L=="boolean")return!L;for(const J in L)if(K.RULES.all[J])return!0;return!1}rt.schemaCxtHasRules=f;function S(L){return typeof L.schema!="boolean"}function u(L,K){const{schema:J,gen:le,opts:V}=L;V.$comment&&J.$comment&&Y(L),q(L),k(L);const $=le.const("_errs",a.default.errors);_(L,$),le.var(K,n._`${$} === ${a.default.errors}`)}function m(L){d.checkUnknownRules(L),C(L)}function _(L,K){if(L.opts.jtd)return r.schemaKeywords(L,[],!1,K);const J=t.getSchemaTypes(L.schema),le=t.coerceAndCheckDataType(L,J);r.schemaKeywords(L,J,!le,K)}function C(L){const{schema:K,errSchemaPath:J,opts:le,self:V}=L;K.$ref&&le.ignoreKeywordsWithRef&&d.schemaHasRulesButRef(K,V.RULES)&&V.logger.warn(`$ref: keywords ignored in schema at path "${J}"`)}function j(L){const{schema:K,opts:J}=L;K.default!==void 0&&J.useDefaults&&J.strict&&ie(L,"default is ignored in the schema root")}function q(L){L.schema.$id&&(L.baseId=o.resolveUrl(L.baseId,L.schema.$id))}function k(L){if(L.schema.$async&&!L.schemaEnv.$async)throw new Error("async schema in sync schema")}function Y({gen:L,schemaEnv:K,schema:J,errSchemaPath:le,opts:V}){const $=J.$comment;if(V.$comment===!0)L.code(n._`${a.default.self}.logger.log(${$})`);else if(typeof V.$comment=="function"){const y=n.str`${le}/$comment`,P=L.scopeValue("root",{ref:K.root});L.code(n._`${a.default.self}.opts.$comment(${$}, ${y}, ${P}.schema)`)}}function Q(L){const{gen:K,schemaEnv:J,validateName:le,ValidationError:V,opts:$}=L;J.$async?K.if(n._`${a.default.errors} === 0`,()=>K.return(a.default.data),()=>K.throw(n._`new ${V}(${a.default.vErrors})`)):(K.assign(n._`${le}.errors`,a.default.vErrors),$.unevaluated&&te(L),K.return(n._`${a.default.errors} === 0`))}function te({gen:L,evaluated:K,props:J,items:le}){J instanceof n.Name&&L.assign(n._`${K}.props`,J),le instanceof n.Name&&L.assign(n._`${K}.items`,le)}function ie(L,K,J=L.opts.strict){if(J){if(K=`strict mode: ${K}`,J===!0)throw new Error(K);L.self.logger.warn(K)}}return rt.checkStrictMode=ie,rt}var Zs;function Ie(){if(Zs)return he;Zs=1,Object.defineProperty(he,"__esModule",{value:!0}),he.func=he.setEvaluated=he.evaluatedPropsToName=he.mergeEvaluated=he.eachItem=he.unescapeJsonPointer=he.escapeJsonPointer=he.escapeFragment=he.unescapeFragment=he.schemaRefOrVal=he.schemaHasRulesButRef=he.schemaHasRules=he.checkUnknownRules=he.alwaysValidSchema=he.toHash=void 0;const e=ce,t=Qe();function r(u){const m={};for(const _ of u)m[_]=!0;return m}he.toHash=r;function n(u,m){return typeof m=="boolean"?m:Object.keys(m).length===0?!0:(a(u,m),!o(m,u.self.RULES.all))}he.alwaysValidSchema=n;function a(u,m=u.schema){const{opts:_,self:C}=u;if(!_.strict||typeof m=="boolean")return;const j=C.RULES.keywords;for(const q in m)j[q]||t.checkStrictMode(u,`unknown keyword: "${q}"`)}he.checkUnknownRules=a;function o(u,m){if(typeof u=="boolean")return!u;for(const _ in u)if(m[_])return!0;return!1}he.schemaHasRules=o;function d(u,m){if(typeof u=="boolean")return!u;for(const _ in u)if(_!=="$ref"&&m.all[_])return!0;return!1}he.schemaHasRulesButRef=d;function w({topSchemaRef:u,schemaPath:m},_,C,j){if(!j){if(typeof _=="number"||typeof _=="boolean")return _;if(typeof _=="string")return e._`${_}`}return e._`${u}${m}${e.getProperty(C)}`}he.schemaRefOrVal=w;function l(u){return g(decodeURIComponent(u))}he.unescapeFragment=l;function i(u){return encodeURIComponent(s(u))}he.escapeFragment=i;function s(u){return typeof u=="number"?`${u}`:u.replace(/~/g,"~0").replace(/\//g,"~1")}he.escapeJsonPointer=s;function g(u){return u.replace(/~1/g,"/").replace(/~0/g,"~")}he.unescapeJsonPointer=g;function R(u,m){if(Array.isArray(u))for(const _ of u)m(_);else m(u)}he.eachItem=R;function c({mergeNames:u,mergeToName:m,mergeValues:_,resultToName:C}){return(j,q,k,Y)=>{const Q=k===void 0?q:k instanceof e.Name?(q instanceof e.Name?u(j,q,k):m(j,q,k),k):q instanceof e.Name?(m(j,k,q),q):_(q,k);return Y===e.Name&&!(Q instanceof e.Name)?C(j,Q):Q}}he.mergeEvaluated={props:c({mergeNames:(u,m,_)=>u.if(e._`${_} !== true && ${m} !== undefined`,()=>{u.if(e._`${m} === true`,()=>u.assign(_,!0),()=>u.assign(_,e._`${_} || {}`).code(e._`Object.assign(${_}, ${m})`))}),mergeToName:(u,m,_)=>u.if(e._`${_} !== true`,()=>{m===!0?u.assign(_,!0):(u.assign(_,e._`${_} || {}`),f(u,_,m))}),mergeValues:(u,m)=>u===!0?!0:{...u,...m},resultToName:E}),items:c({mergeNames:(u,m,_)=>u.if(e._`${_} !== true && ${m} !== undefined`,()=>u.assign(_,e._`${m} === true ? true : ${_} > ${m} ? ${_} : ${m}`)),mergeToName:(u,m,_)=>u.if(e._`${_} !== true`,()=>u.assign(_,m===!0?!0:e._`${_} > ${m} ? ${_} : ${m}`)),mergeValues:(u,m)=>u===!0?!0:Math.max(u,m),resultToName:(u,m)=>u.var("items",m)})};function E(u,m){if(m===!0)return u.var("props",!0);const _=u.var("props",e._`{}`);return m!==void 0&&f(u,_,m),_}he.evaluatedPropsToName=E;function f(u,m,_){Object.keys(_).forEach(C=>u.assign(e._`${m}${e.getProperty(C)}`,!0))}he.setEvaluated=f;function S(u,m){return u.scopeValue("func",{ref:m,code:m.code})}return he.func=S,he}var ea;function cr(){return ea||(ea=1,function(e){Object.defineProperty(e,"__esModule",{value:!0}),e.reportTypeError=e.checkDataTypes=e.checkDataType=e.coerceAndCheckDataType=e.getJSONTypes=e.getSchemaTypes=e.DataType=void 0;const t=kt,r=Et,n=or,a=ce,o=Ie();var d;(function(_){_[_.Correct=0]="Correct",_[_.Wrong=1]="Wrong"})(d=e.DataType||(e.DataType={}));function w(_){const C=l(_.type);if(C.includes("null")){if(_.nullable===!1)throw new Error("type: null contradicts nullable: false")}else{if(!C.length&&_.nullable!==void 0)throw new Error('"nullable" cannot be used without "type"');_.nullable===!0&&C.push("null")}return C}e.getSchemaTypes=w;function l(_){const C=Array.isArray(_)?_:_?[_]:[];if(C.every(t.isJSONType))return C;throw new Error("type must be JSONType or JSONType[]: "+C.join(","))}e.getJSONTypes=l;function i(_,C){const{gen:j,data:q,opts:k}=_,Y=g(C,k.coerceTypes),Q=C.length>0&&!(Y.length===0&&C.length===1&&r.schemaHasRulesForType(_,C[0]));if(Q){const te=f(C,q,k.strict,d.Wrong);j.if(te,()=>{Y.length?R(_,C,Y):u(_)})}return Q}e.coerceAndCheckDataType=i;const s=new Set(["string","number","integer","boolean","null"]);function g(_,C){return C?_.filter(j=>s.has(j)||C==="array"&&j==="array"):[]}function R(_,C,j){const{gen:q,data:k,opts:Y}=_,Q=q.let("dataType",a._`typeof ${k}`),te=q.let("coerced",a._`undefined`);Y.coerceTypes==="array"&&q.if(a._`${Q} == 'object' && Array.isArray(${k}) && ${k}.length == 1`,()=>q.assign(k,a._`${k}[0]`).assign(Q,a._`typeof ${k}`).if(f(C,k,Y.strict),()=>q.assign(te,k))),q.if(a._`${te} !== undefined`);for(const L of j)(s.has(L)||L==="array"&&Y.coerceTypes==="array")&&ie(L);q.else(),u(_),q.endIf(),q.if(a._`${te} !== undefined`,()=>{q.assign(k,te),c(_,te)});function ie(L){switch(L){case"string":q.elseIf(a._`${Q} == "number" || ${Q} == "boolean"`).assign(te,a._`"" + ${k}`).elseIf(a._`${k} === null`).assign(te,a._`""`);return;case"number":q.elseIf(a._`${Q} == "boolean" || ${k} === null
-              || (${Q} == "string" && ${k} && ${k} == +${k})`).assign(te,a._`+${k}`);return;case"integer":q.elseIf(a._`${Q} === "boolean" || ${k} === null
-              || (${Q} === "string" && ${k} && ${k} == +${k} && !(${k} % 1))`).assign(te,a._`+${k}`);return;case"boolean":q.elseIf(a._`${k} === "false" || ${k} === 0 || ${k} === null`).assign(te,!1).elseIf(a._`${k} === "true" || ${k} === 1`).assign(te,!0);return;case"null":q.elseIf(a._`${k} === "" || ${k} === 0 || ${k} === false`),q.assign(te,null);return;case"array":q.elseIf(a._`${Q} === "string" || ${Q} === "number"
-              || ${Q} === "boolean" || ${k} === null`).assign(te,a._`[${k}]`)}}}function c({gen:_,parentData:C,parentDataProperty:j},q){_.if(a._`${C} !== undefined`,()=>_.assign(a._`${C}[${j}]`,q))}function E(_,C,j,q=d.Correct){const k=q===d.Correct?a.operators.EQ:a.operators.NEQ;let Y;switch(_){case"null":return a._`${C} ${k} null`;case"array":Y=a._`Array.isArray(${C})`;break;case"object":Y=a._`${C} && typeof ${C} == "object" && !Array.isArray(${C})`;break;case"integer":Y=Q(a._`!(${C} % 1) && !isNaN(${C})`);break;case"number":Y=Q();break;default:return a._`typeof ${C} ${k} ${_}`}return q===d.Correct?Y:a.not(Y);function Q(te=a.nil){return a.and(a._`typeof ${C} == "number"`,te,j?a._`isFinite(${C})`:a.nil)}}e.checkDataType=E;function f(_,C,j,q){if(_.length===1)return E(_[0],C,j,q);let k;const Y=o.toHash(_);if(Y.array&&Y.object){const Q=a._`typeof ${C} != "object"`;k=Y.null?Q:a._`!${C} || ${Q}`,delete Y.null,delete Y.array,delete Y.object}else k=a.nil;Y.number&&delete Y.integer;for(const Q in Y)k=a.and(k,E(Q,C,j,q));return k}e.checkDataTypes=f;const S={message:({schema:_})=>a.str`should be ${_}`,params:({schema:_,schemaValue:C})=>typeof _=="string"?a._`{type: ${_}}`:a._`{type: ${C}}`};function u(_){const C=m(_);n.reportError(C,S)}e.reportTypeError=u;function m(_){const{gen:C,data:j,schema:q}=_,k=o.schemaRefOrVal(_,q,"type");return{gen:C,keyword:"type",data:j,schema:q.type,schemaCode:k,schemaValue:k,parentSchema:q,params:{},it:_}}}(un)),un}var ta;function lr(){if(ta)return zt;ta=1,Object.defineProperty(zt,"__esModule",{value:!0}),zt.getData=void 0;const e=cr(),t=Ie(),r=or,n=ce,a=Je,o=Wt();class d{constructor(c,E,f){if(l(c,E,f),this.gen=c.gen,this.allErrors=c.allErrors,this.keyword=f,this.data=c.data,this.schema=c.schema[f],this.$data=E.$data&&c.opts.$data&&this.schema&&this.schema.$data,this.schemaValue=t.schemaRefOrVal(c,this.schema,f,this.$data),this.schemaType=E.schemaType,this.parentSchema=c.schema,this.params={},this.it=c,this.def=E,this.$data)this.schemaCode=c.gen.const("vSchema",g(this.$data,c));else if(this.schemaCode=this.schemaValue,!w(this.schema,E.schemaType,E.allowUndefined))throw new Error(`${f} value must be ${JSON.stringify(E.schemaType)}`);("code"in E?E.trackErrors:E.errors!==!1)&&(this.errsCount=c.gen.const("_errs",a.default.errors))}result(c,E,f){this.gen.if(n.not(c)),f?f():this.error(),E?(this.gen.else(),E(),this.allErrors&&this.gen.endIf()):this.allErrors?this.gen.endIf():this.gen.else()}pass(c,E){this.result(c,void 0,E)}fail(c){if(c===void 0){this.error(),this.allErrors||this.gen.if(!1);return}this.gen.if(c),this.error(),this.allErrors?this.gen.endIf():this.gen.else()}fail$data(c){if(!this.$data)return this.fail(c);const{schemaCode:E}=this;this.fail(n._`${E} !== undefined && (${n.or(this.invalid$data(),c)})`)}error(c){(c?r.reportExtraError:r.reportError)(this,this.def.error)}$dataError(){r.reportError(this,this.def.$dataError||r.keyword$DataError)}reset(){if(this.errsCount===void 0)throw new Error('add "trackErrors" to keyword definition');r.resetErrorsCount(this.gen,this.errsCount)}ok(c){this.allErrors||this.gen.if(c)}setParams(c,E){E?Object.assign(this.params,c):this.params=c}block$data(c,E,f=n.nil){this.gen.block(()=>{this.check$data(c,f),E()})}check$data(c=n.nil,E=n.nil){if(!this.$data)return;const{gen:f,schemaCode:S,schemaType:u,def:m}=this;f.if(n.or(n._`${S} === undefined`,E)),c!==n.nil&&f.assign(c,!0),(u.length||m.validateSchema)&&(f.elseIf(this.invalid$data()),this.$dataError(),c!==n.nil&&f.assign(c,!1)),f.else()}invalid$data(){const{gen:c,schemaCode:E,schemaType:f,def:S,it:u}=this;return n.or(m(),_());function m(){if(f.length){if(!(E instanceof n.Name))throw new Error("ajv implementation error");const C=Array.isArray(f)?f:[f];return n._`${e.checkDataTypes(C,E,u.opts.strict,e.DataType.Wrong)}`}return n.nil}function _(){if(S.validateSchema){const C=c.scopeValue("validate$data",{ref:S.validateSchema});return n._`!${C}(${E})`}return n.nil}}subschema(c,E){return o.applySubschema(this.it,c,E)}mergeEvaluated(c,E){const{it:f,gen:S}=this;f.opts.unevaluated&&(f.props!==!0&&c.props!==void 0&&(f.props=t.mergeEvaluated.props(S,c.props,f.props,E)),f.items!==!0&&c.items!==void 0&&(f.items=t.mergeEvaluated.items(S,c.items,f.items,E)))}mergeValidEvaluated(c,E){const{it:f,gen:S}=this;if(f.opts.unevaluated&&(f.props!==!0||f.items!==!0))return S.if(E,()=>this.mergeEvaluated(c,n.Name)),!0}}zt.default=d;function w(R,c,E=!1){return!c.length||c.some(f=>f==="array"?Array.isArray(R):f==="object"?R&&typeof R=="object"&&!Array.isArray(R):typeof R==f||E&&typeof R>"u")}function l({schema:R,opts:c,self:E},f,S){if(Array.isArray(f.keyword)?!f.keyword.includes(S):f.keyword!==S)throw new Error("ajv implementation error");const u=f.dependencies;if(u!=null&&u.some(m=>!Object.prototype.hasOwnProperty.call(R,m)))throw new Error(`parent schema must have dependencies of ${S}: ${u.join(",")}`);if(f.validateSchema&&!f.validateSchema(R[S])){const _="keyword value is invalid: "+E.errorsText(f.validateSchema.errors);if(c.validateSchema==="log")E.logger.error(_);else throw new Error(_)}}const i=/^\/(?:[^~]|~0|~1)*$/,s=/^([0-9]+)(#|\/(?:[^~]|~0|~1)*)?$/;function g(R,{dataLevel:c,dataNames:E,dataPathArr:f}){let S,u;if(R==="")return a.default.rootData;if(R[0]==="/"){if(!i.test(R))throw new Error(`Invalid JSON-pointer: ${R}`);S=R,u=a.default.rootData}else{const j=s.exec(R);if(!j)throw new Error(`Invalid JSON-pointer: ${R}`);const q=+j[1];if(S=j[2],S==="#"){if(q>=c)throw new Error(C("property/index",q));return f[c-q]}if(q>c)throw new Error(C("data",q));if(u=E[c-q],!S)return u}let m=u;const _=S.split("/");for(const j of _)j&&(u=n._`${u}${n.getProperty(t.unescapeJsonPointer(j))}`,m=n._`${m} && ${u}`);return m;function C(j,q){return`Cannot access ${j} ${q} levels up, current level is ${c}`}}return zt.getData=g,zt}var fi={},Tn={exports:{}};(function(e,t){Object.defineProperty(t,"__esModule",{value:!0}),t.MissingRefError=t.ValidationError=void 0;const r=Br();class n extends Error{constructor(d){super("validation failed"),this.errors=d,this.ajv=this.validation=!0}}t.ValidationError=n;class a extends Error{constructor(d,w,l){super(l||`can't resolve reference ${w} from id ${d}`),this.missingRef=r.resolveUrl(d,w),this.missingSchema=r.normalizeId(r.getFullPath(this.missingRef))}}t.MissingRefError=a,e.exports={ValidationError:n,MissingRefError:a}})(Tn,Tn.exports);var Wn=Tn.exports,Be={};Object.defineProperty(Be,"__esModule",{value:!0});Be.resolveSchema=Be.getCompilingSchema=Be.resolveRef=Be.compileSchema=Be.SchemaEnv=void 0;const nt=ce,qo=Wn,Dt=Je,it=Br(),ra=Ie(),Ho=Qe(),Xo=ui;class xr{constructor(t){var r;this.refs={},this.dynamicAnchors={};let n;typeof t.schema=="object"&&(n=t.schema),this.schema=t.schema,this.root=t.root||this,this.baseId=(r=t.baseId)!==null&&r!==void 0?r:it.normalizeId(n==null?void 0:n.$id),this.localRefs=t.localRefs,this.meta=t.meta,this.$async=n==null?void 0:n.$async,this.refs={}}}Be.SchemaEnv=xr;function Yn(e){const t=di.call(this,e);if(t)return t;const r=it.getFullPath(e.root.baseId),{es5:n,lines:a}=this.opts.code,{ownProperties:o}=this.opts,d=new nt.CodeGen(this.scope,{es5:n,lines:a,ownProperties:o});let w;e.$async&&(w=d.scopeValue("Error",{ref:qo.ValidationError,code:nt._`require("ajv/dist/compile/error_classes").ValidationError`}));const l=d.scopeName("validate");e.validateName=l;const i={gen:d,allErrors:this.opts.allErrors,data:Dt.default.data,parentData:Dt.default.parentData,parentDataProperty:Dt.default.parentDataProperty,dataNames:[Dt.default.data],dataPathArr:[nt.nil],dataLevel:0,dataTypes:[],definedProperties:new Set,topSchemaRef:d.scopeValue("schema",this.opts.code.source===!0?{ref:e.schema,code:nt.stringify(e.schema)}:{ref:e.schema}),validateName:l,ValidationError:w,schema:e.schema,schemaEnv:e,rootId:r,baseId:e.baseId||r,schemaPath:nt.nil,errSchemaPath:this.opts.jtd?"":"#",errorPath:nt._`""`,opts:this.opts,self:this};let s;try{this._compilations.add(e),Ho.validateFunctionCode(i),d.optimize(this.opts.code.optimize);const g=d.toString();s=`${d.scopeRefs(Dt.default.scope)}return ${g}`,this.opts.code.process&&(s=this.opts.code.process(s,e));const c=new Function(`${Dt.default.self}`,`${Dt.default.scope}`,s)(this,this.scope.get());if(this.scope.value(l,{ref:c}),c.errors=null,c.schema=e.schema,c.schemaEnv=e,e.$async&&(c.$async=!0),this.opts.code.source===!0&&(c.source={validateName:l,validateCode:g,scopeValues:d._values}),this.opts.unevaluated){const{props:E,items:f}=i;c.evaluated={props:E instanceof nt.Name?void 0:E,items:f instanceof nt.Name?void 0:f,dynamicProps:E instanceof nt.Name,dynamicItems:f instanceof nt.Name},c.source&&(c.source.evaluated=nt.stringify(c.evaluated))}return e.validate=c,e}catch(g){throw delete e.validate,delete e.validateName,s&&this.logger.error("Error compiling schema, function code:",s),g}finally{this._compilations.delete(e)}}Be.compileSchema=Yn;function Ko(e,t,r){var n;r=it.resolveUrl(t,r);const a=e.refs[r];if(a)return a;let o=Wo.call(this,e,r);if(o===void 0){const d=(n=e.localRefs)===null||n===void 0?void 0:n[r];d&&(o=new xr({schema:d,root:e,baseId:t}))}if(o!==void 0)return e.refs[r]=Bo.call(this,o)}Be.resolveRef=Ko;function Bo(e){return it.inlineRef(e.schema,this.opts.inlineRefs)?e.schema:e.validate?e:Yn.call(this,e)}function di(e){for(const t of this._compilations)if(xo(t,e))return t}Be.getCompilingSchema=di;function xo(e,t){return e.schema===t.schema&&e.root===t.root&&e.baseId===t.baseId}function Wo(e,t){let r;for(;typeof(r=this.refs[t])=="string";)t=r;return r||this.schemas[t]||Wr.call(this,e,t)}function Wr(e,t){const r=Xo.parse(t),n=it._getFullPath(r);let a=it.getFullPath(e.baseId);if(Object.keys(e.schema).length>0&&n===a)return dn.call(this,r,e);const o=it.normalizeId(n),d=this.refs[o]||this.schemas[o];if(typeof d=="string"){const w=Wr.call(this,e,d);return typeof(w==null?void 0:w.schema)!="object"?void 0:dn.call(this,r,w)}if(typeof(d==null?void 0:d.schema)=="object"){if(d.validate||Yn.call(this,d),o===it.normalizeId(t)){const{schema:w}=d;return w.$id&&(a=it.resolveUrl(a,w.$id)),new xr({schema:w,root:e,baseId:a})}return dn.call(this,r,d)}}Be.resolveSchema=Wr;const Yo=new Set(["properties","patternProperties","enum","dependencies","definitions"]);function dn(e,{baseId:t,schema:r,root:n}){var a;if(((a=e.fragment)===null||a===void 0?void 0:a[0])!=="/")return;for(const d of e.fragment.slice(1).split("/")){if(typeof r=="boolean"||(r=r[ra.unescapeFragment(d)],r===void 0))return;!Yo.has(d)&&typeof r=="object"&&r.$id&&(t=it.resolveUrl(t,r.$id))}let o;if(typeof r!="boolean"&&r.$ref&&!ra.schemaHasRulesButRef(r,this.RULES)){const d=it.resolveUrl(t,r.$ref);o=Wr.call(this,n,d)}if(o=o||new xr({schema:r,root:n,baseId:t}),o.schema!==o.root.schema)return o}const Jo="https://raw.githubusercontent.com/ajv-validator/ajv/master/lib/refs/data.json#",Qo="Meta-schema for $data reference (JSON AnySchema extension proposal)",Zo="object",ec=["$data"],tc={$data:{type:"string",anyOf:[{format:"relative-json-pointer"},{format:"json-pointer"}]}},rc=!1,nc={$id:Jo,description:Qo,type:Zo,required:ec,properties:tc,additionalProperties:rc};(function(e){Object.defineProperty(e,"__esModule",{value:!0}),e.CodeGen=e.Name=e.nil=e.stringify=e.str=e._=e.KeywordCxt=void 0;const t=lr();e.KeywordCxt=t.default;var r=ce;Object.defineProperty(e,"_",{enumerable:!0,get:function(){return r._}}),Object.defineProperty(e,"str",{enumerable:!0,get:function(){return r.str}}),Object.defineProperty(e,"stringify",{enumerable:!0,get:function(){return r.stringify}}),Object.defineProperty(e,"nil",{enumerable:!0,get:function(){return r.nil}}),Object.defineProperty(e,"Name",{enumerable:!0,get:function(){return r.Name}}),Object.defineProperty(e,"CodeGen",{enumerable:!0,get:function(){return r.CodeGen}});const n=Wn,a=kt,o=Be,d=ce,w=Br(),l=cr(),i=Ie(),s=nc,g=["removeAdditional","useDefaults","coerceTypes"],R=new Set(["validate","serialize","parse","wrapper","root","schema","keyword","pattern","formats","validate$data","func","obj","Error"]),c={errorDataPath:"",format:"`validateFormats: false` can be used instead.",nullable:'"nullable" keyword is supported by default.',jsonPointers:"Deprecated jsPropertySyntax can be used instead.",extendRefs:"Deprecated ignoreKeywordsWithRef can be used instead.",missingRefs:"Pass empty schema with $id that should be ignored to ajv.addSchema.",processCode:"Use option `code: {process: (code, schemaEnv: object) => string}`",sourceCode:"Use option `code: {source: true}`",schemaId:"JSON Schema draft-04 is not supported in Ajv v7.",strictDefaults:"It is default now, see option `strict`.",strictKeywords:"It is default now, see option `strict`.",strictNumbers:"It is default now, see option `strict`.",uniqueItems:'"uniqueItems" keyword is always validated.',unknownFormats:"Disable strict mode or pass `true` to `ajv.addFormat` (or `formats` option).",cache:"Map is used as cache, schema object as key.",serialize:"Map is used as cache, schema object as key."},E={ignoreKeywordsWithRef:"",jsPropertySyntax:"",unicode:'"minLength"/"maxLength" account for unicode characters by default.'};function f(V){var $,y,P,b,z,H,F,p,O,D,B,W;const se=($=V.strict)!==null&&$!==void 0?$:!0,Fe=se?"log":!1,pe=(y=V.code)===null||y===void 0?void 0:y.optimize,mt=pe===!0||pe===void 0?1:pe||0;return{strict:se,strictTypes:(P=V.strictTypes)!==null&&P!==void 0?P:Fe,strictTuples:(b=V.strictTuples)!==null&&b!==void 0?b:Fe,code:V.code?{...V.code,optimize:mt}:{optimize:mt},loopRequired:(z=V.loopRequired)!==null&&z!==void 0?z:1/0,loopEnum:(H=V.loopEnum)!==null&&H!==void 0?H:1/0,meta:(F=V.meta)!==null&&F!==void 0?F:!0,messages:(p=V.messages)!==null&&p!==void 0?p:!0,inlineRefs:(O=V.inlineRefs)!==null&&O!==void 0?O:!0,addUsedSchema:(D=V.addUsedSchema)!==null&&D!==void 0?D:!0,validateSchema:(B=V.validateSchema)!==null&&B!==void 0?B:!0,validateFormats:(W=V.validateFormats)!==null&&W!==void 0?W:!0}}class S{constructor($={}){this.schemas={},this.refs={},this.formats={},this._compilations=new Set,this._loading={},this._cache=new Map,$=this.opts={...$,...f($)};const{es5:y,lines:P}=this.opts.code;this.scope=new d.ValueScope({scope:{},prefixes:R,es5:y,lines:P}),this.logger=Y($.logger);const b=$.validateFormats;$.validateFormats=!1,this.RULES=a.getRules(),u.call(this,c,$,"NOT SUPPORTED"),u.call(this,E,$,"DEPRECATED","warn"),this._metaOpts=q.call(this),$.formats&&C.call(this),this._addVocabularies(),this._addDefaultMetaSchema(),$.keywords&&j.call(this,$.keywords),typeof $.meta=="object"&&this.addMetaSchema($.meta),_.call(this),$.validateFormats=b}_addVocabularies(){this.addKeyword("$async")}_addDefaultMetaSchema(){const{$data:$,meta:y}=this.opts;y&&$&&this.addMetaSchema(s,s.$id,!1)}defaultMeta(){const{meta:$}=this.opts;return this.opts.defaultMeta=typeof $=="object"?$.$id||$:void 0}validate($,y){let P;if(typeof $=="string"){if(P=this.getSchema($),!P)throw new Error(`no schema with key or ref "${$}"`)}else P=this.compile($);const b=P(y);return"$async"in P||(this.errors=P.errors),b}compile($,y){const P=this._addSchema($,y);return P.validate||this._compileSchemaEnv(P)}compileAsync($,y){if(typeof this.opts.loadSchema!="function")throw new Error("options.loadSchema should be a function");const{loadSchema:P}=this.opts;return b.call(this,$,y);async function b(D,B){await z.call(this,D.$schema);const W=this._addSchema(D,B);return W.validate||H.call(this,W)}async function z(D){D&&!this.getSchema(D)&&await b.call(this,{$ref:D},!0)}async function H(D){try{return this._compileSchemaEnv(D)}catch(B){if(!(B instanceof n.MissingRefError))throw B;return F.call(this,B),await p.call(this,B.missingSchema),H.call(this,D)}}function F({missingSchema:D,missingRef:B}){if(this.refs[D])throw new Error(`AnySchema ${D} is loaded but ${B} cannot be resolved`)}async function p(D){const B=await O.call(this,D);this.refs[D]||await z.call(this,B.$schema),this.refs[D]||this.addSchema(B,D,y)}async function O(D){const B=this._loading[D];if(B)return B;try{return await(this._loading[D]=P(D))}finally{delete this._loading[D]}}}addSchema($,y,P,b=this.opts.validateSchema){if(Array.isArray($)){for(const H of $)this.addSchema(H,void 0,P,b);return this}let z;if(typeof $=="object"&&(z=$.$id,z!==void 0&&typeof z!="string"))throw new Error("schema id must be string");return y=w.normalizeId(y||z),this._checkUnique(y),this.schemas[y]=this._addSchema($,P,b,!0),this}addMetaSchema($,y,P=this.opts.validateSchema){return this.addSchema($,y,!0,P),this}validateSchema($,y){if(typeof $=="boolean")return!0;let P;if(P=$.$schema,P!==void 0&&typeof P!="string")throw new Error("$schema must be a string");if(P=P||this.opts.defaultMeta||this.defaultMeta(),!P)return this.logger.warn("meta-schema not available"),this.errors=null,!0;const b=this.validate(P,$);if(!b&&y){const z="schema is invalid: "+this.errorsText();if(this.opts.validateSchema==="log")this.logger.error(z);else throw new Error(z)}return b}getSchema($){let y;for(;typeof(y=m.call(this,$))=="string";)$=y;if(y===void 0){const P=new o.SchemaEnv({schema:{}});if(y=o.resolveSchema.call(this,P,$),!y)return;this.refs[$]=y}return y.validate||this._compileSchemaEnv(y)}removeSchema($){if($ instanceof RegExp)return this._removeAllSchemas(this.schemas,$),this._removeAllSchemas(this.refs,$),this;switch(typeof $){case"undefined":return this._removeAllSchemas(this.schemas),this._removeAllSchemas(this.refs),this._cache.clear(),this;case"string":{const y=m.call(this,$);return typeof y=="object"&&this._cache.delete(y.schema),delete this.schemas[$],delete this.refs[$],this}case"object":{const y=$;this._cache.delete(y);let P=$.$id;return P&&(P=w.normalizeId(P),delete this.schemas[P],delete this.refs[P]),this}default:throw new Error("ajv.removeSchema: invalid parameter")}}addVocabulary($){for(const y of $)this.addKeyword(y);return this}addKeyword($,y){let P;if(typeof $=="string")P=$,typeof y=="object"&&(this.logger.warn("these parameters are deprecated, see docs for addKeyword"),y.keyword=P);else if(typeof $=="object"&&y===void 0){if(y=$,P=y.keyword,Array.isArray(P)&&!P.length)throw new Error("addKeywords: keyword must be string or non-empty array")}else throw new Error("invalid addKeywords parameters");if(te.call(this,P,y),!y)return i.eachItem(P,z=>ie.call(this,z)),this;K.call(this,y);const b={...y,type:l.getJSONTypes(y.type),schemaType:l.getJSONTypes(y.schemaType)};return i.eachItem(P,b.type.length===0?z=>ie.call(this,z,b):z=>b.type.forEach(H=>ie.call(this,z,b,H))),this}getKeyword($){const y=this.RULES.all[$];return typeof y=="object"?y.definition:!!y}removeKeyword($){const{RULES:y}=this;delete y.keywords[$],delete y.all[$];for(const P of y.rules){const b=P.rules.findIndex(z=>z.keyword===$);b>=0&&P.rules.splice(b,1)}return this}addFormat($,y){return typeof y=="string"&&(y=new RegExp(y)),this.formats[$]=y,this}errorsText($=this.errors,{separator:y=", ",dataVar:P="data"}={}){return!$||$.length===0?"No errors":$.map(b=>`${P}${b.dataPath} ${b.message}`).reduce((b,z)=>b+y+z)}$dataMetaSchema($,y){const P=this.RULES.all;$=JSON.parse(JSON.stringify($));for(const b of y){const z=b.split("/").slice(1);let H=$;for(const F of z)H=H[F];for(const F in P){const p=P[F];if(typeof p!="object")continue;const{$data:O}=p.definition,D=H[F];O&&D&&(H[F]=le(D))}}return $}_removeAllSchemas($,y){for(const P in $){const b=$[P];(!y||y.test(P))&&(typeof b=="string"?delete $[P]:b&&!b.meta&&(this._cache.delete(b.schema),delete $[P]))}}_addSchema($,y,P=this.opts.validateSchema,b=this.opts.addUsedSchema){if(typeof $!="object"){if(this.opts.jtd)throw new Error("schema must be object");if(typeof $!="boolean")throw new Error("schema must be object or boolean")}let z=this._cache.get($);if(z!==void 0)return z;const H=w.getSchemaRefs.call(this,$);z=new o.SchemaEnv({schema:$,meta:y,localRefs:H}),this._cache.set(z.schema,z);const F=z.baseId;return b&&!F.startsWith("#")&&(F&&this._checkUnique(F),this.refs[F]=z),P&&this.validateSchema($,!0),z}_checkUnique($){if(this.schemas[$]||this.refs[$])throw new Error(`schema with key or id "${$}" already exists`)}_compileSchemaEnv($){if($.meta?this._compileMetaSchema($):o.compileSchema.call(this,$),!$.validate)throw new Error("ajv implementation error");return $.validate}_compileMetaSchema($){const y=this.opts;this.opts=this._metaOpts;try{o.compileSchema.call(this,$)}finally{this.opts=y}}}e.default=S,S.ValidationError=n.ValidationError,S.MissingRefError=n.MissingRefError;function u(V,$,y,P="error"){for(const b in V){const z=b;z in $&&this.logger[P](`${y}: option ${b}. ${V[z]}`)}}function m(V){return V=w.normalizeId(V),this.schemas[V]||this.refs[V]}function _(){const V=this.opts.schemas;if(V)if(Array.isArray(V))this.addSchema(V);else for(const $ in V)this.addSchema(V[$],$)}function C(){for(const V in this.opts.formats){const $=this.opts.formats[V];$&&this.addFormat(V,$)}}function j(V){if(Array.isArray(V)){this.addVocabulary(V);return}this.logger.warn("keywords option as map is deprecated, pass array");for(const $ in V){const y=V[$];y.keyword||(y.keyword=$),this.addKeyword(y)}}function q(){const V={...this.opts};for(const $ of g)delete V[$];return V}const k={log(){},warn(){},error(){}};function Y(V){if(V===!1)return k;if(V===void 0)return console;if(V.log&&V.warn&&V.error)return V;throw new Error("logger must implement log, warn and error methods")}const Q=/^[a-z_$][a-z0-9_$:-]*$/i;function te(V,$){const{RULES:y}=this;if(i.eachItem(V,P=>{if(y.keywords[P])throw new Error(`Keyword ${P} is already defined`);if(!Q.test(P))throw new Error(`Keyword ${P} has invalid name`)}),!!$&&$.$data&&!("code"in $||"validate"in $))throw new Error('$data keyword must have "code" or "validate" function')}function ie(V,$,y){var P;const b=$==null?void 0:$.post;if(y&&b)throw new Error('keyword with "post" flag cannot have "type"');const{RULES:z}=this;let H=b?z.post:z.rules.find(({type:p})=>p===y);if(H||(H={type:y,rules:[]},z.rules.push(H)),z.keywords[V]=!0,!$)return;const F={keyword:V,definition:{...$,type:l.getJSONTypes($.type),schemaType:l.getJSONTypes($.schemaType)}};$.before?L.call(this,H,F,$.before):H.rules.push(F),z.all[V]=F,(P=$.implements)===null||P===void 0||P.forEach(p=>this.addKeyword(p))}function L(V,$,y){const P=V.rules.findIndex(b=>b.keyword===y);P>=0?V.rules.splice(P,0,$):(V.rules.push($),this.logger.warn(`rule ${y} is not defined`))}function K(V){let{metaSchema:$}=V;$!==void 0&&(V.$data&&this.opts.$data&&($=le($)),V.validateSchema=this.compile($,!0))}const J={$ref:"https://raw.githubusercontent.com/ajv-validator/ajv/master/lib/refs/data.json#"};function le(V){return{anyOf:[V,J]}}})(fi);var Jn={},Qn={},Zn={};Object.defineProperty(Zn,"__esModule",{value:!0});const sc={keyword:"id",code(){throw new Error('NOT SUPPORTED: keyword "id", use "$id" for schema ID')}};Zn.default=sc;var jt={};Object.defineProperty(jt,"__esModule",{value:!0});jt.callRef=jt.getValidate=void 0;const ac=Wn,na=pt(),qe=ce,Gt=Je,sa=Be,Sr=Ie(),ic={keyword:"$ref",schemaType:"string",code(e){const{gen:t,schema:r,it:n}=e,{baseId:a,schemaEnv:o,validateName:d,opts:w,self:l}=n;if(r==="#"||r==="#/")return s();const i=sa.resolveRef.call(l,o.root,a,r);if(i===void 0)throw new ac.MissingRefError(a,r);if(i instanceof sa.SchemaEnv)return g(i);return R(i);function s(){if(o===o.root)return Lr(e,d,o,o.$async);const c=t.scopeValue("root",{ref:o.root});return Lr(e,qe._`${c}.validate`,o.root,o.root.$async)}function g(c){const E=hi(e,c);Lr(e,E,c,c.$async)}function R(c){const E=t.scopeValue("schema",w.code.source===!0?{ref:c,code:qe.stringify(c)}:{ref:c}),f=t.name("valid"),S=e.subschema({schema:c,dataTypes:[],schemaPath:qe.nil,topSchemaRef:E,errSchemaPath:r},f);e.mergeEvaluated(S),e.ok(f)}}};function hi(e,t){const{gen:r}=e;return t.validate?r.scopeValue("validate",{ref:t.validate}):qe._`${r.scopeValue("wrapper",{ref:t})}.validate`}jt.getValidate=hi;function Lr(e,t,r,n){const{gen:a,it:o}=e,{allErrors:d,schemaEnv:w,opts:l}=o,i=l.passContext?Gt.default.this:qe.nil;n?s():g();function s(){if(!w.$async)throw new Error("async schema referenced by sync schema");const E=a.let("valid");a.try(()=>{a.code(qe._`await ${na.callValidateCode(e,t,i)}`),c(t),d||a.assign(E,!0)},f=>{a.if(qe._`!(${f} instanceof ${o.ValidationError})`,()=>a.throw(f)),R(f),d||a.assign(E,!1)}),e.ok(E)}function g(){e.result(na.callValidateCode(e,t,i),()=>c(t),()=>R(t))}function R(E){const f=qe._`${E}.errors`;a.assign(Gt.default.vErrors,qe._`${Gt.default.vErrors} === null ? ${f} : ${Gt.default.vErrors}.concat(${f})`),a.assign(Gt.default.errors,qe._`${Gt.default.vErrors}.length`)}function c(E){var f;if(!o.opts.unevaluated)return;const S=(f=r==null?void 0:r.validate)===null||f===void 0?void 0:f.evaluated;if(o.props!==!0)if(S&&!S.dynamicProps)S.props!==void 0&&(o.props=Sr.mergeEvaluated.props(a,S.props,o.props));else{const u=a.var("props",qe._`${E}.evaluated.props`);o.props=Sr.mergeEvaluated.props(a,u,o.props,qe.Name)}if(o.items!==!0)if(S&&!S.dynamicItems)S.items!==void 0&&(o.items=Sr.mergeEvaluated.items(a,S.items,o.items));else{const u=a.var("items",qe._`${E}.evaluated.items`);o.items=Sr.mergeEvaluated.items(a,u,o.items,qe.Name)}}}jt.callRef=Lr;jt.default=ic;Object.defineProperty(Qn,"__esModule",{value:!0});const oc=Zn,cc=jt,lc=["$schema","$id","$defs","$vocabulary",{keyword:"$comment"},"definitions",oc.default,cc.default];Qn.default=lc;var es={},ts={};Object.defineProperty(ts,"__esModule",{value:!0});const Ur=ce,_t=Ur.operators,Vr={maximum:{okStr:"<=",ok:_t.LTE,fail:_t.GT},minimum:{okStr:">=",ok:_t.GTE,fail:_t.LT},exclusiveMaximum:{okStr:"<",ok:_t.LT,fail:_t.GTE},exclusiveMinimum:{okStr:">",ok:_t.GT,fail:_t.LTE}},uc={message:({keyword:e,schemaCode:t})=>Ur.str`should be ${Vr[e].okStr} ${t}`,params:({keyword:e,schemaCode:t})=>Ur._`{comparison: ${Vr[e].okStr}, limit: ${t}}`},fc={keyword:Object.keys(Vr),type:"number",schemaType:"number",$data:!0,error:uc,code(e){const{keyword:t,data:r,schemaCode:n}=e;e.fail$data(Ur._`${r} ${Vr[t].fail} ${n} || isNaN(${r})`)}};ts.default=fc;var rs={};Object.defineProperty(rs,"__esModule",{value:!0});const nr=ce,dc={message:({schemaCode:e})=>nr.str`should be multiple of ${e}`,params:({schemaCode:e})=>nr._`{multipleOf: ${e}}`},hc={keyword:"multipleOf",type:"number",schemaType:"number",$data:!0,error:dc,code(e){const{gen:t,data:r,schemaCode:n,it:a}=e,o=a.opts.multipleOfPrecision,d=t.let("res"),w=o?nr._`Math.abs(Math.round(${d}) - ${d}) > 1e-${o}`:nr._`${d} !== parseInt(${d})`;e.fail$data(nr._`(${n} === 0 || (${d} = ${r}/${n}, ${w}))`)}};rs.default=hc;var ns={},ss={};Object.defineProperty(ss,"__esModule",{value:!0});function pc(e){const t=e.length;let r=0,n=0,a;for(;n<t;)r++,a=e.charCodeAt(n++),a>=55296&&a<=56319&&n<t&&(a=e.charCodeAt(n),(a&64512)===56320&&n++);return r}ss.default=pc;Object.defineProperty(ns,"__esModule",{value:!0});const wt=ce,mc=ss,yc={message({keyword:e,schemaCode:t}){const r=e==="maxLength"?"more":"fewer";return wt.str`should NOT have ${r} than ${t} characters`},params:({schemaCode:e})=>wt._`{limit: ${e}}`},vc={keyword:["maxLength","minLength"],type:"string",schemaType:"number",$data:!0,error:yc,code(e){const{keyword:t,data:r,schemaCode:n,it:a}=e,o=t==="maxLength"?wt.operators.GT:wt.operators.LT;let d;if(a.opts.unicode===!1)d=wt._`${r}.length`;else{const w=e.gen.scopeValue("func",{ref:mc.default,code:wt._`require("ajv/dist/compile/ucs2length").default`});d=wt._`${w}(${r})`}e.fail$data(wt._`${d} ${o} ${n}`)}};ns.default=vc;var as={};Object.defineProperty(as,"__esModule",{value:!0});const Ec=pt(),zr=ce,$c={message:({schemaCode:e})=>zr.str`should match pattern "${e}"`,params:({schemaCode:e})=>zr._`{pattern: ${e}}`},gc={keyword:"pattern",type:"string",schemaType:"string",$data:!0,error:$c,code(e){const{gen:t,data:r,$data:n,schema:a,schemaCode:o}=e,d=n?zr._`(new RegExp(${o}, "u"))`:Ec.usePattern(t,a);e.fail$data(zr._`!${d}.test(${r})`)}};as.default=gc;var is={};Object.defineProperty(is,"__esModule",{value:!0});const sr=ce,_c={message({keyword:e,schemaCode:t}){const r=e==="maxProperties"?"more":"fewer";return sr.str`should NOT have ${r} than ${t} items`},params:({schemaCode:e})=>sr._`{limit: ${e}}`},wc={keyword:["maxProperties","minProperties"],type:"object",schemaType:"number",$data:!0,error:_c,code(e){const{keyword:t,data:r,schemaCode:n}=e,a=t==="maxProperties"?sr.operators.GT:sr.operators.LT;e.fail$data(sr._`Object.keys(${r}).length ${a} ${n}`)}};is.default=wc;var os={};Object.defineProperty(os,"__esModule",{value:!0});const tr=pt(),ar=ce,Rc=Qe(),Sc={message:({params:{missingProperty:e}})=>ar.str`should have required property '${e}'`,params:({params:{missingProperty:e}})=>ar._`{missingProperty: ${e}}`},Ic={keyword:"required",type:"object",schemaType:"array",$data:!0,error:Sc,code(e){const{gen:t,schema:r,schemaCode:n,data:a,$data:o,it:d}=e,{opts:w}=d;if(!o&&r.length===0)return;const l=r.length>=w.loopRequired;if(d.allErrors?i():s(),w.strictRequired){const c=e.parentSchema.properties,{definedProperties:E}=e.it;for(const f of r)if((c==null?void 0:c[f])===void 0&&!E.has(f)){const S=d.schemaEnv.baseId+d.errSchemaPath,u=`required property "${f}" is not defined at "${S}" (strictRequired)`;Rc.checkStrictMode(d,u,d.opts.strictRequired)}}function i(){if(l||o)e.block$data(ar.nil,g);else for(const c of r)tr.checkReportMissingProp(e,c)}function s(){const c=t.let("missing");if(l||o){const E=t.let("valid",!0);e.block$data(E,()=>R(c,E)),e.ok(E)}else t.if(tr.checkMissingProp(e,r,c)),tr.reportMissingProp(e,c),t.else()}function g(){t.forOf("prop",n,c=>{e.setParams({missingProperty:c}),t.if(tr.noPropertyInData(t,a,c,w.ownProperties),()=>e.error())})}function R(c,E){e.setParams({missingProperty:c}),t.forOf(c,n,()=>{t.assign(E,tr.propertyInData(t,a,c,w.ownProperties)),t.if(ar.not(E),()=>{e.error(),t.break()})},ar.nil)}}};os.default=Ic;var cs={};Object.defineProperty(cs,"__esModule",{value:!0});const ir=ce,Oc={message({keyword:e,schemaCode:t}){const r=e==="maxItems"?"more":"fewer";return ir.str`should NOT have ${r} than ${t} items`},params:({schemaCode:e})=>ir._`{limit: ${e}}`},Nc={keyword:["maxItems","minItems"],type:"array",schemaType:"number",$data:!0,error:Oc,code(e){const{keyword:t,data:r,schemaCode:n}=e,a=t==="maxItems"?ir.operators.GT:ir.operators.LT;e.fail$data(ir._`${r}.length ${a} ${n}`)}};cs.default=Nc;var ls={};Object.defineProperty(ls,"__esModule",{value:!0});const hn=cr(),be=ce,Tc=Kr,Pc={message:({params:{i:e,j:t}})=>be.str`should NOT have duplicate items (items ## ${t} and ${e} are identical)`,params:({params:{i:e,j:t}})=>be._`{i: ${e}, j: ${t}}`},Ac={keyword:"uniqueItems",type:"array",schemaType:"boolean",$data:!0,error:Pc,code(e){const{gen:t,data:r,$data:n,schema:a,parentSchema:o,schemaCode:d,it:w}=e;if(!n&&!a)return;const l=t.let("valid"),i=o.items?hn.getSchemaTypes(o.items):[];e.block$data(l,s,be._`${d} === false`),e.ok(l);function s(){const E=t.let("i",be._`${r}.length`),f=t.let("j");e.setParams({i:E,j:f}),t.assign(l,!0),t.if(be._`${E} > 1`,()=>(g()?R:c)(E,f))}function g(){return i.length>0&&!i.some(E=>E==="object"||E==="array")}function R(E,f){const S=t.name("item"),u=hn.checkDataTypes(i,S,w.opts.strict,hn.DataType.Wrong),m=t.const("indices",be._`{}`);t.for(be._`;${E}--;`,()=>{t.let(S,be._`${r}[${E}]`),t.if(u,be._`continue`),i.length>1&&t.if(be._`typeof ${S} == "string"`,be._`${S} += "_"`),t.if(be._`typeof ${m}[${S}] == "number"`,()=>{t.assign(f,be._`${m}[${S}]`),e.error(),t.assign(l,!1).break()}).code(be._`${m}[${S}] = ${E}`)})}function c(E,f){const S=e.gen.scopeValue("func",{ref:Tc,code:be._`require("ajv/dist/compile/equal")`}),u=t.name("outer");t.label(u).for(be._`;${E}--;`,()=>t.for(be._`${f} = ${E}; ${f}--;`,()=>t.if(be._`${S}(${r}[${E}], ${r}[${f}])`,()=>{e.error(),t.assign(l,!1).break(u)})))}}};ls.default=Ac;var us={};Object.defineProperty(us,"__esModule",{value:!0});const Pn=ce,bc=Kr,Cc={message:"should be equal to constant",params:({schemaCode:e})=>Pn._`{allowedValue: ${e}}`},Dc={keyword:"const",$data:!0,error:Cc,code(e){const t=e.gen.scopeValue("func",{ref:bc,code:Pn._`require("ajv/dist/compile/equal")`});e.fail$data(Pn._`!${t}(${e.data}, ${e.schemaCode})`)}};us.default=Dc;var fs={};Object.defineProperty(fs,"__esModule",{value:!0});const qt=ce,Lc=Kr,kc={message:"should be equal to one of the allowed values",params:({schemaCode:e})=>qt._`{allowedValues: ${e}}`},jc={keyword:"enum",schemaType:"array",$data:!0,error:kc,code(e){const{gen:t,data:r,$data:n,schema:a,schemaCode:o,it:d}=e;if(!n&&a.length===0)throw new Error("enum must have non-empty array");const w=a.length>=d.opts.loopEnum,l=e.gen.scopeValue("func",{ref:Lc,code:qt._`require("ajv/dist/compile/equal")`});let i;if(w||n)i=t.let("valid"),e.block$data(i,s);else{if(!Array.isArray(a))throw new Error("ajv implementation error");const R=t.const("vSchema",o);i=qt.or(...a.map((c,E)=>g(R,E)))}e.pass(i);function s(){t.assign(i,!1),t.forOf("v",o,R=>t.if(qt._`${l}(${r}, ${R})`,()=>t.assign(i,!0).break()))}function g(R,c){const E=a[c];return E&&typeof E=="object"?qt._`${l}(${r}, ${R}[${c}])`:qt._`${r} === ${E}`}}};fs.default=jc;Object.defineProperty(es,"__esModule",{value:!0});const Fc=ts,Mc=rs,Uc=ns,Vc=as,zc=is,Gc=os,qc=cs,Hc=ls,Xc=us,Kc=fs,Bc=[Fc.default,Mc.default,Uc.default,Vc.default,zc.default,Gc.default,qc.default,Hc.default,{keyword:"type",schemaType:["string","array"]},{keyword:"nullable",schemaType:"boolean"},Xc.default,Kc.default];es.default=Bc;var ds={},hs={};Object.defineProperty(hs,"__esModule",{value:!0});const Lt=ce,xc=Wt(),Wc=Ie(),Yc=Qe(),Jc={message:({params:{len:e}})=>Lt.str`should NOT have more than ${e} items`,params:({params:{len:e}})=>Lt._`{limit: ${e}}`},Qc={keyword:"additionalItems",type:"array",schemaType:["boolean","object"],before:"uniqueItems",error:Jc,code(e){const{gen:t,schema:r,parentSchema:n,data:a,it:o}=e,{items:d}=n;if(!Array.isArray(d)){Yc.checkStrictMode(o,'"additionalItems" is ignored when "items" is not an array of schemas');return}o.items=!0;const w=t.const("len",Lt._`${a}.length`);if(r===!1)e.setParams({len:d.length}),e.pass(Lt._`${w} <= ${d.length}`);else if(typeof r=="object"&&!Wc.alwaysValidSchema(o,r)){const i=t.var("valid",Lt._`${w} <= ${d.length}`);t.if(Lt.not(i),()=>l(i)),e.ok(i)}function l(i){t.forRange("i",d.length,w,s=>{e.subschema({keyword:"additionalItems",dataProp:s,dataPropType:xc.Type.Num},i),o.allErrors||t.if(Lt.not(i),()=>t.break())})}}};hs.default=Qc;var ps={};Object.defineProperty(ps,"__esModule",{value:!0});const aa=ce,pn=Ie(),Zc=Qe(),el=pt(),tl={keyword:"items",type:"array",schemaType:["object","array","boolean"],before:"uniqueItems",code(e){const{gen:t,schema:r,it:n}=e;if(Array.isArray(r))n.opts.unevaluated&&r.length&&n.items!==!0&&(n.items=pn.mergeEvaluated.items(t,r.length,n.items)),a(r);else{if(n.items=!0,pn.alwaysValidSchema(n,r))return;e.ok(el.validateArray(e))}function a(o){const{parentSchema:d,data:w}=e;if(n.opts.strictTuples&&!rl(o.length,d)){const s=`"items" is ${o.length}-tuple, but minItems or maxItems/additionalItems are not specified or different`;Zc.checkStrictMode(n,s,n.opts.strictTuples)}const l=t.name("valid"),i=t.const("len",aa._`${w}.length`);o.forEach((s,g)=>{pn.alwaysValidSchema(n,s)||(t.if(aa._`${i} > ${g}`,()=>e.subschema({keyword:"items",schemaProp:g,dataProp:g},l)),e.ok(l))})}}};function rl(e,t){return e===t.minItems&&(e===t.maxItems||t.additionalItems===!1)}ps.default=tl;var ms={};Object.defineProperty(ms,"__esModule",{value:!0});const at=ce,nl=Wt(),sl=Ie(),ia=Qe(),al={message:({params:{min:e,max:t}})=>t===void 0?at.str`should contain at least ${e} valid item(s)`:at.str`should contain at least ${e} and no more than ${t} valid item(s)`,params:({params:{min:e,max:t}})=>t===void 0?at._`{minContains: ${e}}`:at._`{minContains: ${e}, maxContains: ${t}}`},il={keyword:"contains",type:"array",schemaType:["object","boolean"],before:"uniqueItems",trackErrors:!0,error:al,code(e){const{gen:t,schema:r,parentSchema:n,data:a,it:o}=e;let d,w;const{minContains:l,maxContains:i}=n;o.opts.next?(d=l===void 0?1:l,w=i):d=1;const s=t.const("len",at._`${a}.length`);if(e.setParams({min:d,max:w}),w===void 0&&d===0){ia.checkStrictMode(o,'"minContains" == 0 without "maxContains": "contains" keyword ignored');return}if(w!==void 0&&d>w){ia.checkStrictMode(o,'"minContains" > "maxContains" is always invalid'),e.fail();return}if(sl.alwaysValidSchema(o,r)){let E=at._`${s} >= ${d}`;w!==void 0&&(E=at._`${E} && ${s} <= ${w}`),e.pass(E);return}o.items=!0;const g=t.name("valid");if(w===void 0&&d===1)R(g,()=>t.if(g,()=>t.break()));else{t.let(g,!1);const E=t.name("_valid"),f=t.let("count",0);R(E,()=>t.if(E,()=>c(f)))}e.result(g,()=>e.reset());function R(E,f){t.forRange("i",0,s,S=>{e.subschema({keyword:"contains",dataProp:S,dataPropType:nl.Type.Num,compositeRule:!0},E),f()})}function c(E){t.code(at._`${E}++`),w===void 0?t.if(at._`${E} >= ${d}`,()=>t.assign(g,!0).break()):(t.if(at._`${E} > ${w}`,()=>t.assign(g,!1).break()),d===1?t.assign(g,!0):t.if(at._`${E} >= ${d}`,()=>t.assign(g,!0)))}}};ms.default=il;var pi={};(function(e){Object.defineProperty(e,"__esModule",{value:!0}),e.validateSchemaDeps=e.validatePropertyDeps=e.error=void 0;const t=ce,r=Ie(),n=pt();e.error={message:({params:{property:l,depsCount:i,deps:s}})=>{const g=i===1?"property":"properties";return t.str`should have ${g} ${s} when property ${l} is present`},params:({params:{property:l,depsCount:i,deps:s,missingProperty:g}})=>t._`{property: ${l},
-    missingProperty: ${g},
-    depsCount: ${i},
-    deps: ${s}}`};const a={keyword:"dependencies",type:"object",schemaType:"object",error:e.error,code(l){const[i,s]=o(l);d(l,i),w(l,s)}};function o({schema:l}){const i={},s={};for(const g in l){if(g==="__proto__")continue;const R=Array.isArray(l[g])?i:s;R[g]=l[g]}return[i,s]}function d(l,i=l.schema){const{gen:s,data:g,it:R}=l;if(Object.keys(i).length===0)return;const c=s.let("missing");for(const E in i){const f=i[E];if(f.length===0)continue;const S=n.propertyInData(s,g,E,R.opts.ownProperties);l.setParams({property:E,depsCount:f.length,deps:f.join(", ")}),R.allErrors?s.if(S,()=>{for(const u of f)n.checkReportMissingProp(l,u)}):(s.if(t._`${S} && (${n.checkMissingProp(l,f,c)})`),n.reportMissingProp(l,c),s.else())}}e.validatePropertyDeps=d;function w(l,i=l.schema){const{gen:s,data:g,keyword:R,it:c}=l,E=s.name("valid");for(const f in i)r.alwaysValidSchema(c,i[f])||(s.if(n.propertyInData(s,g,f,c.opts.ownProperties),()=>{const S=l.subschema({keyword:R,schemaProp:f},E);l.mergeValidEvaluated(S,E)},()=>s.var(E,!0)),l.ok(E))}e.validateSchemaDeps=w,e.default=a})(pi);var ys={};Object.defineProperty(ys,"__esModule",{value:!0});const An=ce,ol=Ie(),cl={message:({params:e})=>An.str`property name '${e.propertyName}' is invalid`,params:({params:e})=>An._`{propertyName: ${e.propertyName}}`},ll={keyword:"propertyNames",type:"object",schemaType:["object","boolean"],error:cl,code(e){const{gen:t,schema:r,data:n,it:a}=e;if(ol.alwaysValidSchema(a,r))return;const o=t.name("valid");t.forIn("key",n,d=>{e.setParams({propertyName:d}),e.subschema({keyword:"propertyNames",data:d,dataTypes:["string"],propertyName:d,compositeRule:!0},o),t.if(An.not(o),()=>{e.error(!0),a.allErrors||t.break()})}),e.ok(o)}};ys.default=ll;var Yr={};Object.defineProperty(Yr,"__esModule",{value:!0});const Ir=pt(),st=ce,ul=Je,fl=Wt(),mn=Ie(),dl={message:"should NOT have additional properties",params:({params:e})=>st._`{additionalProperty: ${e.additionalProperty}}`},hl={keyword:"additionalProperties",type:["object"],schemaType:["boolean","object"],allowUndefined:!0,trackErrors:!0,error:dl,code(e){const{gen:t,schema:r,parentSchema:n,data:a,errsCount:o,it:d}=e;if(!o)throw new Error("ajv implementation error");const{allErrors:w,opts:l}=d;if(d.props=!0,l.removeAdditional!=="all"&&mn.alwaysValidSchema(d,r))return;const i=Ir.allSchemaProperties(n.properties),s=Ir.allSchemaProperties(n.patternProperties);g(),e.ok(st._`${o} === ${ul.default.errors}`);function g(){t.forIn("key",a,S=>{!i.length&&!s.length?E(S):t.if(R(S),()=>E(S))})}function R(S){let u;if(i.length>8){const m=mn.schemaRefOrVal(d,n.properties,"properties");u=Ir.isOwnProperty(t,m,S)}else i.length?u=st.or(...i.map(m=>st._`${S} === ${m}`)):u=st.nil;return s.length&&(u=st.or(u,...s.map(m=>st._`${Ir.usePattern(t,m)}.test(${S})`))),st.not(u)}function c(S){t.code(st._`delete ${a}[${S}]`)}function E(S){if(l.removeAdditional==="all"||l.removeAdditional&&r===!1){c(S);return}if(r===!1){e.setParams({additionalProperty:S}),e.error(),w||t.break();return}if(typeof r=="object"&&!mn.alwaysValidSchema(d,r)){const u=t.name("valid");l.removeAdditional==="failing"?(f(S,u,!1),t.if(st.not(u),()=>{e.reset(),c(S)})):(f(S,u),w||t.if(st.not(u),()=>t.break()))}}function f(S,u,m){const _={keyword:"additionalProperties",dataProp:S,dataPropType:fl.Type.Str};m===!1&&Object.assign(_,{compositeRule:!0,createErrors:!1,allErrors:!1}),e.subschema(_,u)}}};Yr.default=hl;var vs={};Object.defineProperty(vs,"__esModule",{value:!0});const pl=lr(),oa=pt(),yn=Ie(),ca=Yr,ml={keyword:"properties",type:"object",schemaType:"object",code(e){const{gen:t,schema:r,parentSchema:n,data:a,it:o}=e;o.opts.removeAdditional==="all"&&n.additionalProperties===void 0&&ca.default.code(new pl.default(o,ca.default,"additionalProperties"));const d=oa.allSchemaProperties(r);for(const g of d)o.definedProperties.add(g);o.opts.unevaluated&&d.length&&o.props!==!0&&(o.props=yn.mergeEvaluated.props(t,yn.toHash(d),o.props));const w=d.filter(g=>!yn.alwaysValidSchema(o,r[g]));if(w.length===0)return;const l=t.name("valid");for(const g of w)i(g)?s(g):(t.if(oa.propertyInData(t,a,g,o.opts.ownProperties)),s(g),o.allErrors||t.else().var(l,!0),t.endIf()),e.it.definedProperties.add(g),e.ok(l);function i(g){return o.opts.useDefaults&&!o.compositeRule&&r[g].default!==void 0}function s(g){e.subschema({keyword:"properties",schemaProp:g,dataProp:g},l)}}};vs.default=ml;var Es={};Object.defineProperty(Es,"__esModule",{value:!0});const la=pt(),Or=ce,yl=Wt(),vl=Qe(),El=Ie(),$l={keyword:"patternProperties",type:"object",schemaType:"object",code(e){const{gen:t,schema:r,data:n,parentSchema:a,it:o}=e,{opts:d}=o,w=la.schemaProperties(o,r);if(w.length===0)return;const l=d.strict&&!d.allowMatchingProperties&&a.properties,i=t.name("valid");o.props!==!0&&!(o.props instanceof Or.Name)&&(o.props=El.evaluatedPropsToName(t,o.props));const{props:s}=o;g();function g(){for(const E of w)l&&R(E),o.allErrors?c(E):(t.var(i,!0),c(E),t.if(i))}function R(E){for(const f in l)new RegExp(E).test(f)&&vl.checkStrictMode(o,`property ${f} matches pattern ${E} (use allowMatchingProperties)`)}function c(E){t.forIn("key",n,f=>{t.if(Or._`${la.usePattern(t,E)}.test(${f})`,()=>{e.subschema({keyword:"patternProperties",schemaProp:E,dataProp:f,dataPropType:yl.Type.Str},i),o.opts.unevaluated&&s!==!0?t.assign(Or._`${s}[${f}]`,!0):o.allErrors||t.if(Or.not(i),()=>t.break())})})}}};Es.default=$l;var $s={};Object.defineProperty($s,"__esModule",{value:!0});const gl=Ie(),_l={keyword:"not",schemaType:["object","boolean"],trackErrors:!0,code(e){const{gen:t,schema:r,it:n}=e;if(gl.alwaysValidSchema(n,r)){e.fail();return}const a=t.name("valid");e.subschema({keyword:"not",compositeRule:!0,createErrors:!1,allErrors:!1},a),e.result(a,()=>e.error(),()=>e.reset())},error:{message:"should NOT be valid"}};$s.default=_l;var gs={};Object.defineProperty(gs,"__esModule",{value:!0});const wl=pt(),Rl={keyword:"anyOf",schemaType:"array",trackErrors:!0,code:wl.validateUnion,error:{message:"should match some schema in anyOf"}};gs.default=Rl;var _s={};Object.defineProperty(_s,"__esModule",{value:!0});const kr=ce,Sl=Ie(),Il={message:"should match exactly one schema in oneOf",params:({params:e})=>kr._`{passingSchemas: ${e.passing}}`},Ol={keyword:"oneOf",schemaType:"array",trackErrors:!0,error:Il,code(e){const{gen:t,schema:r,it:n}=e;if(!Array.isArray(r))throw new Error("ajv implementation error");const a=r,o=t.let("valid",!1),d=t.let("passing",null),w=t.name("_valid");e.setParams({passing:d}),t.block(l),e.result(o,()=>e.reset(),()=>e.error(!0));function l(){a.forEach((i,s)=>{let g;Sl.alwaysValidSchema(n,i)?t.var(w,!0):g=e.subschema({keyword:"oneOf",schemaProp:s,compositeRule:!0},w),s>0&&t.if(kr._`${w} && ${o}`).assign(o,!1).assign(d,kr._`[${d}, ${s}]`).else(),t.if(w,()=>{t.assign(o,!0),t.assign(d,s),g&&e.mergeEvaluated(g,kr.Name)})})}}};_s.default=Ol;var ws={};Object.defineProperty(ws,"__esModule",{value:!0});const Nl=Ie(),Tl={keyword:"allOf",schemaType:"array",code(e){const{gen:t,schema:r,it:n}=e;if(!Array.isArray(r))throw new Error("ajv implementation error");const a=t.name("valid");r.forEach((o,d)=>{if(Nl.alwaysValidSchema(n,o))return;const w=e.subschema({keyword:"allOf",schemaProp:d},a);e.ok(a),e.mergeEvaluated(w)})}};ws.default=Tl;var Rs={};Object.defineProperty(Rs,"__esModule",{value:!0});const Gr=ce,Pl=Ie(),Al=Qe(),bl={message:({params:e})=>Gr.str`should match "${e.ifClause}" schema`,params:({params:e})=>Gr._`{failingKeyword: ${e.ifClause}}`},Cl={keyword:"if",schemaType:["object","boolean"],trackErrors:!0,error:bl,code(e){const{gen:t,parentSchema:r,it:n}=e;r.then===void 0&&r.else===void 0&&Al.checkStrictMode(n,'"if" without "then" and "else" is ignored');const a=ua(n,"then"),o=ua(n,"else");if(!a&&!o)return;const d=t.let("valid",!0),w=t.name("_valid");if(l(),e.reset(),a&&o){const s=t.let("ifClause");e.setParams({ifClause:s}),t.if(w,i("then",s),i("else",s))}else a?t.if(w,i("then")):t.if(Gr.not(w),i("else"));e.pass(d,()=>e.error(!0));function l(){const s=e.subschema({keyword:"if",compositeRule:!0,createErrors:!1,allErrors:!1},w);e.mergeEvaluated(s)}function i(s,g){return()=>{const R=e.subschema({keyword:s},w);t.assign(d,w),e.mergeValidEvaluated(R,d),g?t.assign(g,Gr._`${s}`):e.setParams({ifClause:s})}}}};function ua(e,t){const r=e.schema[t];return r!==void 0&&!Pl.alwaysValidSchema(e,r)}Rs.default=Cl;var Ss={};Object.defineProperty(Ss,"__esModule",{value:!0});const Dl=Qe(),Ll={keyword:["then","else"],schemaType:["object","boolean"],code({keyword:e,parentSchema:t,it:r}){t.if===void 0&&Dl.checkStrictMode(r,`"${e}" without "if" is ignored`)}};Ss.default=Ll;Object.defineProperty(ds,"__esModule",{value:!0});const kl=hs,jl=ps,Fl=ms,Ml=pi,Ul=ys,Vl=Yr,zl=vs,Gl=Es,ql=$s,Hl=gs,Xl=_s,Kl=ws,Bl=Rs,xl=Ss,Wl=[ql.default,Hl.default,Xl.default,Kl.default,Bl.default,xl.default,kl.default,jl.default,Fl.default,Ul.default,Vl.default,Ml.default,zl.default,Gl.default];ds.default=Wl;var Is={},Os={};Object.defineProperty(Os,"__esModule",{value:!0});const Pe=ce,Yl={message:({schemaCode:e})=>Pe.str`should match format "${e}"`,params:({schemaCode:e})=>Pe._`{format: ${e}}`},Jl={keyword:"format",type:["number","string"],schemaType:"string",$data:!0,error:Yl,code(e,t){const{gen:r,data:n,$data:a,schema:o,schemaCode:d,it:w}=e,{opts:l,errSchemaPath:i,schemaEnv:s,self:g}=w;if(!l.validateFormats)return;a?R():c();function R(){const E=r.scopeValue("formats",{ref:g.formats,code:l.code.formats}),f=r.const("fDef",Pe._`${E}[${d}]`),S=r.let("fType"),u=r.let("format");r.if(Pe._`typeof ${f} == "object" && !(${f} instanceof RegExp)`,()=>r.assign(S,Pe._`${f}.type || "string"`).assign(u,Pe._`${f}.validate`),()=>r.assign(S,Pe._`"string"`).assign(u,f)),e.fail$data(Pe.or(m(),_()));function m(){return l.strict===!1?Pe.nil:Pe._`${d} && !${u}`}function _(){const C=s.$async?Pe._`(${f}.async ? await ${u}(${n}) : ${u}(${n}))`:Pe._`${u}(${n})`,j=Pe._`(typeof ${u} == "function" ? ${C} : ${u}.test(${n}))`;return Pe._`${u} && ${u} !== true && ${S} === ${t} && !${j}`}}function c(){const E=g.formats[o];if(!E){m();return}if(E===!0)return;const[f,S,u]=_(E);f===t&&e.pass(C());function m(){if(l.strict===!1){g.logger.warn(j());return}throw new Error(j());function j(){return`unknown format "${o}" ignored in schema at path "${i}"`}}function _(j){const q=r.scopeValue("formats",{key:o,ref:j,code:l.code.formats?Pe._`${l.code.formats}${Pe.getProperty(o)}`:void 0});return typeof j=="object"&&!(j instanceof RegExp)?[j.type||"string",j.validate,Pe._`${q}.validate`]:["string",j,q]}function C(){if(typeof E=="object"&&!(E instanceof RegExp)&&E.async){if(!s.$async)throw new Error("async format in sync schema");return Pe._`await ${u}(${n})`}return typeof S=="function"?Pe._`${u}(${n})`:Pe._`${u}.test(${n})`}}}};Os.default=Jl;Object.defineProperty(Is,"__esModule",{value:!0});const Ql=Os,Zl=[Ql.default];Is.default=Zl;var xt={};Object.defineProperty(xt,"__esModule",{value:!0});xt.contentVocabulary=xt.metadataVocabulary=void 0;xt.metadataVocabulary=["title","description","default","deprecated","readOnly","writeOnly","examples"];xt.contentVocabulary=["contentMediaType","contentEncoding","contentSchema"];Object.defineProperty(Jn,"__esModule",{value:!0});const eu=Qn,tu=es,ru=ds,nu=Is,fa=xt,su=[eu.default,tu.default,ru.default,nu.default,fa.metadataVocabulary,fa.contentVocabulary];Jn.default=su;const au="http://json-schema.org/draft-07/schema#",iu="http://json-schema.org/draft-07/schema#",ou="Core schema meta-schema",cu={schemaArray:{type:"array",minItems:1,items:{$ref:"#"}},nonNegativeInteger:{type:"integer",minimum:0},nonNegativeIntegerDefault0:{allOf:[{$ref:"#/definitions/nonNegativeInteger"},{default:0}]},simpleTypes:{enum:["array","boolean","integer","null","number","object","string"]},stringArray:{type:"array",items:{type:"string"},uniqueItems:!0,default:[]}},lu=["object","boolean"],uu={$id:{type:"string",format:"uri-reference"},$schema:{type:"string",format:"uri"},$ref:{type:"string",format:"uri-reference"},$comment:{type:"string"},title:{type:"string"},description:{type:"string"},default:!0,readOnly:{type:"boolean",default:!1},examples:{type:"array",items:!0},multipleOf:{type:"number",exclusiveMinimum:0},maximum:{type:"number"},exclusiveMaximum:{type:"number"},minimum:{type:"number"},exclusiveMinimum:{type:"number"},maxLength:{$ref:"#/definitions/nonNegativeInteger"},minLength:{$ref:"#/definitions/nonNegativeIntegerDefault0"},pattern:{type:"string",format:"regex"},additionalItems:{$ref:"#"},items:{anyOf:[{$ref:"#"},{$ref:"#/definitions/schemaArray"}],default:!0},maxItems:{$ref:"#/definitions/nonNegativeInteger"},minItems:{$ref:"#/definitions/nonNegativeIntegerDefault0"},uniqueItems:{type:"boolean",default:!1},contains:{$ref:"#"},maxProperties:{$ref:"#/definitions/nonNegativeInteger"},minProperties:{$ref:"#/definitions/nonNegativeIntegerDefault0"},required:{$ref:"#/definitions/stringArray"},additionalProperties:{$ref:"#"},definitions:{type:"object",additionalProperties:{$ref:"#"},default:{}},properties:{type:"object",additionalProperties:{$ref:"#"},default:{}},patternProperties:{type:"object",additionalProperties:{$ref:"#"},propertyNames:{format:"regex"},default:{}},dependencies:{type:"object",additionalProperties:{anyOf:[{$ref:"#"},{$ref:"#/definitions/stringArray"}]}},propertyNames:{$ref:"#"},const:!0,enum:{type:"array",items:!0,minItems:1,uniqueItems:!0},type:{anyOf:[{$ref:"#/definitions/simpleTypes"},{type:"array",items:{$ref:"#/definitions/simpleTypes"},minItems:1,uniqueItems:!0}]},format:{type:"string"},contentMediaType:{type:"string"},contentEncoding:{type:"string"},if:{$ref:"#"},then:{$ref:"#"},else:{$ref:"#"},allOf:{$ref:"#/definitions/schemaArray"},anyOf:{$ref:"#/definitions/schemaArray"},oneOf:{$ref:"#/definitions/schemaArray"},not:{$ref:"#"}},fu={$schema:au,$id:iu,title:ou,definitions:cu,type:lu,properties:uu,default:!0};(function(e){Object.defineProperty(e,"__esModule",{value:!0}),e.CodeGen=e.Name=e.nil=e.stringify=e.str=e._=e.KeywordCxt=void 0;const t=lr();e.KeywordCxt=t.default;var r=ce;Object.defineProperty(e,"_",{enumerable:!0,get:function(){return r._}}),Object.defineProperty(e,"str",{enumerable:!0,get:function(){return r.str}}),Object.defineProperty(e,"stringify",{enumerable:!0,get:function(){return r.stringify}}),Object.defineProperty(e,"nil",{enumerable:!0,get:function(){return r.nil}}),Object.defineProperty(e,"Name",{enumerable:!0,get:function(){return r.Name}}),Object.defineProperty(e,"CodeGen",{enumerable:!0,get:function(){return r.CodeGen}});const n=fi,a=Jn,o=fu,d=["/properties"],w="http://json-schema.org/draft-07/schema";class l extends n.default{_addVocabularies(){super._addVocabularies(),a.default.forEach(s=>this.addVocabulary(s))}_addDefaultMetaSchema(){if(super._addDefaultMetaSchema(),!this.opts.meta)return;const s=this.opts.$data?this.$dataMetaSchema(o,d):o;this.addMetaSchema(s,w,!1),this.refs["http://json-schema.org/schema"]=w}defaultMeta(){return this.opts.defaultMeta=super.defaultMeta()||(this.getSchema(w)?w:void 0)}}e.default=l})(ai);var bn={exports:{}},mi={};(function(e){Object.defineProperty(e,"__esModule",{value:!0}),e.formatNames=e.fastFormats=e.fullFormats=void 0;function t(m,_){return{validate:m,compare:_}}e.fullFormats={date:t(o,d),time:t(l,i),"date-time":t(g,R),duration:/^P(?!$)((\d+Y)?(\d+M)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+S)?)?|(\d+W)?)$/,uri:f,"uri-reference":/^(?:[a-z][a-z0-9+\-.]*:)?(?:\/?\/(?:(?:[a-z0-9\-._~!$&'()*+,;=:]|%[0-9a-f]{2})*@)?(?:\[(?:(?:(?:(?:[0-9a-f]{1,4}:){6}|::(?:[0-9a-f]{1,4}:){5}|(?:[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){4}|(?:(?:[0-9a-f]{1,4}:){0,1}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){3}|(?:(?:[0-9a-f]{1,4}:){0,2}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){2}|(?:(?:[0-9a-f]{1,4}:){0,3}[0-9a-f]{1,4})?::[0-9a-f]{1,4}:|(?:(?:[0-9a-f]{1,4}:){0,4}[0-9a-f]{1,4})?::)(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?))|(?:(?:[0-9a-f]{1,4}:){0,5}[0-9a-f]{1,4})?::[0-9a-f]{1,4}|(?:(?:[0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4})?::)|[Vv][0-9a-f]+\.[a-z0-9\-._~!$&'()*+,;=:]+)\]|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)|(?:[a-z0-9\-._~!$&'"()*+,;=]|%[0-9a-f]{2})*)(?::\d*)?(?:\/(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})*)*|\/(?:(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})*)*)?|(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})*)*)?(?:\?(?:[a-z0-9\-._~!$&'"()*+,;=:@/?]|%[0-9a-f]{2})*)?(?:#(?:[a-z0-9\-._~!$&'"()*+,;=:@/?]|%[0-9a-f]{2})*)?$/i,"uri-template":/^(?:(?:[^\x00-\x20"'<>%\\^`{|}]|%[0-9a-f]{2})|\{[+#./;?&=,!@|]?(?:[a-z0-9_]|%[0-9a-f]{2})+(?::[1-9][0-9]{0,3}|\*)?(?:,(?:[a-z0-9_]|%[0-9a-f]{2})+(?::[1-9][0-9]{0,3}|\*)?)*\})*$/i,url:/^(?:https?|ftp):\/\/(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u{00a1}-\u{ffff}]+-)*[a-z0-9\u{00a1}-\u{ffff}]+)(?:\.(?:[a-z0-9\u{00a1}-\u{ffff}]+-)*[a-z0-9\u{00a1}-\u{ffff}]+)*(?:\.(?:[a-z\u{00a1}-\u{ffff}]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/iu,email:/^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i,hostname:/^(?=.{1,253}\.?$)[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[-0-9a-z]{0,61}[0-9a-z])?)*\.?$/i,ipv4:/^(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)$/,ipv6:/^((([0-9a-f]{1,4}:){7}([0-9a-f]{1,4}|:))|(([0-9a-f]{1,4}:){6}(:[0-9a-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9a-f]{1,4}:){5}(((:[0-9a-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9a-f]{1,4}:){4}(((:[0-9a-f]{1,4}){1,3})|((:[0-9a-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9a-f]{1,4}:){3}(((:[0-9a-f]{1,4}){1,4})|((:[0-9a-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9a-f]{1,4}:){2}(((:[0-9a-f]{1,4}){1,5})|((:[0-9a-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9a-f]{1,4}:){1}(((:[0-9a-f]{1,4}){1,6})|((:[0-9a-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9a-f]{1,4}){1,7})|((:[0-9a-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))$/i,regex:u,uuid:/^(?:urn:uuid:)?[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i,"json-pointer":/^(?:\/(?:[^~/]|~0|~1)*)*$/,"json-pointer-uri-fragment":/^#(?:\/(?:[a-z0-9_\-.!$&'()*+,;:=@]|%[0-9a-f]{2}|~0|~1)*)*$/i,"relative-json-pointer":/^(?:0|[1-9][0-9]*)(?:#|(?:\/(?:[^~/]|~0|~1)*)*)$/},e.fastFormats={...e.fullFormats,date:t(/^\d\d\d\d-[0-1]\d-[0-3]\d$/,d),time:t(/^(?:[0-2]\d:[0-5]\d:[0-5]\d|23:59:60)(?:\.\d+)?(?:z|[+-]\d\d(?::?\d\d)?)?$/i,i),"date-time":t(/^\d\d\d\d-[0-1]\d-[0-3]\d[t\s](?:[0-2]\d:[0-5]\d:[0-5]\d|23:59:60)(?:\.\d+)?(?:z|[+-]\d\d(?::?\d\d)?)$/i,R),uri:/^(?:[a-z][a-z0-9+\-.]*:)(?:\/?\/)?[^\s]*$/i,"uri-reference":/^(?:(?:[a-z][a-z0-9+\-.]*:)?\/?\/)?(?:[^\\\s#][^\s#]*)?(?:#[^\\\s]*)?$/i,email:/^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*$/i},e.formatNames=Object.keys(e.fullFormats);function r(m){return m%4===0&&(m%100!==0||m%400===0)}const n=/^(\d\d\d\d)-(\d\d)-(\d\d)$/,a=[0,31,28,31,30,31,30,31,31,30,31,30,31];function o(m){const _=n.exec(m);if(!_)return!1;const C=+_[1],j=+_[2],q=+_[3];return j>=1&&j<=12&&q>=1&&q<=(j===2&&r(C)?29:a[j])}function d(m,_){if(m&&_)return m>_?1:m<_?-1:0}const w=/^(\d\d):(\d\d):(\d\d)(\.\d+)?(z|[+-]\d\d(?::?\d\d)?)?$/i;function l(m,_){const C=w.exec(m);if(!C)return!1;const j=+C[1],q=+C[2],k=+C[3],Y=C[5];return(j<=23&&q<=59&&k<=59||j===23&&q===59&&k===60)&&(!_||Y!=="")}function i(m,_){if(!(m&&_))return;const C=w.exec(m),j=w.exec(_);if(C&&j)return m=C[1]+C[2]+C[3]+(C[4]||""),_=j[1]+j[2]+j[3]+(j[4]||""),m>_?1:m<_?-1:0}const s=/t|\s/i;function g(m){const _=m.split(s);return _.length===2&&o(_[0])&&l(_[1],!0)}function R(m,_){if(!(m&&_))return;const[C,j]=m.split(s),[q,k]=_.split(s),Y=d(C,q);if(Y!==void 0)return Y||i(j,k)}const c=/\/|:/,E=/^(?:[a-z][a-z0-9+\-.]*:)(?:\/?\/(?:(?:[a-z0-9\-._~!$&'()*+,;=:]|%[0-9a-f]{2})*@)?(?:\[(?:(?:(?:(?:[0-9a-f]{1,4}:){6}|::(?:[0-9a-f]{1,4}:){5}|(?:[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){4}|(?:(?:[0-9a-f]{1,4}:){0,1}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){3}|(?:(?:[0-9a-f]{1,4}:){0,2}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){2}|(?:(?:[0-9a-f]{1,4}:){0,3}[0-9a-f]{1,4})?::[0-9a-f]{1,4}:|(?:(?:[0-9a-f]{1,4}:){0,4}[0-9a-f]{1,4})?::)(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?))|(?:(?:[0-9a-f]{1,4}:){0,5}[0-9a-f]{1,4})?::[0-9a-f]{1,4}|(?:(?:[0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4})?::)|[Vv][0-9a-f]+\.[a-z0-9\-._~!$&'()*+,;=:]+)\]|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)|(?:[a-z0-9\-._~!$&'()*+,;=]|%[0-9a-f]{2})*)(?::\d*)?(?:\/(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})*)*|\/(?:(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})*)*)?|(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})*)*)(?:\?(?:[a-z0-9\-._~!$&'()*+,;=:@/?]|%[0-9a-f]{2})*)?(?:#(?:[a-z0-9\-._~!$&'()*+,;=:@/?]|%[0-9a-f]{2})*)?$/i;function f(m){return c.test(m)&&E.test(m)}const S=/[^\\]\\Z/;function u(m){if(S.test(m))return!1;try{return new RegExp(m),!0}catch{return!1}}})(mi);var yi={};(function(e){Object.defineProperty(e,"__esModule",{value:!0}),e.formatLimitDefinition=void 0;const t=lr(),r=ce,n=r.operators,a={formatMaximum:{okStr:"<=",ok:n.LTE,fail:n.GT},formatMinimum:{okStr:">=",ok:n.GTE,fail:n.LT},formatExclusiveMaximum:{okStr:"<",ok:n.LT,fail:n.GTE},formatExclusiveMinimum:{okStr:">",ok:n.GT,fail:n.LTE}},o={message:({keyword:w,schemaCode:l})=>r.str`should be ${a[w].okStr} ${l}`,params:({keyword:w,schemaCode:l})=>r._`{comparison: ${a[w].okStr}, limit: ${l}}`};e.formatLimitDefinition={keyword:Object.keys(a),type:"string",schemaType:"string",$data:!0,error:o,code(w){const{gen:l,data:i,schemaCode:s,keyword:g,it:R}=w,{opts:c,self:E}=R;if(!c.validateFormats)return;const f=new t.default(R,E.RULES.all.format.definition,"format");f.$data?S():u();function S(){const _=l.scopeValue("formats",{ref:E.formats,code:c.code.formats}),C=l.const("fmt",r._`${_}[${f.schemaCode}]`);w.fail$data(r.or(r._`typeof ${C} != "object"`,r._`${C} instanceof RegExp`,r._`typeof ${C}.compare != "function"`,m(C)))}function u(){const _=f.schema,C=E.formats[_];if(!C||C===!0)return;if(typeof C!="object"||C instanceof RegExp||typeof C.compare!="function")throw new Error(`"${g}": format "${_}" does not define "compare" function`);const j=l.scopeValue("formats",{key:_,ref:C,code:c.code.formats?r._`${c.code.formats}${r.getProperty(_)}`:void 0});w.fail$data(m(j))}function m(_){return r._`${_}.compare(${i}, ${s}) ${a[g].fail} 0`}},dependencies:["format"]};const d=w=>(w.addKeyword(e.formatLimitDefinition),w);e.default=d})(yi);(function(e,t){Object.defineProperty(t,"__esModule",{value:!0});const r=mi,n=yi,a=ce,o=new a.Name("fullFormats"),d=new a.Name("fastFormats"),w=(i,s={keywords:!0})=>{if(Array.isArray(s))return l(i,s,r.fullFormats,o),i;const[g,R]=s.mode==="fast"?[r.fastFormats,d]:[r.fullFormats,o],c=s.formats||r.formatNames;return l(i,c,g,R),s.keywords&&n.default(i),i};w.get=(i,s="full")=>{const R=(s==="fast"?r.fastFormats:r.fullFormats)[i];if(!R)throw new Error(`Unknown format "${i}"`);return R};function l(i,s,g,R){var c,E;(c=(E=i.opts.code).formats)!==null&&c!==void 0||(E.formats=a._`require("ajv-formats/dist/formats").${R}`);for(const f of s)i.addFormat(f,g[f])}t.default=w,e.exports=w,e.exports.default=w})(bn,bn.exports);var du=bn.exports;const hu=(e,t,r,n)=>{if(r==="length"||r==="prototype"||r==="arguments"||r==="caller")return;const a=Object.getOwnPropertyDescriptor(e,r),o=Object.getOwnPropertyDescriptor(t,r);!pu(a,o)&&n||Object.defineProperty(e,r,o)},pu=function(e,t){return e===void 0||e.configurable||e.writable===t.writable&&e.enumerable===t.enumerable&&e.configurable===t.configurable&&(e.writable||e.value===t.value)},mu=(e,t)=>{const r=Object.getPrototypeOf(t);r!==Object.getPrototypeOf(e)&&Object.setPrototypeOf(e,r)},yu=(e,t)=>`/* Wrapped ${e}*/
-${t}`,vu=Object.getOwnPropertyDescriptor(Function.prototype,"toString"),Eu=Object.getOwnPropertyDescriptor(Function.prototype.toString,"name"),$u=(e,t,r)=>{const n=r===""?"":`with ${r.trim()}() `,a=yu.bind(null,n,t.toString());Object.defineProperty(a,"name",Eu),Object.defineProperty(e,"toString",{...vu,value:a})},gu=(e,t,{ignoreNonConfigurable:r=!1}={})=>{const{name:n}=e;for(const a of Reflect.ownKeys(t))hu(e,t,a,r);return mu(e,t),$u(e,t,n),e};var _u=gu;const wu=_u;var Ru=(e,t={})=>{if(typeof e!="function")throw new TypeError(`Expected the first argument to be a function, got \`${typeof e}\``);const{wait:r=0,before:n=!1,after:a=!0}=t;if(!n&&!a)throw new Error("Both `before` and `after` are false, function wouldn't be called.");let o,d;const w=function(...l){const i=this,s=()=>{o=void 0,a&&(d=e.apply(i,l))},g=n&&!o;return clearTimeout(o),o=setTimeout(s,r),g&&(d=e.apply(i,l)),d};return wu(w,e),w.cancel=()=>{o&&(clearTimeout(o),o=void 0)},w},Cn={exports:{}};const Su="2.0.0",vi=256,Iu=Number.MAX_SAFE_INTEGER||9007199254740991,Ou=16,Nu=vi-6,Tu=["major","premajor","minor","preminor","patch","prepatch","prerelease"];var ur={MAX_LENGTH:vi,MAX_SAFE_COMPONENT_LENGTH:Ou,MAX_SAFE_BUILD_LENGTH:Nu,MAX_SAFE_INTEGER:Iu,RELEASE_TYPES:Tu,SEMVER_SPEC_VERSION:Su,FLAG_INCLUDE_PRERELEASE:1,FLAG_LOOSE:2};const Pu=typeof process=="object"&&process.env&&process.env.NODE_DEBUG&&/\bsemver\b/i.test(process.env.NODE_DEBUG)?(...e)=>console.error("SEMVER",...e):()=>{};var Jr=Pu;(function(e,t){const{MAX_SAFE_COMPONENT_LENGTH:r,MAX_SAFE_BUILD_LENGTH:n,MAX_LENGTH:a}=ur,o=Jr;t=e.exports={};const d=t.re=[],w=t.safeRe=[],l=t.src=[],i=t.safeSrc=[],s=t.t={};let g=0;const R="[a-zA-Z0-9-]",c=[["\\s",1],["\\d",a],[R,n]],E=S=>{for(const[u,m]of c)S=S.split(`${u}*`).join(`${u}{0,${m}}`).split(`${u}+`).join(`${u}{1,${m}}`);return S},f=(S,u,m)=>{const _=E(u),C=g++;o(S,C,u),s[S]=C,l[C]=u,i[C]=_,d[C]=new RegExp(u,m?"g":void 0),w[C]=new RegExp(_,m?"g":void 0)};f("NUMERICIDENTIFIER","0|[1-9]\\d*"),f("NUMERICIDENTIFIERLOOSE","\\d+"),f("NONNUMERICIDENTIFIER",`\\d*[a-zA-Z-]${R}*`),f("MAINVERSION",`(${l[s.NUMERICIDENTIFIER]})\\.(${l[s.NUMERICIDENTIFIER]})\\.(${l[s.NUMERICIDENTIFIER]})`),f("MAINVERSIONLOOSE",`(${l[s.NUMERICIDENTIFIERLOOSE]})\\.(${l[s.NUMERICIDENTIFIERLOOSE]})\\.(${l[s.NUMERICIDENTIFIERLOOSE]})`),f("PRERELEASEIDENTIFIER",`(?:${l[s.NONNUMERICIDENTIFIER]}|${l[s.NUMERICIDENTIFIER]})`),f("PRERELEASEIDENTIFIERLOOSE",`(?:${l[s.NONNUMERICIDENTIFIER]}|${l[s.NUMERICIDENTIFIERLOOSE]})`),f("PRERELEASE",`(?:-(${l[s.PRERELEASEIDENTIFIER]}(?:\\.${l[s.PRERELEASEIDENTIFIER]})*))`),f("PRERELEASELOOSE",`(?:-?(${l[s.PRERELEASEIDENTIFIERLOOSE]}(?:\\.${l[s.PRERELEASEIDENTIFIERLOOSE]})*))`),f("BUILDIDENTIFIER",`${R}+`),f("BUILD",`(?:\\+(${l[s.BUILDIDENTIFIER]}(?:\\.${l[s.BUILDIDENTIFIER]})*))`),f("FULLPLAIN",`v?${l[s.MAINVERSION]}${l[s.PRERELEASE]}?${l[s.BUILD]}?`),f("FULL",`^${l[s.FULLPLAIN]}$`),f("LOOSEPLAIN",`[v=\\s]*${l[s.MAINVERSIONLOOSE]}${l[s.PRERELEASELOOSE]}?${l[s.BUILD]}?`),f("LOOSE",`^${l[s.LOOSEPLAIN]}$`),f("GTLT","((?:<|>)?=?)"),f("XRANGEIDENTIFIERLOOSE",`${l[s.NUMERICIDENTIFIERLOOSE]}|x|X|\\*`),f("XRANGEIDENTIFIER",`${l[s.NUMERICIDENTIFIER]}|x|X|\\*`),f("XRANGEPLAIN",`[v=\\s]*(${l[s.XRANGEIDENTIFIER]})(?:\\.(${l[s.XRANGEIDENTIFIER]})(?:\\.(${l[s.XRANGEIDENTIFIER]})(?:${l[s.PRERELEASE]})?${l[s.BUILD]}?)?)?`),f("XRANGEPLAINLOOSE",`[v=\\s]*(${l[s.XRANGEIDENTIFIERLOOSE]})(?:\\.(${l[s.XRANGEIDENTIFIERLOOSE]})(?:\\.(${l[s.XRANGEIDENTIFIERLOOSE]})(?:${l[s.PRERELEASELOOSE]})?${l[s.BUILD]}?)?)?`),f("XRANGE",`^${l[s.GTLT]}\\s*${l[s.XRANGEPLAIN]}$`),f("XRANGELOOSE",`^${l[s.GTLT]}\\s*${l[s.XRANGEPLAINLOOSE]}$`),f("COERCEPLAIN",`(^|[^\\d])(\\d{1,${r}})(?:\\.(\\d{1,${r}}))?(?:\\.(\\d{1,${r}}))?`),f("COERCE",`${l[s.COERCEPLAIN]}(?:$|[^\\d])`),f("COERCEFULL",l[s.COERCEPLAIN]+`(?:${l[s.PRERELEASE]})?(?:${l[s.BUILD]})?(?:$|[^\\d])`),f("COERCERTL",l[s.COERCE],!0),f("COERCERTLFULL",l[s.COERCEFULL],!0),f("LONETILDE","(?:~>?)"),f("TILDETRIM",`(\\s*)${l[s.LONETILDE]}\\s+`,!0),t.tildeTrimReplace="$1~",f("TILDE",`^${l[s.LONETILDE]}${l[s.XRANGEPLAIN]}$`),f("TILDELOOSE",`^${l[s.LONETILDE]}${l[s.XRANGEPLAINLOOSE]}$`),f("LONECARET","(?:\\^)"),f("CARETTRIM",`(\\s*)${l[s.LONECARET]}\\s+`,!0),t.caretTrimReplace="$1^",f("CARET",`^${l[s.LONECARET]}${l[s.XRANGEPLAIN]}$`),f("CARETLOOSE",`^${l[s.LONECARET]}${l[s.XRANGEPLAINLOOSE]}$`),f("COMPARATORLOOSE",`^${l[s.GTLT]}\\s*(${l[s.LOOSEPLAIN]})$|^$`),f("COMPARATOR",`^${l[s.GTLT]}\\s*(${l[s.FULLPLAIN]})$|^$`),f("COMPARATORTRIM",`(\\s*)${l[s.GTLT]}\\s*(${l[s.LOOSEPLAIN]}|${l[s.XRANGEPLAIN]})`,!0),t.comparatorTrimReplace="$1$2$3",f("HYPHENRANGE",`^\\s*(${l[s.XRANGEPLAIN]})\\s+-\\s+(${l[s.XRANGEPLAIN]})\\s*$`),f("HYPHENRANGELOOSE",`^\\s*(${l[s.XRANGEPLAINLOOSE]})\\s+-\\s+(${l[s.XRANGEPLAINLOOSE]})\\s*$`),f("STAR","(<|>)?=?\\s*\\*"),f("GTE0","^\\s*>=\\s*0\\.0\\.0\\s*$"),f("GTE0PRE","^\\s*>=\\s*0\\.0\\.0-0\\s*$")})(Cn,Cn.exports);var fr=Cn.exports;const Au=Object.freeze({loose:!0}),bu=Object.freeze({}),Cu=e=>e?typeof e!="object"?Au:e:bu;var Ns=Cu;const da=/^[0-9]+$/,Ei=(e,t)=>{if(typeof e=="number"&&typeof t=="number")return e===t?0:e<t?-1:1;const r=da.test(e),n=da.test(t);return r&&n&&(e=+e,t=+t),e===t?0:r&&!n?-1:n&&!r?1:e<t?-1:1},Du=(e,t)=>Ei(t,e);var $i={compareIdentifiers:Ei,rcompareIdentifiers:Du};const Nr=Jr,{MAX_LENGTH:ha,MAX_SAFE_INTEGER:Tr}=ur,{safeRe:Pr,t:Ar}=fr,Lu=Ns,{compareIdentifiers:Dn}=$i,ku=(e,t)=>{const r=t.split(".");if(r.length>e.length)return!1;for(let n=0;n<r.length;n++)if(Dn(e[n],r[n])!==0)return!1;return!0};let ju=class dt{constructor(t,r){if(r=Lu(r),t instanceof dt){if(t.loose===!!r.loose&&t.includePrerelease===!!r.includePrerelease)return t;t=t.version}else if(typeof t!="string")throw new TypeError(`Invalid version. Must be a string. Got type "${typeof t}".`);if(t.length>ha)throw new TypeError(`version is longer than ${ha} characters`);Nr("SemVer",t,r),this.options=r,this.loose=!!r.loose,this.includePrerelease=!!r.includePrerelease;const n=t.trim().match(r.loose?Pr[Ar.LOOSE]:Pr[Ar.FULL]);if(!n)throw new TypeError(`Invalid Version: ${t}`);if(this.raw=t,this.major=+n[1],this.minor=+n[2],this.patch=+n[3],this.major>Tr||this.major<0)throw new TypeError("Invalid major version");if(this.minor>Tr||this.minor<0)throw new TypeError("Invalid minor version");if(this.patch>Tr||this.patch<0)throw new TypeError("Invalid patch version");n[4]?this.prerelease=n[4].split(".").map(a=>{if(/^[0-9]+$/.test(a)){const o=+a;if(o>=0&&o<Tr)return o}return a}):this.prerelease=[],this.build=n[5]?n[5].split("."):[],this.format()}format(){return this.version=`${this.major}.${this.minor}.${this.patch}`,this.prerelease.length&&(this.version+=`-${this.prerelease.join(".")}`),this.version}toString(){return this.version}compare(t){if(Nr("SemVer.compare",this.version,this.options,t),!(t instanceof dt)){if(typeof t=="string"&&t===this.version)return 0;t=new dt(t,this.options)}return t.version===this.version?0:this.compareMain(t)||this.comparePre(t)}compareMain(t){return t instanceof dt||(t=new dt(t,this.options)),this.major<t.major?-1:this.major>t.major?1:this.minor<t.minor?-1:this.minor>t.minor?1:this.patch<t.patch?-1:this.patch>t.patch?1:0}comparePre(t){if(t instanceof dt||(t=new dt(t,this.options)),this.prerelease.length&&!t.prerelease.length)return-1;if(!this.prerelease.length&&t.prerelease.length)return 1;if(!this.prerelease.length&&!t.prerelease.length)return 0;let r=0;do{const n=this.prerelease[r],a=t.prerelease[r];if(Nr("prerelease compare",r,n,a),n===void 0&&a===void 0)return 0;if(a===void 0)return 1;if(n===void 0)return-1;if(n===a)continue;return Dn(n,a)}while(++r)}compareBuild(t){t instanceof dt||(t=new dt(t,this.options));let r=0;do{const n=this.build[r],a=t.build[r];if(Nr("build compare",r,n,a),n===void 0&&a===void 0)return 0;if(a===void 0)return 1;if(n===void 0)return-1;if(n===a)continue;return Dn(n,a)}while(++r)}inc(t,r,n){if(t.startsWith("pre")){if(!r&&n===!1)throw new Error("invalid increment argument: identifier is empty");if(r){const a=`-${r}`.match(this.options.loose?Pr[Ar.PRERELEASELOOSE]:Pr[Ar.PRERELEASE]);if(!a||a[1]!==r)throw new Error(`invalid identifier: ${r}`)}}switch(t){case"premajor":this.prerelease.length=0,this.patch=0,this.minor=0,this.major++,this.inc("pre",r,n);break;case"preminor":this.prerelease.length=0,this.patch=0,this.minor++,this.inc("pre",r,n);break;case"prepatch":this.prerelease.length=0,this.inc("patch",r,n),this.inc("pre",r,n);break;case"prerelease":this.prerelease.length===0&&this.inc("patch",r,n),this.inc("pre",r,n);break;case"release":if(this.prerelease.length===0)throw new Error(`version ${this.raw} is not a prerelease`);this.prerelease.length=0;break;case"major":(this.minor!==0||this.patch!==0||this.prerelease.length===0)&&this.major++,this.minor=0,this.patch=0,this.prerelease=[];break;case"minor":(this.patch!==0||this.prerelease.length===0)&&this.minor++,this.patch=0,this.prerelease=[];break;case"patch":this.prerelease.length===0&&this.patch++,this.prerelease=[];break;case"pre":{const a=Number(n)?1:0;if(this.prerelease.length===0)this.prerelease=[a];else{let o=this.prerelease.length;for(;--o>=0;)typeof this.prerelease[o]=="number"&&(this.prerelease[o]++,o=-2);if(o===-1){if(r===this.prerelease.join(".")&&n===!1)throw new Error("invalid increment argument: identifier already exists");this.prerelease.push(a)}}if(r){let o=[r,a];if(n===!1&&(o=[r]),ku(this.prerelease,r)){const d=this.prerelease[r.split(".").length];isNaN(d)&&(this.prerelease=o)}else this.prerelease=o}break}default:throw new Error(`invalid increment argument: ${t}`)}return this.raw=this.format(),this.build.length&&(this.raw+=`+${this.build.join(".")}`),this}};var je=ju;const pa=je,Fu=(e,t,r=!1)=>{if(e instanceof pa)return e;try{return new pa(e,t)}catch(n){if(!r)return null;throw n}};var Ft=Fu;const Mu=Ft,Uu=(e,t)=>{const r=Mu(e,t);return r?r.version:null};var Vu=Uu;const zu=Ft,Gu=(e,t)=>{const r=zu(e.trim().replace(/^[=v]+/,""),t);return r?r.version:null};var qu=Gu;const ma=je,Hu=(e,t,r,n,a)=>{typeof r=="string"&&(a=n,n=r,r=void 0);try{return new ma(e instanceof ma?e.version:e,r).inc(t,n,a).version}catch{return null}};var Xu=Hu;const ya=Ft,Ku=(e,t)=>{const r=ya(e,null,!0),n=ya(t,null,!0),a=r.compare(n);if(a===0)return null;const o=a>0,d=o?r:n,w=o?n:r,l=!!d.prerelease.length;if(!!w.prerelease.length&&!l){if(!w.patch&&!w.minor)return"major";if(w.compareMain(d)===0)return w.minor&&!w.patch?"minor":"patch"}const s=l?"pre":"";return r.major!==n.major?s+"major":r.minor!==n.minor?s+"minor":r.patch!==n.patch?s+"patch":"prerelease"};var Bu=Ku;const xu=je,Wu=(e,t)=>new xu(e,t).major;var Yu=Wu;const Ju=je,Qu=(e,t)=>new Ju(e,t).minor;var Zu=Qu;const ef=je,tf=(e,t)=>new ef(e,t).patch;var rf=tf;const nf=Ft,sf=(e,t)=>{const r=nf(e,t);return r&&r.prerelease.length?r.prerelease:null};var af=sf;const va=je,of=(e,t,r)=>new va(e,r).compare(new va(t,r));var ot=of;const cf=ot,lf=(e,t,r)=>cf(t,e,r);var uf=lf;const ff=ot,df=(e,t)=>ff(e,t,!0);var hf=df;const Ea=je,pf=(e,t,r)=>{const n=new Ea(e,r),a=new Ea(t,r);return n.compare(a)||n.compareBuild(a)};var Ts=pf;const mf=Ts,yf=(e,t)=>e.sort((r,n)=>mf(r,n,t));var vf=yf;const Ef=Ts,$f=(e,t)=>e.sort((r,n)=>Ef(n,r,t));var gf=$f;const _f=ot,wf=(e,t,r)=>_f(e,t,r)>0;var Qr=wf;const Rf=ot,Sf=(e,t,r)=>Rf(e,t,r)<0;var Ps=Sf;const If=ot,Of=(e,t,r)=>If(e,t,r)===0;var gi=Of;const Nf=ot,Tf=(e,t,r)=>Nf(e,t,r)!==0;var _i=Tf;const Pf=ot,Af=(e,t,r)=>Pf(e,t,r)>=0;var As=Af;const bf=ot,Cf=(e,t,r)=>bf(e,t,r)<=0;var bs=Cf;const Df=gi,Lf=_i,kf=Qr,jf=As,Ff=Ps,Mf=bs,Uf=(e,t,r,n)=>{switch(t){case"===":return typeof e=="object"&&(e=e.version),typeof r=="object"&&(r=r.version),e===r;case"!==":return typeof e=="object"&&(e=e.version),typeof r=="object"&&(r=r.version),e!==r;case"":case"=":case"==":return Df(e,r,n);case"!=":return Lf(e,r,n);case">":return kf(e,r,n);case">=":return jf(e,r,n);case"<":return Ff(e,r,n);case"<=":return Mf(e,r,n);default:throw new TypeError(`Invalid operator: ${t}`)}};var wi=Uf;const Vf=je,zf=Ft,{safeRe:br,t:Cr}=fr,Gf=(e,t)=>{if(e instanceof Vf)return e;if(typeof e=="number"&&(e=String(e)),typeof e!="string")return null;t=t||{};let r=null;if(!t.rtl)r=e.match(t.includePrerelease?br[Cr.COERCEFULL]:br[Cr.COERCE]);else{const l=t.includePrerelease?br[Cr.COERCERTLFULL]:br[Cr.COERCERTL];let i;for(;(i=l.exec(e))&&(!r||r.index+r[0].length!==e.length);)(!r||i.index+i[0].length!==r.index+r[0].length)&&(r=i),l.lastIndex=i.index+i[1].length+i[2].length;l.lastIndex=-1}if(r===null)return null;const n=r[2],a=r[3]||"0",o=r[4]||"0",d=t.includePrerelease&&r[5]?`-${r[5]}`:"",w=t.includePrerelease&&r[6]?`+${r[6]}`:"";return zf(`${n}.${a}.${o}${d}${w}`,t)};var qf=Gf;const Hf=Ft,Xf=ur,Kf=je,Bf=(e,t,r)=>{if(!Xf.RELEASE_TYPES.includes(t))return null;const n=xf(e,r);return n&&Wf(n,t)},xf=(e,t)=>{const r=e instanceof Kf?e.version:e;return Hf(r,t)},Wf=(e,t)=>{if(Yf(t))return e.version;switch(e.prerelease=[],t){case"major":e.minor=0,e.patch=0;break;case"minor":e.patch=0;break}return e.format()},Yf=e=>e.startsWith("pre");var Jf=Bf;class Qf{constructor(){this.max=1e3,this.map=new Map}get(t){const r=this.map.get(t);if(r!==void 0)return this.map.delete(t),this.map.set(t,r),r}delete(t){return this.map.delete(t)}set(t,r){if(!this.delete(t)&&r!==void 0){if(this.map.size>=this.max){const a=this.map.keys().next().value;this.delete(a)}this.map.set(t,r)}return this}}var Zf=Qf,vn,$a;function ct(){if($a)return vn;$a=1;const e=/\s+/g;class t{constructor(y,P){if(P=a(P),y instanceof t)return y.loose===!!P.loose&&y.includePrerelease===!!P.includePrerelease?y:new t(y.raw,P);if(y instanceof o)return this.raw=y.value,this.set=[[y]],this.formatted=void 0,this;if(this.options=P,this.loose=!!P.loose,this.includePrerelease=!!P.includePrerelease,this.raw=y.trim().replace(e," "),this.set=this.raw.split("||").map(b=>this.parseRange(b.trim())).filter(b=>b.length),!this.set.length)throw new TypeError(`Invalid SemVer Range: ${this.raw}`);if(this.set.length>1){const b=this.set[0];if(this.set=this.set.filter(z=>!u(z[0])),this.set.length===0)this.set=[b];else if(this.set.length>1){for(const z of this.set)if(z.length===1&&m(z[0])){this.set=[z];break}}}this.formatted=void 0}get range(){if(this.formatted===void 0){this.formatted="";for(let y=0;y<this.set.length;y++){y>0&&(this.formatted+="||");const P=this.set[y];for(let b=0;b<P.length;b++)b>0&&(this.formatted+=" "),this.formatted+=P[b].toString().trim()}}return this.formatted}format(){return this.range}toString(){return this.range}parseRange(y){y=y.replace(S,"");const b=((this.options.includePrerelease&&E)|(this.options.loose&&f))+":"+y,z=n.get(b);if(z)return z;const H=this.options.loose,F=H?l[s.HYPHENRANGELOOSE]:l[s.HYPHENRANGE];y=y.replace(F,le(this.options.includePrerelease)),d("hyphen replace",y),y=y.replace(l[s.COMPARATORTRIM],g),d("comparator trim",y),y=y.replace(l[s.TILDETRIM],R),d("tilde trim",y),y=y.replace(l[s.CARETTRIM],c),d("caret trim",y);let p=y.split(" ").map(W=>C(W,this.options)).join(" ").split(/\s+/).map(W=>J(W,this.options));H&&(p=p.filter(W=>(d("loose invalid filter",W,this.options),!!W.match(l[s.COMPARATORLOOSE])))),d("range list",p);const O=new Map,D=p.map(W=>new o(W,this.options));for(const W of D){if(u(W))return[W];O.set(W.value,W)}O.size>1&&O.has("")&&O.delete("");const B=[...O.values()];return n.set(b,B),B}intersects(y,P){if(!(y instanceof t))throw new TypeError("a Range is required");return this.set.some(b=>_(b,P)&&y.set.some(z=>_(z,P)&&b.every(H=>z.every(F=>H.intersects(F,P)))))}test(y){if(!y)return!1;if(typeof y=="string")try{y=new w(y,this.options)}catch{return!1}for(let P=0;P<this.set.length;P++)if(V(this.set[P],y,this.options))return!0;return!1}}vn=t;const r=Zf,n=new r,a=Ns,o=Zr(),d=Jr,w=je,{safeRe:l,src:i,t:s,comparatorTrimReplace:g,tildeTrimReplace:R,caretTrimReplace:c}=fr,{FLAG_INCLUDE_PRERELEASE:E,FLAG_LOOSE:f}=ur,S=new RegExp(i[s.BUILD],"g"),u=$=>$.value==="<0.0.0-0",m=$=>$.value==="",_=($,y)=>{let P=!0;const b=$.slice();let z=b.pop();for(;P&&b.length;)P=b.every(H=>z.intersects(H,y)),z=b.pop();return P},C=($,y)=>($=$.replace(l[s.BUILD],""),d("comp",$,y),$=Q($,y),d("caret",$),$=k($,y),d("tildes",$),$=ie($,y),d("xrange",$),$=K($,y),d("stars",$),$),j=$=>!$||$.toLowerCase()==="x"||$==="*",q=($,y,P)=>j($)&&!j(y)||j(y)&&P&&!j(P),k=($,y)=>$.trim().split(/\s+/).map(P=>Y(P,y)).join(" "),Y=($,y)=>{const P=y.loose?l[s.TILDELOOSE]:l[s.TILDE];return $.replace(P,(b,z,H,F,p)=>{d("tilde",$,b,z,H,F,p);let O;return j(z)?O="":j(H)?O=`>=${z}.0.0 <${+z+1}.0.0-0`:j(F)?O=`>=${z}.${H}.0 <${z}.${+H+1}.0-0`:p?(d("replaceTilde pr",p),O=`>=${z}.${H}.${F}-${p} <${z}.${+H+1}.0-0`):O=`>=${z}.${H}.${F} <${z}.${+H+1}.0-0`,d("tilde return",O),O})},Q=($,y)=>$.trim().split(/\s+/).map(P=>te(P,y)).join(" "),te=($,y)=>{d("caret",$,y);const P=y.loose?l[s.CARETLOOSE]:l[s.CARET],b=y.includePrerelease?"-0":"";return $.replace(P,(z,H,F,p,O)=>{d("caret",$,z,H,F,p,O);let D;return j(H)?D="":j(F)?D=`>=${H}.0.0${b} <${+H+1}.0.0-0`:j(p)?H==="0"?D=`>=${H}.${F}.0${b} <${H}.${+F+1}.0-0`:D=`>=${H}.${F}.0${b} <${+H+1}.0.0-0`:O?(d("replaceCaret pr",O),H==="0"?F==="0"?D=`>=${H}.${F}.${p}-${O} <${H}.${F}.${+p+1}-0`:D=`>=${H}.${F}.${p}-${O} <${H}.${+F+1}.0-0`:D=`>=${H}.${F}.${p}-${O} <${+H+1}.0.0-0`):(d("no pr"),H==="0"?F==="0"?D=`>=${H}.${F}.${p} <${H}.${F}.${+p+1}-0`:D=`>=${H}.${F}.${p} <${H}.${+F+1}.0-0`:D=`>=${H}.${F}.${p} <${+H+1}.0.0-0`),d("caret return",D),D})},ie=($,y)=>(d("replaceXRanges",$,y),$.split(/\s+/).map(P=>L(P,y)).join(" ")),L=($,y)=>{$=$.trim();const P=y.loose?l[s.XRANGELOOSE]:l[s.XRANGE];return $.replace(P,(b,z,H,F,p,O)=>{if(d("xRange",$,b,z,H,F,p,O),q(H,F,p))return $;const D=j(H),B=D||j(F),W=B||j(p),se=W;return z==="="&&se&&(z=""),O=y.includePrerelease?"-0":"",D?z===">"||z==="<"?b="<0.0.0-0":b="*":z&&se?(B&&(F=0),p=0,z===">"?(z=">=",B?(H=+H+1,F=0,p=0):(F=+F+1,p=0)):z==="<="&&(z="<",B?H=+H+1:F=+F+1),z==="<"&&(O="-0"),b=`${z+H}.${F}.${p}${O}`):B?b=`>=${H}.0.0${O} <${+H+1}.0.0-0`:W&&(b=`>=${H}.${F}.0${O} <${H}.${+F+1}.0-0`),d("xRange return",b),b})},K=($,y)=>(d("replaceStars",$,y),$.trim().replace(l[s.STAR],"")),J=($,y)=>(d("replaceGTE0",$,y),$.trim().replace(l[y.includePrerelease?s.GTE0PRE:s.GTE0],"")),le=$=>(y,P,b,z,H,F,p,O,D,B,W,se)=>(j(b)?P="":j(z)?P=`>=${b}.0.0${$?"-0":""}`:j(H)?P=`>=${b}.${z}.0${$?"-0":""}`:F?P=`>=${P}`:P=`>=${P}${$?"-0":""}`,j(D)?O="":j(B)?O=`<${+D+1}.0.0-0`:j(W)?O=`<${D}.${+B+1}.0-0`:se?O=`<=${D}.${B}.${W}-${se}`:$?O=`<${D}.${B}.${+W+1}-0`:O=`<=${O}`,`${P} ${O}`.trim()),V=($,y,P)=>{for(let b=0;b<$.length;b++)if(!$[b].test(y))return!1;if(y.prerelease.length&&!P.includePrerelease){for(let b=0;b<$.length;b++)if(d($[b].semver),$[b].semver!==o.ANY&&$[b].semver.prerelease.length>0){const z=$[b].semver;if(z.major===y.major&&z.minor===y.minor&&z.patch===y.patch)return!0}return!1}return!0};return vn}var En,ga;function Zr(){if(ga)return En;ga=1;const e=Symbol("SemVer ANY");class t{static get ANY(){return e}constructor(s,g){if(g=r(g),s instanceof t){if(s.loose===!!g.loose)return s;s=s.value}s=s.trim().split(/\s+/).join(" "),d("comparator",s,g),this.options=g,this.loose=!!g.loose,this.parse(s),this.semver===e?this.value="":this.value=this.operator+this.semver.version,d("comp",this)}parse(s){const g=this.options.loose?n[a.COMPARATORLOOSE]:n[a.COMPARATOR],R=s.match(g);if(!R)throw new TypeError(`Invalid comparator: ${s}`);this.operator=R[1]!==void 0?R[1]:"",this.operator==="="&&(this.operator=""),R[2]?this.semver=new w(R[2],this.options.loose):this.semver=e}toString(){return this.value}test(s){if(d("Comparator.test",s,this.options.loose),this.semver===e||s===e)return!0;if(typeof s=="string")try{s=new w(s,this.options)}catch{return!1}return o(s,this.operator,this.semver,this.options)}intersects(s,g){if(!(s instanceof t))throw new TypeError("a Comparator is required");return this.operator===""?this.value===""?!0:new l(s.value,g).test(this.value):s.operator===""?s.value===""?!0:new l(this.value,g).test(s.semver):(g=r(g),g.includePrerelease&&(this.value==="<0.0.0-0"||s.value==="<0.0.0-0")||!g.includePrerelease&&(this.value.startsWith("<0.0.0")||s.value.startsWith("<0.0.0"))?!1:!!(this.operator.startsWith(">")&&s.operator.startsWith(">")||this.operator.startsWith("<")&&s.operator.startsWith("<")||this.semver.version===s.semver.version&&this.operator.includes("=")&&s.operator.includes("=")||o(this.semver,"<",s.semver,g)&&this.operator.startsWith(">")&&s.operator.startsWith("<")||o(this.semver,">",s.semver,g)&&this.operator.startsWith("<")&&s.operator.startsWith(">")))}}En=t;const r=Ns,{safeRe:n,t:a}=fr,o=wi,d=Jr,w=je,l=ct();return En}const ed=ct(),td=(e,t,r)=>{try{t=new ed(t,r)}catch{return!1}return t.test(e)};var en=td;const rd=ct(),nd=(e,t)=>new rd(e,t).set.map(r=>r.map(n=>n.value).join(" ").trim().split(" "));var sd=nd;const ad=je,id=ct(),od=(e,t,r)=>{let n=null,a=null,o=null;try{o=new id(t,r)}catch{return null}return e.forEach(d=>{o.test(d)&&(!n||a.compare(d)===-1)&&(n=d,a=new ad(n,r))}),n};var cd=od;const ld=je,ud=ct(),fd=(e,t,r)=>{let n=null,a=null,o=null;try{o=new ud(t,r)}catch{return null}return e.forEach(d=>{o.test(d)&&(!n||a.compare(d)===1)&&(n=d,a=new ld(n,r))}),n};var dd=fd;const $n=je,hd=ct(),_a=Qr,pd=(e,t)=>{e=new hd(e,t);let r=new $n("0.0.0");if(e.test(r)||(r=new $n("0.0.0-0"),e.test(r)))return r;r=null;for(let n=0;n<e.set.length;++n){const a=e.set[n];let o=null;a.forEach(d=>{const w=new $n(d.semver.version);switch(d.operator){case">":w.prerelease.length===0?w.patch++:w.prerelease.push(0),w.raw=w.format();case"":case">=":(!o||_a(w,o))&&(o=w);break;case"<":case"<=":break;default:throw new Error(`Unexpected operation: ${d.operator}`)}}),o&&(!r||_a(r,o))&&(r=o)}return r&&e.test(r)?r:null};var md=pd;const yd=ct(),vd=(e,t)=>{try{return new yd(e,t).range||"*"}catch{return null}};var Ed=vd;const $d=je,Ri=Zr(),{ANY:gd}=Ri,_d=ct(),wd=en,wa=Qr,Ra=Ps,Rd=bs,Sd=As,Id=(e,t,r,n)=>{e=new $d(e,n),t=new _d(t,n);let a,o,d,w,l;switch(r){case">":a=wa,o=Rd,d=Ra,w=">",l=">=";break;case"<":a=Ra,o=Sd,d=wa,w="<",l="<=";break;default:throw new TypeError('Must provide a hilo val of "<" or ">"')}if(wd(e,t,n))return!1;for(let i=0;i<t.set.length;++i){const s=t.set[i];let g=null,R=null;if(s.forEach(c=>{c.semver===gd&&(c=new Ri(">=0.0.0")),g=g||c,R=R||c,a(c.semver,g.semver,n)?g=c:d(c.semver,R.semver,n)&&(R=c)}),g.operator===w||g.operator===l||(!R.operator||R.operator===w)&&o(e,R.semver))return!1;if(R.operator===l&&d(e,R.semver))return!1}return!0};var Cs=Id;const Od=Cs,Nd=(e,t,r)=>Od(e,t,">",r);var Td=Nd;const Pd=Cs,Ad=(e,t,r)=>Pd(e,t,"<",r);var bd=Ad;const Sa=ct(),Cd=(e,t,r)=>(e=new Sa(e,r),t=new Sa(t,r),e.intersects(t,r));var Dd=Cd;const Ld=en,kd=ot;var jd=(e,t,r)=>{const n=[];let a=null,o=null;const d=e.sort((s,g)=>kd(s,g,r));for(const s of d)Ld(s,t,r)?(o=s,a||(a=s)):(o&&n.push([a,o]),o=null,a=null);a&&n.push([a,null]);const w=[];for(const[s,g]of n)s===g?w.push(s):!g&&s===d[0]?w.push("*"):g?s===d[0]?w.push(`<=${g}`):w.push(`${s} - ${g}`):w.push(`>=${s}`);const l=w.join(" || "),i=typeof t.raw=="string"?t.raw:String(t);return l.length<i.length?l:t};const Ia=ct(),Ds=Zr(),{ANY:gn}=Ds,_n=en,Ls=ot,Fd=(e,t,r={})=>{if(e===t)return!0;e=new Ia(e,r),t=new Ia(t,r);let n=!1;e:for(const a of e.set){for(const o of t.set){const d=Ud(a,o,r);if(n=n||d!==null,d)continue e}if(n)return!1}return!0},Md=[new Ds(">=0.0.0-0")],Oa=[new Ds(">=0.0.0")],Ud=(e,t,r)=>{if(e===t)return!0;if(e.length===1&&e[0].semver===gn){if(t.length===1&&t[0].semver===gn)return!0;r.includePrerelease?e=Md:e=Oa}if(t.length===1&&t[0].semver===gn){if(r.includePrerelease)return!0;t=Oa}const n=new Set;let a,o;for(const c of e)c.operator===">"||c.operator===">="?a=Na(a,c,r):c.operator==="<"||c.operator==="<="?o=Ta(o,c,r):n.add(c.semver);if(n.size>1)return null;let d;if(a&&o){if(d=Ls(a.semver,o.semver,r),d>0)return null;if(d===0&&(a.operator!==">="||o.operator!=="<="))return null}for(const c of n){if(a&&!_n(c,String(a),r)||o&&!_n(c,String(o),r))return null;for(const E of t)if(!_n(c,String(E),r))return!1;return!0}let w,l,i,s,g=o&&!r.includePrerelease&&o.semver.prerelease.length?o.semver:!1,R=a&&!r.includePrerelease&&a.semver.prerelease.length?a.semver:!1;g&&g.prerelease.length===1&&o.operator==="<"&&g.prerelease[0]===0&&(g=!1);for(const c of t){if(s=s||c.operator===">"||c.operator===">=",i=i||c.operator==="<"||c.operator==="<=",a){if(R&&c.semver.prerelease&&c.semver.prerelease.length&&c.semver.major===R.major&&c.semver.minor===R.minor&&c.semver.patch===R.patch&&(R=!1),c.operator===">"||c.operator===">="){if(w=Na(a,c,r),w===c&&w!==a)return!1}else if(a.operator===">="&&!c.test(a.semver))return!1}if(o){if(g&&c.semver.prerelease&&c.semver.prerelease.length&&c.semver.major===g.major&&c.semver.minor===g.minor&&c.semver.patch===g.patch&&(g=!1),c.operator==="<"||c.operator==="<="){if(l=Ta(o,c,r),l===c&&l!==o)return!1}else if(o.operator==="<="&&!c.test(o.semver))return!1}if(!c.operator&&(o||a)&&d!==0)return!1}return!(a&&i&&!o&&d!==0||o&&s&&!a&&d!==0||R||g)},Na=(e,t,r)=>{if(!e)return t;const n=Ls(e.semver,t.semver,r);return n>0?e:n<0||t.operator===">"&&e.operator===">="?t:e},Ta=(e,t,r)=>{if(!e)return t;const n=Ls(e.semver,t.semver,r);return n<0?e:n>0||t.operator==="<"&&e.operator==="<="?t:e};var Vd=Fd;const wn=fr,Pa=ur,zd=je,Aa=$i,Gd=Ft,qd=Vu,Hd=qu,Xd=Xu,Kd=Bu,Bd=Yu,xd=Zu,Wd=rf,Yd=af,Jd=ot,Qd=uf,Zd=hf,eh=Ts,th=vf,rh=gf,nh=Qr,sh=Ps,ah=gi,ih=_i,oh=As,ch=bs,lh=wi,uh=qf,fh=Jf,dh=Zr(),hh=ct(),ph=en,mh=sd,yh=cd,vh=dd,Eh=md,$h=Ed,gh=Cs,_h=Td,wh=bd,Rh=Dd,Sh=jd,Ih=Vd;var Oh={parse:Gd,valid:qd,clean:Hd,inc:Xd,diff:Kd,major:Bd,minor:xd,patch:Wd,prerelease:Yd,compare:Jd,rcompare:Qd,compareLoose:Zd,compareBuild:eh,sort:th,rsort:rh,gt:nh,lt:sh,eq:ah,neq:ih,gte:oh,lte:ch,cmp:lh,coerce:uh,truncate:fh,Comparator:dh,Range:hh,satisfies:ph,toComparators:mh,maxSatisfying:yh,minSatisfying:vh,minVersion:Eh,validRange:$h,outside:gh,gtr:_h,ltr:wh,intersects:Rh,simplifyRange:Sh,subset:Ih,SemVer:zd,re:wn.re,src:wn.src,tokens:wn.t,SEMVER_SPEC_VERSION:Pa.SEMVER_SPEC_VERSION,RELEASE_TYPES:Pa.RELEASE_TYPES,compareIdentifiers:Aa.compareIdentifiers,rcompareIdentifiers:Aa.rcompareIdentifiers},tn={exports:{}},ks={exports:{}};const Si=(e,t)=>{for(const r of Reflect.ownKeys(t))Object.defineProperty(e,r,Object.getOwnPropertyDescriptor(t,r));return e};ks.exports=Si;ks.exports.default=Si;var Nh=ks.exports;const Th=Nh,qr=new WeakMap,Ii=(e,t={})=>{if(typeof e!="function")throw new TypeError("Expected a function");let r,n=0;const a=e.displayName||e.name||"<anonymous>",o=function(...d){if(qr.set(o,++n),n===1)r=e.apply(this,d),e=null;else if(t.throw===!0)throw new Error(`Function \`${a}\` can only be called once`);return r};return Th(o,e),qr.set(o,n),o};tn.exports=Ii;tn.exports.default=Ii;tn.exports.callCount=e=>{if(!qr.has(e))throw new Error(`The given function \`${e.name}\` is not wrapped by the \`onetime\` package`);return qr.get(e)};var Ph=tn.exports;(function(e,t){var r=rr&&rr.__classPrivateFieldSet||function($,y,P){if(!y.has($))throw new TypeError("attempted to set private field on non-instance");return y.set($,P),P},n=rr&&rr.__classPrivateFieldGet||function($,y){if(!y.has($))throw new TypeError("attempted to get private field on non-instance");return y.get($)},a,o,d,w,l,i;Object.defineProperty(t,"__esModule",{value:!0});const s=Hr,g=Nt,R=Ti,c=Pi,E=Ai,f=ji,S=Vi,u=Ji,m=to,_=ht,C=ai,j=du,q=Ru,k=Oh,Y=Ph,Q="aes-256-cbc",te=()=>Object.create(null),ie=$=>$!=null;delete require.cache[__filename];const L=g.dirname((o=(a=e.parent)===null||a===void 0?void 0:a.filename)!==null&&o!==void 0?o:"."),K=($,y)=>{const P=new Set(["undefined","symbol","function"]),b=typeof y;if(P.has(b))throw new TypeError(`Setting a value of type \`${b}\` for key \`${$}\` is not allowed as it's not supported by JSON`)},J="__internal__",le=`${J}.migrations.version`;class V{constructor(y={}){var P;d.set(this,void 0),w.set(this,void 0),l.set(this,void 0),i.set(this,{}),this._deserialize=O=>JSON.parse(O),this._serialize=O=>JSON.stringify(O,null,"	");const b={configName:"config",fileExtension:"json",projectSuffix:"nodejs",clearInvalidConfig:!1,accessPropertiesByDotNotation:!0,...y},z=Y(()=>{const O=u.sync({cwd:L}),D=O&&JSON.parse(s.readFileSync(O,"utf8"));return D??{}});if(!b.cwd){if(b.projectName||(b.projectName=z().name),!b.projectName)throw new Error("Project name could not be inferred. Please specify the `projectName` option.");b.cwd=m(b.projectName,{suffix:b.projectSuffix}).config}if(r(this,l,b),b.schema){if(typeof b.schema!="object")throw new TypeError("The `schema` option must be an object.");const O=new C.default({allErrors:!0,useDefaults:!0});j.default(O);const D={type:"object",properties:b.schema};r(this,d,O.compile(D));for(const[B,W]of Object.entries(b.schema))W!=null&&W.default&&(n(this,i)[B]=W.default)}b.defaults&&r(this,i,{...n(this,i),...b.defaults}),b.serialize&&(this._serialize=b.serialize),b.deserialize&&(this._deserialize=b.deserialize),this.events=new E.EventEmitter,r(this,w,b.encryptionKey);const H=b.fileExtension?`.${b.fileExtension}`:"";this.path=g.resolve(b.cwd,`${(P=b.configName)!==null&&P!==void 0?P:"config"}${H}`);const F=this.store,p=Object.assign(te(),b.defaults,F);this._validate(p);try{c.deepEqual(F,p)}catch{this.store=p}if(b.watch&&this._watch(),b.migrations){if(b.projectVersion||(b.projectVersion=z().version),!b.projectVersion)throw new Error("Project version could not be inferred. Please specify the `projectVersion` option.");this._migrate(b.migrations,b.projectVersion)}}get(y,P){return n(this,l).accessPropertiesByDotNotation?this._get(y,P):y in this.store?this.store[y]:P}set(y,P){if(typeof y!="string"&&typeof y!="object")throw new TypeError(`Expected \`key\` to be of type \`string\` or \`object\`, got ${typeof y}`);if(typeof y!="object"&&P===void 0)throw new TypeError("Use `delete()` to clear values");if(this._containsReservedKey(y))throw new TypeError(`Please don't use the ${J} key, as it's used to manage this module internal operations.`);const{store:b}=this,z=(H,F)=>{K(H,F),n(this,l).accessPropertiesByDotNotation?f.set(b,H,F):b[H]=F};if(typeof y=="object"){const H=y;for(const[F,p]of Object.entries(H))z(F,p)}else z(y,P);this.store=b}has(y){return n(this,l).accessPropertiesByDotNotation?f.has(this.store,y):y in this.store}reset(...y){for(const P of y)ie(n(this,i)[P])&&this.set(P,n(this,i)[P])}delete(y){const{store:P}=this;n(this,l).accessPropertiesByDotNotation?f.delete(P,y):delete P[y],this.store=P}clear(){this.store=te();for(const y of Object.keys(n(this,i)))this.reset(y)}onDidChange(y,P){if(typeof y!="string")throw new TypeError(`Expected \`key\` to be of type \`string\`, got ${typeof y}`);if(typeof P!="function")throw new TypeError(`Expected \`callback\` to be of type \`function\`, got ${typeof P}`);return this._handleChange(()=>this.get(y),P)}onDidAnyChange(y){if(typeof y!="function")throw new TypeError(`Expected \`callback\` to be of type \`function\`, got ${typeof y}`);return this._handleChange(()=>this.store,y)}get size(){return Object.keys(this.store).length}get store(){try{const y=s.readFileSync(this.path,n(this,w)?null:"utf8"),P=this._encryptData(y),b=this._deserialize(P);return this._validate(b),Object.assign(te(),b)}catch(y){if(y.code==="ENOENT")return this._ensureDirectory(),te();if(n(this,l).clearInvalidConfig&&y.name==="SyntaxError")return te();throw y}}set store(y){this._ensureDirectory(),this._validate(y),this._write(y),this.events.emit("change")}*[(d=new WeakMap,w=new WeakMap,l=new WeakMap,i=new WeakMap,Symbol.iterator)](){for(const[y,P]of Object.entries(this.store))yield[y,P]}_encryptData(y){if(!n(this,w))return y.toString();try{if(n(this,w))try{if(y.slice(16,17).toString()===":"){const P=y.slice(0,16),b=R.pbkdf2Sync(n(this,w),P.toString(),1e4,32,"sha512"),z=R.createDecipheriv(Q,b,P);y=Buffer.concat([z.update(Buffer.from(y.slice(17))),z.final()]).toString("utf8")}else{const P=R.createDecipher(Q,n(this,w));y=Buffer.concat([P.update(Buffer.from(y)),P.final()]).toString("utf8")}}catch{}}catch{}return y.toString()}_handleChange(y,P){let b=y();const z=()=>{const H=b,F=y();try{c.deepEqual(F,H)}catch{b=F,P.call(this,F,H)}};return this.events.on("change",z),()=>this.events.removeListener("change",z)}_validate(y){if(!n(this,d)||n(this,d).call(this,y)||!n(this,d).errors)return;const b=n(this,d).errors.map(({dataPath:z,message:H=""})=>`\`${z.slice(1)}\` ${H}`);throw new Error("Config schema violation: "+b.join("; "))}_ensureDirectory(){S.sync(g.dirname(this.path))}_write(y){let P=this._serialize(y);if(n(this,w)){const b=R.randomBytes(16),z=R.pbkdf2Sync(n(this,w),b.toString(),1e4,32,"sha512"),H=R.createCipheriv(Q,z,b);P=Buffer.concat([b,Buffer.from(":"),H.update(Buffer.from(P)),H.final()])}if(process.env.SNAP)s.writeFileSync(this.path,P);else try{_.writeFileSync(this.path,P)}catch(b){if(b.code==="EXDEV"){s.writeFileSync(this.path,P);return}throw b}}_watch(){this._ensureDirectory(),s.existsSync(this.path)||this._write(te()),s.watch(this.path,{persistent:!1},q(()=>{this.events.emit("change")},{wait:100}))}_migrate(y,P){let b=this._get(le,"0.0.0");const z=Object.keys(y).filter(F=>this._shouldPerformMigration(F,b,P));let H={...this.store};for(const F of z)try{const p=y[F];p(this),this._set(le,F),b=F,H={...this.store}}catch(p){throw this.store=H,new Error(`Something went wrong during the migration! Changes applied to the store until this failed migration will be restored. ${p}`)}(this._isVersionInRangeFormat(b)||!k.eq(b,P))&&this._set(le,P)}_containsReservedKey(y){return typeof y=="object"&&Object.keys(y)[0]===J?!0:typeof y!="string"?!1:n(this,l).accessPropertiesByDotNotation?!!y.startsWith(`${J}.`):!1}_isVersionInRangeFormat(y){return k.clean(y)===null}_shouldPerformMigration(y,P,b){return this._isVersionInRangeFormat(y)?P!=="0.0.0"&&k.satisfies(P,y)?!1:k.satisfies(b,y):!(k.lte(y,P)||k.gt(y,b))}_get(y,P){return f.get(this.store,y,P)}_set(y,P){const{store:b}=this;f.set(b,y,P),this.store=b}}t.default=V,e.exports=V,e.exports.default=V})(Rn,Rn.exports);var Ah=Rn.exports;const ba=Nt,{app:jr,ipcMain:Ln,ipcRenderer:Ca,shell:bh}=X,Ch=Ah;let Da=!1;const La=()=>{if(!Ln||!jr)throw new Error("Electron Store: You need to call `.initRenderer()` from the main process.");const e={defaultCwd:jr.getPath("userData"),appVersion:jr.getVersion()};return Da||(Ln.on("electron-store-get-data",t=>{t.returnValue=e}),Da=!0),e};class Dh extends Ch{constructor(t){let r,n;if(Ca){const a=Ca.sendSync("electron-store-get-data");if(!a)throw new Error("Electron Store: You need to call `.initRenderer()` from the main process.");({defaultCwd:r,appVersion:n}=a)}else Ln&&jr&&({defaultCwd:r,appVersion:n}=La());t={name:"config",...t},t.projectVersion||(t.projectVersion=n),t.cwd?t.cwd=ba.isAbsolute(t.cwd)?t.cwd:ba.join(r,t.cwd):t.cwd=r,t.configName=t.name,delete t.name,super(t)}static initRenderer(){La()}openInEditor(){bh.openPath(this.path)}}var Lh=Dh;const kh=Ci(Lh),ka=new kh({name:"jianyue-reader"});X.contextBridge.exposeInMainWorld("electronAPI",{store:{get:e=>ka.get(e),set:(e,t)=>ka.set(e,t)},fs:{readFileAsBuffer:e=>X.ipcRenderer.invoke("fs:readFileAsBuffer",e),readFileAsText:e=>X.ipcRenderer.invoke("fs:readFileAsText",e),checkFileExists:e=>X.ipcRenderer.invoke("fs:checkFileExists",e),getFileName:e=>X.ipcRenderer.invoke("fs:getFileName",e),getFileSize:e=>X.ipcRenderer.invoke("fs:getFileSize",e),writeTextFile:e=>X.ipcRenderer.invoke("fs:writeTextFile",e),writeImageFile:e=>X.ipcRenderer.invoke("fs:writeImageFile",e),scanFolder:e=>X.ipcRenderer.invoke("fs:scanFolder",e),generateNextFileName:(e,t)=>X.ipcRenderer.invoke("fs:generateNextFileName",e,t),writeToFile:(e,t)=>X.ipcRenderer.invoke("fs:writeToFile",e,t)},dialog:{showFilePicker:()=>X.ipcRenderer.invoke("dialog:showFilePicker"),showNoteFilePicker:()=>X.ipcRenderer.invoke("dialog:showNoteFilePicker"),showImagePicker:()=>X.ipcRenderer.invoke("dialog:showImagePicker"),showFontPicker:()=>X.ipcRenderer.invoke("dialog:showFontPicker"),showFolderPicker:()=>X.ipcRenderer.invoke("dialog:showFolderPicker"),saveFile:(e,t)=>X.ipcRenderer.invoke("dialog:saveFile",e,t),showNoteSaveDialog:e=>X.ipcRenderer.invoke("dialog:showNoteSaveDialog",e)},book:{copyToCache:(e,t)=>X.ipcRenderer.invoke("book:copyToCache",e,t),deleteCached:e=>X.ipcRenderer.invoke("book:deleteCached",e),cachedExists:e=>X.ipcRenderer.invoke("book:cachedExists",e)},cover:{save:(e,t)=>X.ipcRenderer.invoke("cover:save",e,t),delete:e=>X.ipcRenderer.invoke("cover:delete",e),exists:e=>X.ipcRenderer.invoke("cover:exists",e),findEpubCover:(e,t)=>X.ipcRenderer.invoke("cover:findEpubCover",e,t)},font:{copyToCache:e=>X.ipcRenderer.invoke("font:copyToCache",e),delete:e=>X.ipcRenderer.invoke("font:delete",e),getFiles:()=>X.ipcRenderer.invoke("font:getFiles")},ai:{ensureCacheDir:()=>X.ipcRenderer.invoke("ai:ensureCacheDir"),readCacheFile:e=>X.ipcRenderer.invoke("ai:readCacheFile",e),writeCacheFile:(e,t)=>X.ipcRenderer.invoke("ai:writeCacheFile",e,t),deleteCacheFile:e=>X.ipcRenderer.invoke("ai:deleteCacheFile",e),listCacheFiles:()=>X.ipcRenderer.invoke("ai:listCacheFiles")},clipboard:{writeText:e=>X.ipcRenderer.invoke("clipboard:writeText",e),readText:()=>X.ipcRenderer.invoke("clipboard:readText")},image:{saveToCache:e=>X.ipcRenderer.invoke("image:saveToCache",e)},shell:{showItemInFolder:e=>X.ipcRenderer.invoke("shell:showItemInFolder",e)},devTools:{toggle:()=>X.ipcRenderer.invoke("window:toggleDevTools")},floatReader:{create:(e,t,r)=>X.ipcRenderer.invoke("floatReader:create",e,t,r),close:e=>X.ipcRenderer.invoke("floatReader:close",e!==!1),isOpen:()=>X.ipcRenderer.invoke("floatReader:isOpen"),togglePin:()=>X.ipcRenderer.invoke("floatReader:togglePin")},floatNote:{create:(e,t,r)=>X.ipcRenderer.invoke("floatNote:create",e,t,r),close:()=>X.ipcRenderer.invoke("floatNote:close"),isOpen:()=>X.ipcRenderer.invoke("floatNote:isOpen"),syncContent:e=>X.ipcRenderer.invoke("floatNote:syncContent",e),togglePin:()=>X.ipcRenderer.invoke("floatNote:togglePin"),onContentUpdate:e=>{const t=(r,n)=>e(n);return X.ipcRenderer.on("floatNote:contentUpdate",t),()=>{X.ipcRenderer.removeListener("floatNote:contentUpdate",t)}}},window:{show:()=>X.ipcRenderer.invoke("window:show"),hide:()=>X.ipcRenderer.invoke("window:hide"),minimize:()=>X.ipcRenderer.invoke("window:minimize"),maximize:()=>X.ipcRenderer.invoke("window:maximize"),close:()=>X.ipcRenderer.invoke("window:close"),isMaximized:()=>X.ipcRenderer.invoke("window:isMaximized"),setupMaximizeListener:()=>X.ipcRenderer.invoke("window:setupMaximizeListener"),onMaximizeChange:e=>{X.ipcRenderer.on("window:maximize-change",(t,r)=>e(r))}},app:{getPath:e=>X.ipcRenderer.invoke("app:getPath",e),getVersion:()=>X.ipcRenderer.invoke("app:getVersion"),openCacheFolder:()=>X.ipcRenderer.invoke("app:openCacheFolder"),getPendingFilePath:()=>X.ipcRenderer.invoke("app:pendingFilePath")},onFileOpen:e=>{const t=(r,n)=>e(n);return X.ipcRenderer.on("file-open",t),()=>{X.ipcRenderer.removeListener("file-open",t)}}});X.contextBridge.exposeInMainWorld("services",{readFileAsBuffer:e=>X.ipcRenderer.invoke("fs:readFileAsBuffer",e),readFileAsText:e=>X.ipcRenderer.invoke("fs:readFileAsText",e),checkFileExists:e=>X.ipcRenderer.invoke("fs:checkFileExists",e),showFilePicker:()=>X.ipcRenderer.invoke("dialog:showFilePicker"),showNoteFilePicker:()=>X.ipcRenderer.invoke("dialog:showNoteFilePicker"),showImagePicker:()=>X.ipcRenderer.invoke("dialog:showImagePicker"),showFontPicker:()=>X.ipcRenderer.invoke("dialog:showFontPicker"),showFolderPicker:()=>X.ipcRenderer.invoke("dialog:showFolderPicker"),saveFile:(e,t)=>X.ipcRenderer.invoke("dialog:saveFile",e,t),showNoteSaveDialog:e=>X.ipcRenderer.invoke("dialog:showNoteSaveDialog",e),writeTextFile:e=>X.ipcRenderer.invoke("fs:writeTextFile",e),writeImageFile:e=>X.ipcRenderer.invoke("fs:writeImageFile",e),getFileName:e=>X.ipcRenderer.invoke("fs:getFileName",e),getFileSize:e=>X.ipcRenderer.invoke("fs:getFileSize",e),copyBookToCache:(e,t)=>X.ipcRenderer.invoke("book:copyToCache",e,t),deleteCachedBook:e=>X.ipcRenderer.invoke("book:deleteCached",e),cachedBookExists:e=>X.ipcRenderer.invoke("book:cachedExists",e),saveCoverFile:(e,t)=>X.ipcRenderer.invoke("cover:save",e,t),deleteCoverFile:e=>X.ipcRenderer.invoke("cover:delete",e),coverFileExists:e=>X.ipcRenderer.invoke("cover:exists",e),findEpubCover:(e,t)=>X.ipcRenderer.invoke("cover:findEpubCover",e,t),extractEpubAll:e=>X.ipcRenderer.invoke("epub:extractAll",e),copyFontToCache:e=>X.ipcRenderer.invoke("font:copyToCache",e),deleteFontFile:e=>X.ipcRenderer.invoke("font:delete",e),getFontFiles:()=>X.ipcRenderer.invoke("font:getFiles"),showItemInFolder:e=>X.ipcRenderer.invoke("shell:showItemInFolder",e),ensureAiCacheDir:()=>X.ipcRenderer.invoke("ai:ensureCacheDir"),readAiCacheFile:e=>X.ipcRenderer.invoke("ai:readCacheFile",e),writeAiCacheFile:(e,t)=>X.ipcRenderer.invoke("ai:writeCacheFile",e,t),deleteAiCacheFile:e=>X.ipcRenderer.invoke("ai:deleteCacheFile",e),listAiCacheFiles:()=>X.ipcRenderer.invoke("ai:listCacheFiles"),generateNextFileName:(e,t)=>X.ipcRenderer.invoke("fs:generateNextFileName",e,t),writeToFile:(e,t)=>X.ipcRenderer.invoke("fs:writeToFile",e,t),saveImageToCache:e=>X.ipcRenderer.invoke("image:saveToCache",e),createFloatReader:(e,t,r,n)=>X.ipcRenderer.invoke("floatReader:create",e,t,r,n),closeFloatReader:()=>X.ipcRenderer.invoke("floatReader:close"),isFloatReaderOpen:()=>X.ipcRenderer.invoke("floatReader:isOpen"),createFloatNote:(e,t,r)=>X.ipcRenderer.invoke("floatNote:create",e,t,r),closeFloatNote:()=>X.ipcRenderer.invoke("floatNote:close"),isFloatNoteOpen:()=>X.ipcRenderer.invoke("floatNote:isOpen"),syncFloatNoteContent:e=>X.ipcRenderer.invoke("floatNote:syncContent",e),onFloatNoteContentUpdate:e=>{const t=(r,n)=>e(n);return X.ipcRenderer.on("floatNote:contentUpdate",t),()=>{X.ipcRenderer.removeListener("floatNote:contentUpdate",t)}},onFileOpen:e=>{const t=(r,n)=>e(n);return X.ipcRenderer.on("file-open",t),()=>{X.ipcRenderer.removeListener("file-open",t)}}});
+"use strict";
+const require$$1$1 = require("electron");
+const require$$0$1 = require("path");
+const require$$0 = require("fs");
+const require$$2$1 = require("crypto");
+const require$$3 = require("assert");
+const require$$4$1 = require("events");
+const require$$2 = require("util");
+const require$$1 = require("os");
+var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
+function getDefaultExportFromCjs(x) {
+  return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, "default") ? x["default"] : x;
+}
+var source = { exports: {} };
+var isObj$1 = (value) => {
+  const type2 = typeof value;
+  return value !== null && (type2 === "object" || type2 === "function");
+};
+const isObj = isObj$1;
+const disallowedKeys = /* @__PURE__ */ new Set([
+  "__proto__",
+  "prototype",
+  "constructor"
+]);
+const isValidPath = (pathSegments) => !pathSegments.some((segment) => disallowedKeys.has(segment));
+function getPathSegments(path2) {
+  const pathArray = path2.split(".");
+  const parts = [];
+  for (let i = 0; i < pathArray.length; i++) {
+    let p = pathArray[i];
+    while (p[p.length - 1] === "\\" && pathArray[i + 1] !== void 0) {
+      p = p.slice(0, -1) + ".";
+      p += pathArray[++i];
+    }
+    parts.push(p);
+  }
+  if (!isValidPath(parts)) {
+    return [];
+  }
+  return parts;
+}
+var dotProp = {
+  get(object, path2, value) {
+    if (!isObj(object) || typeof path2 !== "string") {
+      return value === void 0 ? object : value;
+    }
+    const pathArray = getPathSegments(path2);
+    if (pathArray.length === 0) {
+      return;
+    }
+    for (let i = 0; i < pathArray.length; i++) {
+      object = object[pathArray[i]];
+      if (object === void 0 || object === null) {
+        if (i !== pathArray.length - 1) {
+          return value;
+        }
+        break;
+      }
+    }
+    return object === void 0 ? value : object;
+  },
+  set(object, path2, value) {
+    if (!isObj(object) || typeof path2 !== "string") {
+      return object;
+    }
+    const root = object;
+    const pathArray = getPathSegments(path2);
+    for (let i = 0; i < pathArray.length; i++) {
+      const p = pathArray[i];
+      if (!isObj(object[p])) {
+        object[p] = {};
+      }
+      if (i === pathArray.length - 1) {
+        object[p] = value;
+      }
+      object = object[p];
+    }
+    return root;
+  },
+  delete(object, path2) {
+    if (!isObj(object) || typeof path2 !== "string") {
+      return false;
+    }
+    const pathArray = getPathSegments(path2);
+    for (let i = 0; i < pathArray.length; i++) {
+      const p = pathArray[i];
+      if (i === pathArray.length - 1) {
+        delete object[p];
+        return true;
+      }
+      object = object[p];
+      if (!isObj(object)) {
+        return false;
+      }
+    }
+  },
+  has(object, path2) {
+    if (!isObj(object) || typeof path2 !== "string") {
+      return false;
+    }
+    const pathArray = getPathSegments(path2);
+    if (pathArray.length === 0) {
+      return false;
+    }
+    for (let i = 0; i < pathArray.length; i++) {
+      if (isObj(object)) {
+        if (!(pathArray[i] in object)) {
+          return false;
+        }
+        object = object[pathArray[i]];
+      } else {
+        return false;
+      }
+    }
+    return true;
+  }
+};
+var makeDir$1 = { exports: {} };
+var semver$3 = { exports: {} };
+(function(module, exports) {
+  exports = module.exports = SemVer3;
+  var debug2;
+  if (typeof process === "object" && process.env && process.env.NODE_DEBUG && /\bsemver\b/i.test(process.env.NODE_DEBUG)) {
+    debug2 = function() {
+      var args = Array.prototype.slice.call(arguments, 0);
+      args.unshift("SEMVER");
+      console.log.apply(console, args);
+    };
+  } else {
+    debug2 = function() {
+    };
+  }
+  exports.SEMVER_SPEC_VERSION = "2.0.0";
+  var MAX_LENGTH2 = 256;
+  var MAX_SAFE_INTEGER2 = Number.MAX_SAFE_INTEGER || /* istanbul ignore next */
+  9007199254740991;
+  var MAX_SAFE_COMPONENT_LENGTH2 = 16;
+  var MAX_SAFE_BUILD_LENGTH2 = MAX_LENGTH2 - 6;
+  var re2 = exports.re = [];
+  var safeRe = exports.safeRe = [];
+  var src = exports.src = [];
+  var t2 = exports.tokens = {};
+  var R = 0;
+  function tok(n) {
+    t2[n] = R++;
+  }
+  var LETTERDASHNUMBER = "[a-zA-Z0-9-]";
+  var safeRegexReplacements = [
+    ["\\s", 1],
+    ["\\d", MAX_LENGTH2],
+    [LETTERDASHNUMBER, MAX_SAFE_BUILD_LENGTH2]
+  ];
+  function makeSafeRe(value) {
+    for (var i2 = 0; i2 < safeRegexReplacements.length; i2++) {
+      var token = safeRegexReplacements[i2][0];
+      var max = safeRegexReplacements[i2][1];
+      value = value.split(token + "*").join(token + "{0," + max + "}").split(token + "+").join(token + "{1," + max + "}");
+    }
+    return value;
+  }
+  tok("NUMERICIDENTIFIER");
+  src[t2.NUMERICIDENTIFIER] = "0|[1-9]\\d*";
+  tok("NUMERICIDENTIFIERLOOSE");
+  src[t2.NUMERICIDENTIFIERLOOSE] = "\\d+";
+  tok("NONNUMERICIDENTIFIER");
+  src[t2.NONNUMERICIDENTIFIER] = "\\d*[a-zA-Z-]" + LETTERDASHNUMBER + "*";
+  tok("MAINVERSION");
+  src[t2.MAINVERSION] = "(" + src[t2.NUMERICIDENTIFIER] + ")\\.(" + src[t2.NUMERICIDENTIFIER] + ")\\.(" + src[t2.NUMERICIDENTIFIER] + ")";
+  tok("MAINVERSIONLOOSE");
+  src[t2.MAINVERSIONLOOSE] = "(" + src[t2.NUMERICIDENTIFIERLOOSE] + ")\\.(" + src[t2.NUMERICIDENTIFIERLOOSE] + ")\\.(" + src[t2.NUMERICIDENTIFIERLOOSE] + ")";
+  tok("PRERELEASEIDENTIFIER");
+  src[t2.PRERELEASEIDENTIFIER] = "(?:" + src[t2.NUMERICIDENTIFIER] + "|" + src[t2.NONNUMERICIDENTIFIER] + ")";
+  tok("PRERELEASEIDENTIFIERLOOSE");
+  src[t2.PRERELEASEIDENTIFIERLOOSE] = "(?:" + src[t2.NUMERICIDENTIFIERLOOSE] + "|" + src[t2.NONNUMERICIDENTIFIER] + ")";
+  tok("PRERELEASE");
+  src[t2.PRERELEASE] = "(?:-(" + src[t2.PRERELEASEIDENTIFIER] + "(?:\\." + src[t2.PRERELEASEIDENTIFIER] + ")*))";
+  tok("PRERELEASELOOSE");
+  src[t2.PRERELEASELOOSE] = "(?:-?(" + src[t2.PRERELEASEIDENTIFIERLOOSE] + "(?:\\." + src[t2.PRERELEASEIDENTIFIERLOOSE] + ")*))";
+  tok("BUILDIDENTIFIER");
+  src[t2.BUILDIDENTIFIER] = LETTERDASHNUMBER + "+";
+  tok("BUILD");
+  src[t2.BUILD] = "(?:\\+(" + src[t2.BUILDIDENTIFIER] + "(?:\\." + src[t2.BUILDIDENTIFIER] + ")*))";
+  tok("FULL");
+  tok("FULLPLAIN");
+  src[t2.FULLPLAIN] = "v?" + src[t2.MAINVERSION] + src[t2.PRERELEASE] + "?" + src[t2.BUILD] + "?";
+  src[t2.FULL] = "^" + src[t2.FULLPLAIN] + "$";
+  tok("LOOSEPLAIN");
+  src[t2.LOOSEPLAIN] = "[v=\\s]*" + src[t2.MAINVERSIONLOOSE] + src[t2.PRERELEASELOOSE] + "?" + src[t2.BUILD] + "?";
+  tok("LOOSE");
+  src[t2.LOOSE] = "^" + src[t2.LOOSEPLAIN] + "$";
+  tok("GTLT");
+  src[t2.GTLT] = "((?:<|>)?=?)";
+  tok("XRANGEIDENTIFIERLOOSE");
+  src[t2.XRANGEIDENTIFIERLOOSE] = src[t2.NUMERICIDENTIFIERLOOSE] + "|x|X|\\*";
+  tok("XRANGEIDENTIFIER");
+  src[t2.XRANGEIDENTIFIER] = src[t2.NUMERICIDENTIFIER] + "|x|X|\\*";
+  tok("XRANGEPLAIN");
+  src[t2.XRANGEPLAIN] = "[v=\\s]*(" + src[t2.XRANGEIDENTIFIER] + ")(?:\\.(" + src[t2.XRANGEIDENTIFIER] + ")(?:\\.(" + src[t2.XRANGEIDENTIFIER] + ")(?:" + src[t2.PRERELEASE] + ")?" + src[t2.BUILD] + "?)?)?";
+  tok("XRANGEPLAINLOOSE");
+  src[t2.XRANGEPLAINLOOSE] = "[v=\\s]*(" + src[t2.XRANGEIDENTIFIERLOOSE] + ")(?:\\.(" + src[t2.XRANGEIDENTIFIERLOOSE] + ")(?:\\.(" + src[t2.XRANGEIDENTIFIERLOOSE] + ")(?:" + src[t2.PRERELEASELOOSE] + ")?" + src[t2.BUILD] + "?)?)?";
+  tok("XRANGE");
+  src[t2.XRANGE] = "^" + src[t2.GTLT] + "\\s*" + src[t2.XRANGEPLAIN] + "$";
+  tok("XRANGELOOSE");
+  src[t2.XRANGELOOSE] = "^" + src[t2.GTLT] + "\\s*" + src[t2.XRANGEPLAINLOOSE] + "$";
+  tok("COERCE");
+  src[t2.COERCE] = "(^|[^\\d])(\\d{1," + MAX_SAFE_COMPONENT_LENGTH2 + "})(?:\\.(\\d{1," + MAX_SAFE_COMPONENT_LENGTH2 + "}))?(?:\\.(\\d{1," + MAX_SAFE_COMPONENT_LENGTH2 + "}))?(?:$|[^\\d])";
+  tok("COERCERTL");
+  re2[t2.COERCERTL] = new RegExp(src[t2.COERCE], "g");
+  safeRe[t2.COERCERTL] = new RegExp(makeSafeRe(src[t2.COERCE]), "g");
+  tok("LONETILDE");
+  src[t2.LONETILDE] = "(?:~>?)";
+  tok("TILDETRIM");
+  src[t2.TILDETRIM] = "(\\s*)" + src[t2.LONETILDE] + "\\s+";
+  re2[t2.TILDETRIM] = new RegExp(src[t2.TILDETRIM], "g");
+  safeRe[t2.TILDETRIM] = new RegExp(makeSafeRe(src[t2.TILDETRIM]), "g");
+  var tildeTrimReplace = "$1~";
+  tok("TILDE");
+  src[t2.TILDE] = "^" + src[t2.LONETILDE] + src[t2.XRANGEPLAIN] + "$";
+  tok("TILDELOOSE");
+  src[t2.TILDELOOSE] = "^" + src[t2.LONETILDE] + src[t2.XRANGEPLAINLOOSE] + "$";
+  tok("LONECARET");
+  src[t2.LONECARET] = "(?:\\^)";
+  tok("CARETTRIM");
+  src[t2.CARETTRIM] = "(\\s*)" + src[t2.LONECARET] + "\\s+";
+  re2[t2.CARETTRIM] = new RegExp(src[t2.CARETTRIM], "g");
+  safeRe[t2.CARETTRIM] = new RegExp(makeSafeRe(src[t2.CARETTRIM]), "g");
+  var caretTrimReplace = "$1^";
+  tok("CARET");
+  src[t2.CARET] = "^" + src[t2.LONECARET] + src[t2.XRANGEPLAIN] + "$";
+  tok("CARETLOOSE");
+  src[t2.CARETLOOSE] = "^" + src[t2.LONECARET] + src[t2.XRANGEPLAINLOOSE] + "$";
+  tok("COMPARATORLOOSE");
+  src[t2.COMPARATORLOOSE] = "^" + src[t2.GTLT] + "\\s*(" + src[t2.LOOSEPLAIN] + ")$|^$";
+  tok("COMPARATOR");
+  src[t2.COMPARATOR] = "^" + src[t2.GTLT] + "\\s*(" + src[t2.FULLPLAIN] + ")$|^$";
+  tok("COMPARATORTRIM");
+  src[t2.COMPARATORTRIM] = "(\\s*)" + src[t2.GTLT] + "\\s*(" + src[t2.LOOSEPLAIN] + "|" + src[t2.XRANGEPLAIN] + ")";
+  re2[t2.COMPARATORTRIM] = new RegExp(src[t2.COMPARATORTRIM], "g");
+  safeRe[t2.COMPARATORTRIM] = new RegExp(makeSafeRe(src[t2.COMPARATORTRIM]), "g");
+  var comparatorTrimReplace = "$1$2$3";
+  tok("HYPHENRANGE");
+  src[t2.HYPHENRANGE] = "^\\s*(" + src[t2.XRANGEPLAIN] + ")\\s+-\\s+(" + src[t2.XRANGEPLAIN] + ")\\s*$";
+  tok("HYPHENRANGELOOSE");
+  src[t2.HYPHENRANGELOOSE] = "^\\s*(" + src[t2.XRANGEPLAINLOOSE] + ")\\s+-\\s+(" + src[t2.XRANGEPLAINLOOSE] + ")\\s*$";
+  tok("STAR");
+  src[t2.STAR] = "(<|>)?=?\\s*\\*";
+  for (var i = 0; i < R; i++) {
+    debug2(i, src[i]);
+    if (!re2[i]) {
+      re2[i] = new RegExp(src[i]);
+      safeRe[i] = new RegExp(makeSafeRe(src[i]));
+    }
+  }
+  exports.parse = parse2;
+  function parse2(version, options) {
+    if (!options || typeof options !== "object") {
+      options = {
+        loose: !!options,
+        includePrerelease: false
+      };
+    }
+    if (version instanceof SemVer3) {
+      return version;
+    }
+    if (typeof version !== "string") {
+      return null;
+    }
+    if (version.length > MAX_LENGTH2) {
+      return null;
+    }
+    var r = options.loose ? safeRe[t2.LOOSE] : safeRe[t2.FULL];
+    if (!r.test(version)) {
+      return null;
+    }
+    try {
+      return new SemVer3(version, options);
+    } catch (er) {
+      return null;
+    }
+  }
+  exports.valid = valid2;
+  function valid2(version, options) {
+    var v = parse2(version, options);
+    return v ? v.version : null;
+  }
+  exports.clean = clean2;
+  function clean2(version, options) {
+    var s = parse2(version.trim().replace(/^[=v]+/, ""), options);
+    return s ? s.version : null;
+  }
+  exports.SemVer = SemVer3;
+  function SemVer3(version, options) {
+    if (!options || typeof options !== "object") {
+      options = {
+        loose: !!options,
+        includePrerelease: false
+      };
+    }
+    if (version instanceof SemVer3) {
+      if (version.loose === options.loose) {
+        return version;
+      } else {
+        version = version.version;
+      }
+    } else if (typeof version !== "string") {
+      throw new TypeError("Invalid Version: " + version);
+    }
+    if (version.length > MAX_LENGTH2) {
+      throw new TypeError("version is longer than " + MAX_LENGTH2 + " characters");
+    }
+    if (!(this instanceof SemVer3)) {
+      return new SemVer3(version, options);
+    }
+    debug2("SemVer", version, options);
+    this.options = options;
+    this.loose = !!options.loose;
+    var m = version.trim().match(options.loose ? safeRe[t2.LOOSE] : safeRe[t2.FULL]);
+    if (!m) {
+      throw new TypeError("Invalid Version: " + version);
+    }
+    this.raw = version;
+    this.major = +m[1];
+    this.minor = +m[2];
+    this.patch = +m[3];
+    if (this.major > MAX_SAFE_INTEGER2 || this.major < 0) {
+      throw new TypeError("Invalid major version");
+    }
+    if (this.minor > MAX_SAFE_INTEGER2 || this.minor < 0) {
+      throw new TypeError("Invalid minor version");
+    }
+    if (this.patch > MAX_SAFE_INTEGER2 || this.patch < 0) {
+      throw new TypeError("Invalid patch version");
+    }
+    if (!m[4]) {
+      this.prerelease = [];
+    } else {
+      this.prerelease = m[4].split(".").map(function(id2) {
+        if (/^[0-9]+$/.test(id2)) {
+          var num = +id2;
+          if (num >= 0 && num < MAX_SAFE_INTEGER2) {
+            return num;
+          }
+        }
+        return id2;
+      });
+    }
+    this.build = m[5] ? m[5].split(".") : [];
+    this.format();
+  }
+  SemVer3.prototype.format = function() {
+    this.version = this.major + "." + this.minor + "." + this.patch;
+    if (this.prerelease.length) {
+      this.version += "-" + this.prerelease.join(".");
+    }
+    return this.version;
+  };
+  SemVer3.prototype.toString = function() {
+    return this.version;
+  };
+  SemVer3.prototype.compare = function(other) {
+    debug2("SemVer.compare", this.version, this.options, other);
+    if (!(other instanceof SemVer3)) {
+      other = new SemVer3(other, this.options);
+    }
+    return this.compareMain(other) || this.comparePre(other);
+  };
+  SemVer3.prototype.compareMain = function(other) {
+    if (!(other instanceof SemVer3)) {
+      other = new SemVer3(other, this.options);
+    }
+    return compareIdentifiers2(this.major, other.major) || compareIdentifiers2(this.minor, other.minor) || compareIdentifiers2(this.patch, other.patch);
+  };
+  SemVer3.prototype.comparePre = function(other) {
+    if (!(other instanceof SemVer3)) {
+      other = new SemVer3(other, this.options);
+    }
+    if (this.prerelease.length && !other.prerelease.length) {
+      return -1;
+    } else if (!this.prerelease.length && other.prerelease.length) {
+      return 1;
+    } else if (!this.prerelease.length && !other.prerelease.length) {
+      return 0;
+    }
+    var i2 = 0;
+    do {
+      var a = this.prerelease[i2];
+      var b = other.prerelease[i2];
+      debug2("prerelease compare", i2, a, b);
+      if (a === void 0 && b === void 0) {
+        return 0;
+      } else if (b === void 0) {
+        return 1;
+      } else if (a === void 0) {
+        return -1;
+      } else if (a === b) {
+        continue;
+      } else {
+        return compareIdentifiers2(a, b);
+      }
+    } while (++i2);
+  };
+  SemVer3.prototype.compareBuild = function(other) {
+    if (!(other instanceof SemVer3)) {
+      other = new SemVer3(other, this.options);
+    }
+    var i2 = 0;
+    do {
+      var a = this.build[i2];
+      var b = other.build[i2];
+      debug2("prerelease compare", i2, a, b);
+      if (a === void 0 && b === void 0) {
+        return 0;
+      } else if (b === void 0) {
+        return 1;
+      } else if (a === void 0) {
+        return -1;
+      } else if (a === b) {
+        continue;
+      } else {
+        return compareIdentifiers2(a, b);
+      }
+    } while (++i2);
+  };
+  SemVer3.prototype.inc = function(release, identifier) {
+    switch (release) {
+      case "premajor":
+        this.prerelease.length = 0;
+        this.patch = 0;
+        this.minor = 0;
+        this.major++;
+        this.inc("pre", identifier);
+        break;
+      case "preminor":
+        this.prerelease.length = 0;
+        this.patch = 0;
+        this.minor++;
+        this.inc("pre", identifier);
+        break;
+      case "prepatch":
+        this.prerelease.length = 0;
+        this.inc("patch", identifier);
+        this.inc("pre", identifier);
+        break;
+      case "prerelease":
+        if (this.prerelease.length === 0) {
+          this.inc("patch", identifier);
+        }
+        this.inc("pre", identifier);
+        break;
+      case "major":
+        if (this.minor !== 0 || this.patch !== 0 || this.prerelease.length === 0) {
+          this.major++;
+        }
+        this.minor = 0;
+        this.patch = 0;
+        this.prerelease = [];
+        break;
+      case "minor":
+        if (this.patch !== 0 || this.prerelease.length === 0) {
+          this.minor++;
+        }
+        this.patch = 0;
+        this.prerelease = [];
+        break;
+      case "patch":
+        if (this.prerelease.length === 0) {
+          this.patch++;
+        }
+        this.prerelease = [];
+        break;
+      case "pre":
+        if (this.prerelease.length === 0) {
+          this.prerelease = [0];
+        } else {
+          var i2 = this.prerelease.length;
+          while (--i2 >= 0) {
+            if (typeof this.prerelease[i2] === "number") {
+              this.prerelease[i2]++;
+              i2 = -2;
+            }
+          }
+          if (i2 === -1) {
+            this.prerelease.push(0);
+          }
+        }
+        if (identifier) {
+          if (this.prerelease[0] === identifier) {
+            if (isNaN(this.prerelease[1])) {
+              this.prerelease = [identifier, 0];
+            }
+          } else {
+            this.prerelease = [identifier, 0];
+          }
+        }
+        break;
+      default:
+        throw new Error("invalid increment argument: " + release);
+    }
+    this.format();
+    this.raw = this.version;
+    return this;
+  };
+  exports.inc = inc2;
+  function inc2(version, release, loose, identifier) {
+    if (typeof loose === "string") {
+      identifier = loose;
+      loose = void 0;
+    }
+    try {
+      return new SemVer3(version, loose).inc(release, identifier).version;
+    } catch (er) {
+      return null;
+    }
+  }
+  exports.diff = diff2;
+  function diff2(version1, version2) {
+    if (eq2(version1, version2)) {
+      return null;
+    } else {
+      var v1 = parse2(version1);
+      var v2 = parse2(version2);
+      var prefix = "";
+      if (v1.prerelease.length || v2.prerelease.length) {
+        prefix = "pre";
+        var defaultResult = "prerelease";
+      }
+      for (var key in v1) {
+        if (key === "major" || key === "minor" || key === "patch") {
+          if (v1[key] !== v2[key]) {
+            return prefix + key;
+          }
+        }
+      }
+      return defaultResult;
+    }
+  }
+  exports.compareIdentifiers = compareIdentifiers2;
+  var numeric2 = /^[0-9]+$/;
+  function compareIdentifiers2(a, b) {
+    var anum = numeric2.test(a);
+    var bnum = numeric2.test(b);
+    if (anum && bnum) {
+      a = +a;
+      b = +b;
+    }
+    return a === b ? 0 : anum && !bnum ? -1 : bnum && !anum ? 1 : a < b ? -1 : 1;
+  }
+  exports.rcompareIdentifiers = rcompareIdentifiers2;
+  function rcompareIdentifiers2(a, b) {
+    return compareIdentifiers2(b, a);
+  }
+  exports.major = major2;
+  function major2(a, loose) {
+    return new SemVer3(a, loose).major;
+  }
+  exports.minor = minor2;
+  function minor2(a, loose) {
+    return new SemVer3(a, loose).minor;
+  }
+  exports.patch = patch2;
+  function patch2(a, loose) {
+    return new SemVer3(a, loose).patch;
+  }
+  exports.compare = compare2;
+  function compare2(a, b, loose) {
+    return new SemVer3(a, loose).compare(new SemVer3(b, loose));
+  }
+  exports.compareLoose = compareLoose2;
+  function compareLoose2(a, b) {
+    return compare2(a, b, true);
+  }
+  exports.compareBuild = compareBuild2;
+  function compareBuild2(a, b, loose) {
+    var versionA = new SemVer3(a, loose);
+    var versionB = new SemVer3(b, loose);
+    return versionA.compare(versionB) || versionA.compareBuild(versionB);
+  }
+  exports.rcompare = rcompare2;
+  function rcompare2(a, b, loose) {
+    return compare2(b, a, loose);
+  }
+  exports.sort = sort2;
+  function sort2(list, loose) {
+    return list.sort(function(a, b) {
+      return exports.compareBuild(a, b, loose);
+    });
+  }
+  exports.rsort = rsort2;
+  function rsort2(list, loose) {
+    return list.sort(function(a, b) {
+      return exports.compareBuild(b, a, loose);
+    });
+  }
+  exports.gt = gt2;
+  function gt2(a, b, loose) {
+    return compare2(a, b, loose) > 0;
+  }
+  exports.lt = lt2;
+  function lt2(a, b, loose) {
+    return compare2(a, b, loose) < 0;
+  }
+  exports.eq = eq2;
+  function eq2(a, b, loose) {
+    return compare2(a, b, loose) === 0;
+  }
+  exports.neq = neq2;
+  function neq2(a, b, loose) {
+    return compare2(a, b, loose) !== 0;
+  }
+  exports.gte = gte2;
+  function gte2(a, b, loose) {
+    return compare2(a, b, loose) >= 0;
+  }
+  exports.lte = lte2;
+  function lte2(a, b, loose) {
+    return compare2(a, b, loose) <= 0;
+  }
+  exports.cmp = cmp2;
+  function cmp2(a, op, b, loose) {
+    switch (op) {
+      case "===":
+        if (typeof a === "object")
+          a = a.version;
+        if (typeof b === "object")
+          b = b.version;
+        return a === b;
+      case "!==":
+        if (typeof a === "object")
+          a = a.version;
+        if (typeof b === "object")
+          b = b.version;
+        return a !== b;
+      case "":
+      case "=":
+      case "==":
+        return eq2(a, b, loose);
+      case "!=":
+        return neq2(a, b, loose);
+      case ">":
+        return gt2(a, b, loose);
+      case ">=":
+        return gte2(a, b, loose);
+      case "<":
+        return lt2(a, b, loose);
+      case "<=":
+        return lte2(a, b, loose);
+      default:
+        throw new TypeError("Invalid operator: " + op);
+    }
+  }
+  exports.Comparator = Comparator2;
+  function Comparator2(comp, options) {
+    if (!options || typeof options !== "object") {
+      options = {
+        loose: !!options,
+        includePrerelease: false
+      };
+    }
+    if (comp instanceof Comparator2) {
+      if (comp.loose === !!options.loose) {
+        return comp;
+      } else {
+        comp = comp.value;
+      }
+    }
+    if (!(this instanceof Comparator2)) {
+      return new Comparator2(comp, options);
+    }
+    comp = comp.trim().split(/\s+/).join(" ");
+    debug2("comparator", comp, options);
+    this.options = options;
+    this.loose = !!options.loose;
+    this.parse(comp);
+    if (this.semver === ANY2) {
+      this.value = "";
+    } else {
+      this.value = this.operator + this.semver.version;
+    }
+    debug2("comp", this);
+  }
+  var ANY2 = {};
+  Comparator2.prototype.parse = function(comp) {
+    var r = this.options.loose ? safeRe[t2.COMPARATORLOOSE] : safeRe[t2.COMPARATOR];
+    var m = comp.match(r);
+    if (!m) {
+      throw new TypeError("Invalid comparator: " + comp);
+    }
+    this.operator = m[1] !== void 0 ? m[1] : "";
+    if (this.operator === "=") {
+      this.operator = "";
+    }
+    if (!m[2]) {
+      this.semver = ANY2;
+    } else {
+      this.semver = new SemVer3(m[2], this.options.loose);
+    }
+  };
+  Comparator2.prototype.toString = function() {
+    return this.value;
+  };
+  Comparator2.prototype.test = function(version) {
+    debug2("Comparator.test", version, this.options.loose);
+    if (this.semver === ANY2 || version === ANY2) {
+      return true;
+    }
+    if (typeof version === "string") {
+      try {
+        version = new SemVer3(version, this.options);
+      } catch (er) {
+        return false;
+      }
+    }
+    return cmp2(version, this.operator, this.semver, this.options);
+  };
+  Comparator2.prototype.intersects = function(comp, options) {
+    if (!(comp instanceof Comparator2)) {
+      throw new TypeError("a Comparator is required");
+    }
+    if (!options || typeof options !== "object") {
+      options = {
+        loose: !!options,
+        includePrerelease: false
+      };
+    }
+    var rangeTmp;
+    if (this.operator === "") {
+      if (this.value === "") {
+        return true;
+      }
+      rangeTmp = new Range2(comp.value, options);
+      return satisfies2(this.value, rangeTmp, options);
+    } else if (comp.operator === "") {
+      if (comp.value === "") {
+        return true;
+      }
+      rangeTmp = new Range2(this.value, options);
+      return satisfies2(comp.semver, rangeTmp, options);
+    }
+    var sameDirectionIncreasing = (this.operator === ">=" || this.operator === ">") && (comp.operator === ">=" || comp.operator === ">");
+    var sameDirectionDecreasing = (this.operator === "<=" || this.operator === "<") && (comp.operator === "<=" || comp.operator === "<");
+    var sameSemVer = this.semver.version === comp.semver.version;
+    var differentDirectionsInclusive = (this.operator === ">=" || this.operator === "<=") && (comp.operator === ">=" || comp.operator === "<=");
+    var oppositeDirectionsLessThan = cmp2(this.semver, "<", comp.semver, options) && ((this.operator === ">=" || this.operator === ">") && (comp.operator === "<=" || comp.operator === "<"));
+    var oppositeDirectionsGreaterThan = cmp2(this.semver, ">", comp.semver, options) && ((this.operator === "<=" || this.operator === "<") && (comp.operator === ">=" || comp.operator === ">"));
+    return sameDirectionIncreasing || sameDirectionDecreasing || sameSemVer && differentDirectionsInclusive || oppositeDirectionsLessThan || oppositeDirectionsGreaterThan;
+  };
+  exports.Range = Range2;
+  function Range2(range2, options) {
+    if (!options || typeof options !== "object") {
+      options = {
+        loose: !!options,
+        includePrerelease: false
+      };
+    }
+    if (range2 instanceof Range2) {
+      if (range2.loose === !!options.loose && range2.includePrerelease === !!options.includePrerelease) {
+        return range2;
+      } else {
+        return new Range2(range2.raw, options);
+      }
+    }
+    if (range2 instanceof Comparator2) {
+      return new Range2(range2.value, options);
+    }
+    if (!(this instanceof Range2)) {
+      return new Range2(range2, options);
+    }
+    this.options = options;
+    this.loose = !!options.loose;
+    this.includePrerelease = !!options.includePrerelease;
+    this.raw = range2.trim().split(/\s+/).join(" ");
+    this.set = this.raw.split("||").map(function(range22) {
+      return this.parseRange(range22.trim());
+    }, this).filter(function(c) {
+      return c.length;
+    });
+    if (!this.set.length) {
+      throw new TypeError("Invalid SemVer Range: " + this.raw);
+    }
+    this.format();
+  }
+  Range2.prototype.format = function() {
+    this.range = this.set.map(function(comps) {
+      return comps.join(" ").trim();
+    }).join("||").trim();
+    return this.range;
+  };
+  Range2.prototype.toString = function() {
+    return this.range;
+  };
+  Range2.prototype.parseRange = function(range2) {
+    var loose = this.options.loose;
+    var hr = loose ? safeRe[t2.HYPHENRANGELOOSE] : safeRe[t2.HYPHENRANGE];
+    range2 = range2.replace(hr, hyphenReplace);
+    debug2("hyphen replace", range2);
+    range2 = range2.replace(safeRe[t2.COMPARATORTRIM], comparatorTrimReplace);
+    debug2("comparator trim", range2, safeRe[t2.COMPARATORTRIM]);
+    range2 = range2.replace(safeRe[t2.TILDETRIM], tildeTrimReplace);
+    range2 = range2.replace(safeRe[t2.CARETTRIM], caretTrimReplace);
+    range2 = range2.split(/\s+/).join(" ");
+    var compRe = loose ? safeRe[t2.COMPARATORLOOSE] : safeRe[t2.COMPARATOR];
+    var set = range2.split(" ").map(function(comp) {
+      return parseComparator(comp, this.options);
+    }, this).join(" ").split(/\s+/);
+    if (this.options.loose) {
+      set = set.filter(function(comp) {
+        return !!comp.match(compRe);
+      });
+    }
+    set = set.map(function(comp) {
+      return new Comparator2(comp, this.options);
+    }, this);
+    return set;
+  };
+  Range2.prototype.intersects = function(range2, options) {
+    if (!(range2 instanceof Range2)) {
+      throw new TypeError("a Range is required");
+    }
+    return this.set.some(function(thisComparators) {
+      return isSatisfiable(thisComparators, options) && range2.set.some(function(rangeComparators) {
+        return isSatisfiable(rangeComparators, options) && thisComparators.every(function(thisComparator) {
+          return rangeComparators.every(function(rangeComparator) {
+            return thisComparator.intersects(rangeComparator, options);
+          });
+        });
+      });
+    });
+  };
+  function isSatisfiable(comparators, options) {
+    var result = true;
+    var remainingComparators = comparators.slice();
+    var testComparator = remainingComparators.pop();
+    while (result && remainingComparators.length) {
+      result = remainingComparators.every(function(otherComparator) {
+        return testComparator.intersects(otherComparator, options);
+      });
+      testComparator = remainingComparators.pop();
+    }
+    return result;
+  }
+  exports.toComparators = toComparators2;
+  function toComparators2(range2, options) {
+    return new Range2(range2, options).set.map(function(comp) {
+      return comp.map(function(c) {
+        return c.value;
+      }).join(" ").trim().split(" ");
+    });
+  }
+  function parseComparator(comp, options) {
+    debug2("comp", comp, options);
+    comp = replaceCarets(comp, options);
+    debug2("caret", comp);
+    comp = replaceTildes(comp, options);
+    debug2("tildes", comp);
+    comp = replaceXRanges(comp, options);
+    debug2("xrange", comp);
+    comp = replaceStars(comp, options);
+    debug2("stars", comp);
+    return comp;
+  }
+  function isX(id2) {
+    return !id2 || id2.toLowerCase() === "x" || id2 === "*";
+  }
+  function replaceTildes(comp, options) {
+    return comp.trim().split(/\s+/).map(function(comp2) {
+      return replaceTilde(comp2, options);
+    }).join(" ");
+  }
+  function replaceTilde(comp, options) {
+    var r = options.loose ? safeRe[t2.TILDELOOSE] : safeRe[t2.TILDE];
+    return comp.replace(r, function(_, M, m, p, pr) {
+      debug2("tilde", comp, _, M, m, p, pr);
+      var ret;
+      if (isX(M)) {
+        ret = "";
+      } else if (isX(m)) {
+        ret = ">=" + M + ".0.0 <" + (+M + 1) + ".0.0";
+      } else if (isX(p)) {
+        ret = ">=" + M + "." + m + ".0 <" + M + "." + (+m + 1) + ".0";
+      } else if (pr) {
+        debug2("replaceTilde pr", pr);
+        ret = ">=" + M + "." + m + "." + p + "-" + pr + " <" + M + "." + (+m + 1) + ".0";
+      } else {
+        ret = ">=" + M + "." + m + "." + p + " <" + M + "." + (+m + 1) + ".0";
+      }
+      debug2("tilde return", ret);
+      return ret;
+    });
+  }
+  function replaceCarets(comp, options) {
+    return comp.trim().split(/\s+/).map(function(comp2) {
+      return replaceCaret(comp2, options);
+    }).join(" ");
+  }
+  function replaceCaret(comp, options) {
+    debug2("caret", comp, options);
+    var r = options.loose ? safeRe[t2.CARETLOOSE] : safeRe[t2.CARET];
+    return comp.replace(r, function(_, M, m, p, pr) {
+      debug2("caret", comp, _, M, m, p, pr);
+      var ret;
+      if (isX(M)) {
+        ret = "";
+      } else if (isX(m)) {
+        ret = ">=" + M + ".0.0 <" + (+M + 1) + ".0.0";
+      } else if (isX(p)) {
+        if (M === "0") {
+          ret = ">=" + M + "." + m + ".0 <" + M + "." + (+m + 1) + ".0";
+        } else {
+          ret = ">=" + M + "." + m + ".0 <" + (+M + 1) + ".0.0";
+        }
+      } else if (pr) {
+        debug2("replaceCaret pr", pr);
+        if (M === "0") {
+          if (m === "0") {
+            ret = ">=" + M + "." + m + "." + p + "-" + pr + " <" + M + "." + m + "." + (+p + 1);
+          } else {
+            ret = ">=" + M + "." + m + "." + p + "-" + pr + " <" + M + "." + (+m + 1) + ".0";
+          }
+        } else {
+          ret = ">=" + M + "." + m + "." + p + "-" + pr + " <" + (+M + 1) + ".0.0";
+        }
+      } else {
+        debug2("no pr");
+        if (M === "0") {
+          if (m === "0") {
+            ret = ">=" + M + "." + m + "." + p + " <" + M + "." + m + "." + (+p + 1);
+          } else {
+            ret = ">=" + M + "." + m + "." + p + " <" + M + "." + (+m + 1) + ".0";
+          }
+        } else {
+          ret = ">=" + M + "." + m + "." + p + " <" + (+M + 1) + ".0.0";
+        }
+      }
+      debug2("caret return", ret);
+      return ret;
+    });
+  }
+  function replaceXRanges(comp, options) {
+    debug2("replaceXRanges", comp, options);
+    return comp.split(/\s+/).map(function(comp2) {
+      return replaceXRange(comp2, options);
+    }).join(" ");
+  }
+  function replaceXRange(comp, options) {
+    comp = comp.trim();
+    var r = options.loose ? safeRe[t2.XRANGELOOSE] : safeRe[t2.XRANGE];
+    return comp.replace(r, function(ret, gtlt, M, m, p, pr) {
+      debug2("xRange", comp, ret, gtlt, M, m, p, pr);
+      var xM = isX(M);
+      var xm = xM || isX(m);
+      var xp = xm || isX(p);
+      var anyX = xp;
+      if (gtlt === "=" && anyX) {
+        gtlt = "";
+      }
+      pr = options.includePrerelease ? "-0" : "";
+      if (xM) {
+        if (gtlt === ">" || gtlt === "<") {
+          ret = "<0.0.0-0";
+        } else {
+          ret = "*";
+        }
+      } else if (gtlt && anyX) {
+        if (xm) {
+          m = 0;
+        }
+        p = 0;
+        if (gtlt === ">") {
+          gtlt = ">=";
+          if (xm) {
+            M = +M + 1;
+            m = 0;
+            p = 0;
+          } else {
+            m = +m + 1;
+            p = 0;
+          }
+        } else if (gtlt === "<=") {
+          gtlt = "<";
+          if (xm) {
+            M = +M + 1;
+          } else {
+            m = +m + 1;
+          }
+        }
+        ret = gtlt + M + "." + m + "." + p + pr;
+      } else if (xm) {
+        ret = ">=" + M + ".0.0" + pr + " <" + (+M + 1) + ".0.0" + pr;
+      } else if (xp) {
+        ret = ">=" + M + "." + m + ".0" + pr + " <" + M + "." + (+m + 1) + ".0" + pr;
+      }
+      debug2("xRange return", ret);
+      return ret;
+    });
+  }
+  function replaceStars(comp, options) {
+    debug2("replaceStars", comp, options);
+    return comp.trim().replace(safeRe[t2.STAR], "");
+  }
+  function hyphenReplace($0, from, fM, fm, fp, fpr, fb, to, tM, tm, tp, tpr, tb) {
+    if (isX(fM)) {
+      from = "";
+    } else if (isX(fm)) {
+      from = ">=" + fM + ".0.0";
+    } else if (isX(fp)) {
+      from = ">=" + fM + "." + fm + ".0";
+    } else {
+      from = ">=" + from;
+    }
+    if (isX(tM)) {
+      to = "";
+    } else if (isX(tm)) {
+      to = "<" + (+tM + 1) + ".0.0";
+    } else if (isX(tp)) {
+      to = "<" + tM + "." + (+tm + 1) + ".0";
+    } else if (tpr) {
+      to = "<=" + tM + "." + tm + "." + tp + "-" + tpr;
+    } else {
+      to = "<=" + to;
+    }
+    return (from + " " + to).trim();
+  }
+  Range2.prototype.test = function(version) {
+    if (!version) {
+      return false;
+    }
+    if (typeof version === "string") {
+      try {
+        version = new SemVer3(version, this.options);
+      } catch (er) {
+        return false;
+      }
+    }
+    for (var i2 = 0; i2 < this.set.length; i2++) {
+      if (testSet(this.set[i2], version, this.options)) {
+        return true;
+      }
+    }
+    return false;
+  };
+  function testSet(set, version, options) {
+    for (var i2 = 0; i2 < set.length; i2++) {
+      if (!set[i2].test(version)) {
+        return false;
+      }
+    }
+    if (version.prerelease.length && !options.includePrerelease) {
+      for (i2 = 0; i2 < set.length; i2++) {
+        debug2(set[i2].semver);
+        if (set[i2].semver === ANY2) {
+          continue;
+        }
+        if (set[i2].semver.prerelease.length > 0) {
+          var allowed = set[i2].semver;
+          if (allowed.major === version.major && allowed.minor === version.minor && allowed.patch === version.patch) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+    return true;
+  }
+  exports.satisfies = satisfies2;
+  function satisfies2(version, range2, options) {
+    try {
+      range2 = new Range2(range2, options);
+    } catch (er) {
+      return false;
+    }
+    return range2.test(version);
+  }
+  exports.maxSatisfying = maxSatisfying2;
+  function maxSatisfying2(versions, range2, options) {
+    var max = null;
+    var maxSV = null;
+    try {
+      var rangeObj = new Range2(range2, options);
+    } catch (er) {
+      return null;
+    }
+    versions.forEach(function(v) {
+      if (rangeObj.test(v)) {
+        if (!max || maxSV.compare(v) === -1) {
+          max = v;
+          maxSV = new SemVer3(max, options);
+        }
+      }
+    });
+    return max;
+  }
+  exports.minSatisfying = minSatisfying2;
+  function minSatisfying2(versions, range2, options) {
+    var min = null;
+    var minSV = null;
+    try {
+      var rangeObj = new Range2(range2, options);
+    } catch (er) {
+      return null;
+    }
+    versions.forEach(function(v) {
+      if (rangeObj.test(v)) {
+        if (!min || minSV.compare(v) === 1) {
+          min = v;
+          minSV = new SemVer3(min, options);
+        }
+      }
+    });
+    return min;
+  }
+  exports.minVersion = minVersion2;
+  function minVersion2(range2, loose) {
+    range2 = new Range2(range2, loose);
+    var minver = new SemVer3("0.0.0");
+    if (range2.test(minver)) {
+      return minver;
+    }
+    minver = new SemVer3("0.0.0-0");
+    if (range2.test(minver)) {
+      return minver;
+    }
+    minver = null;
+    for (var i2 = 0; i2 < range2.set.length; ++i2) {
+      var comparators = range2.set[i2];
+      comparators.forEach(function(comparator2) {
+        var compver = new SemVer3(comparator2.semver.version);
+        switch (comparator2.operator) {
+          case ">":
+            if (compver.prerelease.length === 0) {
+              compver.patch++;
+            } else {
+              compver.prerelease.push(0);
+            }
+            compver.raw = compver.format();
+          case "":
+          case ">=":
+            if (!minver || gt2(minver, compver)) {
+              minver = compver;
+            }
+            break;
+          case "<":
+          case "<=":
+            break;
+          default:
+            throw new Error("Unexpected operation: " + comparator2.operator);
+        }
+      });
+    }
+    if (minver && range2.test(minver)) {
+      return minver;
+    }
+    return null;
+  }
+  exports.validRange = validRange2;
+  function validRange2(range2, options) {
+    try {
+      return new Range2(range2, options).range || "*";
+    } catch (er) {
+      return null;
+    }
+  }
+  exports.ltr = ltr2;
+  function ltr2(version, range2, options) {
+    return outside2(version, range2, "<", options);
+  }
+  exports.gtr = gtr2;
+  function gtr2(version, range2, options) {
+    return outside2(version, range2, ">", options);
+  }
+  exports.outside = outside2;
+  function outside2(version, range2, hilo, options) {
+    version = new SemVer3(version, options);
+    range2 = new Range2(range2, options);
+    var gtfn, ltefn, ltfn, comp, ecomp;
+    switch (hilo) {
+      case ">":
+        gtfn = gt2;
+        ltefn = lte2;
+        ltfn = lt2;
+        comp = ">";
+        ecomp = ">=";
+        break;
+      case "<":
+        gtfn = lt2;
+        ltefn = gte2;
+        ltfn = gt2;
+        comp = "<";
+        ecomp = "<=";
+        break;
+      default:
+        throw new TypeError('Must provide a hilo val of "<" or ">"');
+    }
+    if (satisfies2(version, range2, options)) {
+      return false;
+    }
+    for (var i2 = 0; i2 < range2.set.length; ++i2) {
+      var comparators = range2.set[i2];
+      var high = null;
+      var low = null;
+      comparators.forEach(function(comparator2) {
+        if (comparator2.semver === ANY2) {
+          comparator2 = new Comparator2(">=0.0.0");
+        }
+        high = high || comparator2;
+        low = low || comparator2;
+        if (gtfn(comparator2.semver, high.semver, options)) {
+          high = comparator2;
+        } else if (ltfn(comparator2.semver, low.semver, options)) {
+          low = comparator2;
+        }
+      });
+      if (high.operator === comp || high.operator === ecomp) {
+        return false;
+      }
+      if ((!low.operator || low.operator === comp) && ltefn(version, low.semver)) {
+        return false;
+      } else if (low.operator === ecomp && ltfn(version, low.semver)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  exports.prerelease = prerelease2;
+  function prerelease2(version, options) {
+    var parsed = parse2(version, options);
+    return parsed && parsed.prerelease.length ? parsed.prerelease : null;
+  }
+  exports.intersects = intersects2;
+  function intersects2(r1, r2, options) {
+    r1 = new Range2(r1, options);
+    r2 = new Range2(r2, options);
+    return r1.intersects(r2);
+  }
+  exports.coerce = coerce2;
+  function coerce2(version, options) {
+    if (version instanceof SemVer3) {
+      return version;
+    }
+    if (typeof version === "number") {
+      version = String(version);
+    }
+    if (typeof version !== "string") {
+      return null;
+    }
+    options = options || {};
+    var match = null;
+    if (!options.rtl) {
+      match = version.match(safeRe[t2.COERCE]);
+    } else {
+      var next;
+      while ((next = safeRe[t2.COERCERTL].exec(version)) && (!match || match.index + match[0].length !== version.length)) {
+        if (!match || next.index + next[0].length !== match.index + match[0].length) {
+          match = next;
+        }
+        safeRe[t2.COERCERTL].lastIndex = next.index + next[1].length + next[2].length;
+      }
+      safeRe[t2.COERCERTL].lastIndex = -1;
+    }
+    if (match === null) {
+      return null;
+    }
+    return parse2(match[2] + "." + (match[3] || "0") + "." + (match[4] || "0"), options);
+  }
+})(semver$3, semver$3.exports);
+var semverExports = semver$3.exports;
+const fs$3 = require$$0;
+const path$6 = require$$0$1;
+const { promisify } = require$$2;
+const semver$2 = semverExports;
+const useNativeRecursiveOption = semver$2.satisfies(process.version, ">=10.12.0");
+const checkPath = (pth) => {
+  if (process.platform === "win32") {
+    const pathHasInvalidWinCharacters = /[<>:"|?*]/.test(pth.replace(path$6.parse(pth).root, ""));
+    if (pathHasInvalidWinCharacters) {
+      const error2 = new Error(`Path contains invalid characters: ${pth}`);
+      error2.code = "EINVAL";
+      throw error2;
+    }
+  }
+};
+const processOptions = (options) => {
+  const defaults2 = {
+    mode: 511,
+    fs: fs$3
+  };
+  return {
+    ...defaults2,
+    ...options
+  };
+};
+const permissionError = (pth) => {
+  const error2 = new Error(`operation not permitted, mkdir '${pth}'`);
+  error2.code = "EPERM";
+  error2.errno = -4048;
+  error2.path = pth;
+  error2.syscall = "mkdir";
+  return error2;
+};
+const makeDir = async (input, options) => {
+  checkPath(input);
+  options = processOptions(options);
+  const mkdir = promisify(options.fs.mkdir);
+  const stat = promisify(options.fs.stat);
+  if (useNativeRecursiveOption && options.fs.mkdir === fs$3.mkdir) {
+    const pth = path$6.resolve(input);
+    await mkdir(pth, {
+      mode: options.mode,
+      recursive: true
+    });
+    return pth;
+  }
+  const make = async (pth) => {
+    try {
+      await mkdir(pth, options.mode);
+      return pth;
+    } catch (error2) {
+      if (error2.code === "EPERM") {
+        throw error2;
+      }
+      if (error2.code === "ENOENT") {
+        if (path$6.dirname(pth) === pth) {
+          throw permissionError(pth);
+        }
+        if (error2.message.includes("null bytes")) {
+          throw error2;
+        }
+        await make(path$6.dirname(pth));
+        return make(pth);
+      }
+      try {
+        const stats = await stat(pth);
+        if (!stats.isDirectory()) {
+          throw new Error("The path is not a directory");
+        }
+      } catch (_) {
+        throw error2;
+      }
+      return pth;
+    }
+  };
+  return make(path$6.resolve(input));
+};
+makeDir$1.exports = makeDir;
+makeDir$1.exports.sync = (input, options) => {
+  checkPath(input);
+  options = processOptions(options);
+  if (useNativeRecursiveOption && options.fs.mkdirSync === fs$3.mkdirSync) {
+    const pth = path$6.resolve(input);
+    fs$3.mkdirSync(pth, {
+      mode: options.mode,
+      recursive: true
+    });
+    return pth;
+  }
+  const make = (pth) => {
+    try {
+      options.fs.mkdirSync(pth, options.mode);
+    } catch (error2) {
+      if (error2.code === "EPERM") {
+        throw error2;
+      }
+      if (error2.code === "ENOENT") {
+        if (path$6.dirname(pth) === pth) {
+          throw permissionError(pth);
+        }
+        if (error2.message.includes("null bytes")) {
+          throw error2;
+        }
+        make(path$6.dirname(pth));
+        return make(pth);
+      }
+      try {
+        if (!options.fs.statSync(pth).isDirectory()) {
+          throw new Error("The path is not a directory");
+        }
+      } catch (_) {
+        throw error2;
+      }
+    }
+    return pth;
+  };
+  return make(path$6.resolve(input));
+};
+var makeDirExports = makeDir$1.exports;
+var pkgUp = { exports: {} };
+var findUp$1 = { exports: {} };
+var locatePath$1 = { exports: {} };
+var pathExists$1 = { exports: {} };
+const fs$2 = require$$0;
+pathExists$1.exports = (fp) => new Promise((resolve2) => {
+  fs$2.access(fp, (err) => {
+    resolve2(!err);
+  });
+});
+pathExists$1.exports.sync = (fp) => {
+  try {
+    fs$2.accessSync(fp);
+    return true;
+  } catch (err) {
+    return false;
+  }
+};
+var pathExistsExports = pathExists$1.exports;
+var pLimit$2 = { exports: {} };
+var pTry$2 = { exports: {} };
+const pTry$1 = (fn, ...arguments_) => new Promise((resolve2) => {
+  resolve2(fn(...arguments_));
+});
+pTry$2.exports = pTry$1;
+pTry$2.exports.default = pTry$1;
+var pTryExports = pTry$2.exports;
+const pTry = pTryExports;
+const pLimit$1 = (concurrency) => {
+  if (!((Number.isInteger(concurrency) || concurrency === Infinity) && concurrency > 0)) {
+    return Promise.reject(new TypeError("Expected `concurrency` to be a number from 1 and up"));
+  }
+  const queue = [];
+  let activeCount = 0;
+  const next = () => {
+    activeCount--;
+    if (queue.length > 0) {
+      queue.shift()();
+    }
+  };
+  const run = (fn, resolve2, ...args) => {
+    activeCount++;
+    const result = pTry(fn, ...args);
+    resolve2(result);
+    result.then(next, next);
+  };
+  const enqueue = (fn, resolve2, ...args) => {
+    if (activeCount < concurrency) {
+      run(fn, resolve2, ...args);
+    } else {
+      queue.push(run.bind(null, fn, resolve2, ...args));
+    }
+  };
+  const generator = (fn, ...args) => new Promise((resolve2) => enqueue(fn, resolve2, ...args));
+  Object.defineProperties(generator, {
+    activeCount: {
+      get: () => activeCount
+    },
+    pendingCount: {
+      get: () => queue.length
+    },
+    clearQueue: {
+      value: () => {
+        queue.length = 0;
+      }
+    }
+  });
+  return generator;
+};
+pLimit$2.exports = pLimit$1;
+pLimit$2.exports.default = pLimit$1;
+var pLimitExports = pLimit$2.exports;
+const pLimit = pLimitExports;
+class EndError extends Error {
+  constructor(value) {
+    super();
+    this.value = value;
+  }
+}
+const testElement = (el, tester) => Promise.resolve(el).then(tester);
+const finder = (el) => Promise.all(el).then((val) => val[1] === true && Promise.reject(new EndError(val[0])));
+var pLocate$1 = (iterable, tester, opts) => {
+  opts = Object.assign({
+    concurrency: Infinity,
+    preserveOrder: true
+  }, opts);
+  const limit2 = pLimit(opts.concurrency);
+  const items2 = [...iterable].map((el) => [el, limit2(testElement, el, tester)]);
+  const checkLimit = pLimit(opts.preserveOrder ? 1 : Infinity);
+  return Promise.all(items2.map((el) => checkLimit(finder, el))).then(() => {
+  }).catch((err) => err instanceof EndError ? err.value : Promise.reject(err));
+};
+const path$5 = require$$0$1;
+const pathExists = pathExistsExports;
+const pLocate = pLocate$1;
+locatePath$1.exports = (iterable, options) => {
+  options = Object.assign({
+    cwd: process.cwd()
+  }, options);
+  return pLocate(iterable, (el) => pathExists(path$5.resolve(options.cwd, el)), options);
+};
+locatePath$1.exports.sync = (iterable, options) => {
+  options = Object.assign({
+    cwd: process.cwd()
+  }, options);
+  for (const el of iterable) {
+    if (pathExists.sync(path$5.resolve(options.cwd, el))) {
+      return el;
+    }
+  }
+};
+var locatePathExports = locatePath$1.exports;
+const path$4 = require$$0$1;
+const locatePath = locatePathExports;
+findUp$1.exports = (filename, opts = {}) => {
+  const startDir = path$4.resolve(opts.cwd || "");
+  const { root } = path$4.parse(startDir);
+  const filenames = [].concat(filename);
+  return new Promise((resolve2) => {
+    (function find(dir) {
+      locatePath(filenames, { cwd: dir }).then((file) => {
+        if (file) {
+          resolve2(path$4.join(dir, file));
+        } else if (dir === root) {
+          resolve2(null);
+        } else {
+          find(path$4.dirname(dir));
+        }
+      });
+    })(startDir);
+  });
+};
+findUp$1.exports.sync = (filename, opts = {}) => {
+  let dir = path$4.resolve(opts.cwd || "");
+  const { root } = path$4.parse(dir);
+  const filenames = [].concat(filename);
+  while (true) {
+    const file = locatePath.sync(filenames, { cwd: dir });
+    if (file) {
+      return path$4.join(dir, file);
+    }
+    if (dir === root) {
+      return null;
+    }
+    dir = path$4.dirname(dir);
+  }
+};
+var findUpExports = findUp$1.exports;
+const findUp = findUpExports;
+pkgUp.exports = async ({ cwd } = {}) => findUp("package.json", { cwd });
+pkgUp.exports.sync = ({ cwd } = {}) => findUp.sync("package.json", { cwd });
+var pkgUpExports = pkgUp.exports;
+var envPaths$1 = { exports: {} };
+const path$3 = require$$0$1;
+const os = require$$1;
+const homedir = os.homedir();
+const tmpdir = os.tmpdir();
+const { env } = process;
+const macos = (name) => {
+  const library = path$3.join(homedir, "Library");
+  return {
+    data: path$3.join(library, "Application Support", name),
+    config: path$3.join(library, "Preferences", name),
+    cache: path$3.join(library, "Caches", name),
+    log: path$3.join(library, "Logs", name),
+    temp: path$3.join(tmpdir, name)
+  };
+};
+const windows = (name) => {
+  const appData = env.APPDATA || path$3.join(homedir, "AppData", "Roaming");
+  const localAppData = env.LOCALAPPDATA || path$3.join(homedir, "AppData", "Local");
+  return {
+    // Data/config/cache/log are invented by me as Windows isn't opinionated about this
+    data: path$3.join(localAppData, name, "Data"),
+    config: path$3.join(appData, name, "Config"),
+    cache: path$3.join(localAppData, name, "Cache"),
+    log: path$3.join(localAppData, name, "Log"),
+    temp: path$3.join(tmpdir, name)
+  };
+};
+const linux = (name) => {
+  const username = path$3.basename(homedir);
+  return {
+    data: path$3.join(env.XDG_DATA_HOME || path$3.join(homedir, ".local", "share"), name),
+    config: path$3.join(env.XDG_CONFIG_HOME || path$3.join(homedir, ".config"), name),
+    cache: path$3.join(env.XDG_CACHE_HOME || path$3.join(homedir, ".cache"), name),
+    // https://wiki.debian.org/XDGBaseDirectorySpecification#state
+    log: path$3.join(env.XDG_STATE_HOME || path$3.join(homedir, ".local", "state"), name),
+    temp: path$3.join(tmpdir, username, name)
+  };
+};
+const envPaths = (name, options) => {
+  if (typeof name !== "string") {
+    throw new TypeError(`Expected string, got ${typeof name}`);
+  }
+  options = Object.assign({ suffix: "nodejs" }, options);
+  if (options.suffix) {
+    name += `-${options.suffix}`;
+  }
+  if (process.platform === "darwin") {
+    return macos(name);
+  }
+  if (process.platform === "win32") {
+    return windows(name);
+  }
+  return linux(name);
+};
+envPaths$1.exports = envPaths;
+envPaths$1.exports.default = envPaths;
+var envPathsExports = envPaths$1.exports;
+var dist$1 = {};
+var consts = {};
+Object.defineProperty(consts, "__esModule", { value: true });
+consts.NOOP = consts.LIMIT_FILES_DESCRIPTORS = consts.LIMIT_BASENAME_LENGTH = consts.IS_USER_ROOT = consts.IS_POSIX = consts.DEFAULT_TIMEOUT_SYNC = consts.DEFAULT_TIMEOUT_ASYNC = consts.DEFAULT_WRITE_OPTIONS = consts.DEFAULT_READ_OPTIONS = consts.DEFAULT_FOLDER_MODE = consts.DEFAULT_FILE_MODE = consts.DEFAULT_ENCODING = void 0;
+const DEFAULT_ENCODING = "utf8";
+consts.DEFAULT_ENCODING = DEFAULT_ENCODING;
+const DEFAULT_FILE_MODE = 438;
+consts.DEFAULT_FILE_MODE = DEFAULT_FILE_MODE;
+const DEFAULT_FOLDER_MODE = 511;
+consts.DEFAULT_FOLDER_MODE = DEFAULT_FOLDER_MODE;
+const DEFAULT_READ_OPTIONS = {};
+consts.DEFAULT_READ_OPTIONS = DEFAULT_READ_OPTIONS;
+const DEFAULT_WRITE_OPTIONS = {};
+consts.DEFAULT_WRITE_OPTIONS = DEFAULT_WRITE_OPTIONS;
+const DEFAULT_TIMEOUT_ASYNC = 5e3;
+consts.DEFAULT_TIMEOUT_ASYNC = DEFAULT_TIMEOUT_ASYNC;
+const DEFAULT_TIMEOUT_SYNC = 100;
+consts.DEFAULT_TIMEOUT_SYNC = DEFAULT_TIMEOUT_SYNC;
+const IS_POSIX = !!process.getuid;
+consts.IS_POSIX = IS_POSIX;
+const IS_USER_ROOT = process.getuid ? !process.getuid() : false;
+consts.IS_USER_ROOT = IS_USER_ROOT;
+const LIMIT_BASENAME_LENGTH = 128;
+consts.LIMIT_BASENAME_LENGTH = LIMIT_BASENAME_LENGTH;
+const LIMIT_FILES_DESCRIPTORS = 1e4;
+consts.LIMIT_FILES_DESCRIPTORS = LIMIT_FILES_DESCRIPTORS;
+const NOOP = () => {
+};
+consts.NOOP = NOOP;
+var fs$1 = {};
+var attemptify = {};
+Object.defineProperty(attemptify, "__esModule", { value: true });
+attemptify.attemptifySync = attemptify.attemptifyAsync = void 0;
+const consts_1$4 = consts;
+const attemptifyAsync = (fn, onError = consts_1$4.NOOP) => {
+  return function() {
+    return fn.apply(void 0, arguments).catch(onError);
+  };
+};
+attemptify.attemptifyAsync = attemptifyAsync;
+const attemptifySync = (fn, onError = consts_1$4.NOOP) => {
+  return function() {
+    try {
+      return fn.apply(void 0, arguments);
+    } catch (error2) {
+      return onError(error2);
+    }
+  };
+};
+attemptify.attemptifySync = attemptifySync;
+var fs_handlers = {};
+Object.defineProperty(fs_handlers, "__esModule", { value: true });
+const consts_1$3 = consts;
+const Handlers = {
+  isChangeErrorOk: (error2) => {
+    const { code: code2 } = error2;
+    if (code2 === "ENOSYS")
+      return true;
+    if (!consts_1$3.IS_USER_ROOT && (code2 === "EINVAL" || code2 === "EPERM"))
+      return true;
+    return false;
+  },
+  isRetriableError: (error2) => {
+    const { code: code2 } = error2;
+    if (code2 === "EMFILE" || code2 === "ENFILE" || code2 === "EAGAIN" || code2 === "EBUSY" || code2 === "EACCESS" || code2 === "EACCS" || code2 === "EPERM")
+      return true;
+    return false;
+  },
+  onChangeError: (error2) => {
+    if (Handlers.isChangeErrorOk(error2))
+      return;
+    throw error2;
+  }
+};
+fs_handlers.default = Handlers;
+var retryify = {};
+var retryify_queue = {};
+Object.defineProperty(retryify_queue, "__esModule", { value: true });
+const consts_1$2 = consts;
+const RetryfyQueue = {
+  interval: 25,
+  intervalId: void 0,
+  limit: consts_1$2.LIMIT_FILES_DESCRIPTORS,
+  queueActive: /* @__PURE__ */ new Set(),
+  queueWaiting: /* @__PURE__ */ new Set(),
+  init: () => {
+    if (RetryfyQueue.intervalId)
+      return;
+    RetryfyQueue.intervalId = setInterval(RetryfyQueue.tick, RetryfyQueue.interval);
+  },
+  reset: () => {
+    if (!RetryfyQueue.intervalId)
+      return;
+    clearInterval(RetryfyQueue.intervalId);
+    delete RetryfyQueue.intervalId;
+  },
+  add: (fn) => {
+    RetryfyQueue.queueWaiting.add(fn);
+    if (RetryfyQueue.queueActive.size < RetryfyQueue.limit / 2) {
+      RetryfyQueue.tick();
+    } else {
+      RetryfyQueue.init();
+    }
+  },
+  remove: (fn) => {
+    RetryfyQueue.queueWaiting.delete(fn);
+    RetryfyQueue.queueActive.delete(fn);
+  },
+  schedule: () => {
+    return new Promise((resolve2) => {
+      const cleanup = () => RetryfyQueue.remove(resolver);
+      const resolver = () => resolve2(cleanup);
+      RetryfyQueue.add(resolver);
+    });
+  },
+  tick: () => {
+    if (RetryfyQueue.queueActive.size >= RetryfyQueue.limit)
+      return;
+    if (!RetryfyQueue.queueWaiting.size)
+      return RetryfyQueue.reset();
+    for (const fn of RetryfyQueue.queueWaiting) {
+      if (RetryfyQueue.queueActive.size >= RetryfyQueue.limit)
+        break;
+      RetryfyQueue.queueWaiting.delete(fn);
+      RetryfyQueue.queueActive.add(fn);
+      fn();
+    }
+  }
+};
+retryify_queue.default = RetryfyQueue;
+Object.defineProperty(retryify, "__esModule", { value: true });
+retryify.retryifySync = retryify.retryifyAsync = void 0;
+const retryify_queue_1 = retryify_queue;
+const retryifyAsync = (fn, isRetriableError) => {
+  return function(timestamp) {
+    return function attempt() {
+      return retryify_queue_1.default.schedule().then((cleanup) => {
+        return fn.apply(void 0, arguments).then((result) => {
+          cleanup();
+          return result;
+        }, (error2) => {
+          cleanup();
+          if (Date.now() >= timestamp)
+            throw error2;
+          if (isRetriableError(error2)) {
+            const delay = Math.round(100 + 400 * Math.random()), delayPromise = new Promise((resolve2) => setTimeout(resolve2, delay));
+            return delayPromise.then(() => attempt.apply(void 0, arguments));
+          }
+          throw error2;
+        });
+      });
+    };
+  };
+};
+retryify.retryifyAsync = retryifyAsync;
+const retryifySync = (fn, isRetriableError) => {
+  return function(timestamp) {
+    return function attempt() {
+      try {
+        return fn.apply(void 0, arguments);
+      } catch (error2) {
+        if (Date.now() > timestamp)
+          throw error2;
+        if (isRetriableError(error2))
+          return attempt.apply(void 0, arguments);
+        throw error2;
+      }
+    };
+  };
+};
+retryify.retryifySync = retryifySync;
+Object.defineProperty(fs$1, "__esModule", { value: true });
+const fs = require$$0;
+const util_1$d = require$$2;
+const attemptify_1 = attemptify;
+const fs_handlers_1 = fs_handlers;
+const retryify_1 = retryify;
+const FS = {
+  chmodAttempt: attemptify_1.attemptifyAsync(util_1$d.promisify(fs.chmod), fs_handlers_1.default.onChangeError),
+  chownAttempt: attemptify_1.attemptifyAsync(util_1$d.promisify(fs.chown), fs_handlers_1.default.onChangeError),
+  closeAttempt: attemptify_1.attemptifyAsync(util_1$d.promisify(fs.close)),
+  fsyncAttempt: attemptify_1.attemptifyAsync(util_1$d.promisify(fs.fsync)),
+  mkdirAttempt: attemptify_1.attemptifyAsync(util_1$d.promisify(fs.mkdir)),
+  realpathAttempt: attemptify_1.attemptifyAsync(util_1$d.promisify(fs.realpath)),
+  statAttempt: attemptify_1.attemptifyAsync(util_1$d.promisify(fs.stat)),
+  unlinkAttempt: attemptify_1.attemptifyAsync(util_1$d.promisify(fs.unlink)),
+  closeRetry: retryify_1.retryifyAsync(util_1$d.promisify(fs.close), fs_handlers_1.default.isRetriableError),
+  fsyncRetry: retryify_1.retryifyAsync(util_1$d.promisify(fs.fsync), fs_handlers_1.default.isRetriableError),
+  openRetry: retryify_1.retryifyAsync(util_1$d.promisify(fs.open), fs_handlers_1.default.isRetriableError),
+  readFileRetry: retryify_1.retryifyAsync(util_1$d.promisify(fs.readFile), fs_handlers_1.default.isRetriableError),
+  renameRetry: retryify_1.retryifyAsync(util_1$d.promisify(fs.rename), fs_handlers_1.default.isRetriableError),
+  statRetry: retryify_1.retryifyAsync(util_1$d.promisify(fs.stat), fs_handlers_1.default.isRetriableError),
+  writeRetry: retryify_1.retryifyAsync(util_1$d.promisify(fs.write), fs_handlers_1.default.isRetriableError),
+  chmodSyncAttempt: attemptify_1.attemptifySync(fs.chmodSync, fs_handlers_1.default.onChangeError),
+  chownSyncAttempt: attemptify_1.attemptifySync(fs.chownSync, fs_handlers_1.default.onChangeError),
+  closeSyncAttempt: attemptify_1.attemptifySync(fs.closeSync),
+  mkdirSyncAttempt: attemptify_1.attemptifySync(fs.mkdirSync),
+  realpathSyncAttempt: attemptify_1.attemptifySync(fs.realpathSync),
+  statSyncAttempt: attemptify_1.attemptifySync(fs.statSync),
+  unlinkSyncAttempt: attemptify_1.attemptifySync(fs.unlinkSync),
+  closeSyncRetry: retryify_1.retryifySync(fs.closeSync, fs_handlers_1.default.isRetriableError),
+  fsyncSyncRetry: retryify_1.retryifySync(fs.fsyncSync, fs_handlers_1.default.isRetriableError),
+  openSyncRetry: retryify_1.retryifySync(fs.openSync, fs_handlers_1.default.isRetriableError),
+  readFileSyncRetry: retryify_1.retryifySync(fs.readFileSync, fs_handlers_1.default.isRetriableError),
+  renameSyncRetry: retryify_1.retryifySync(fs.renameSync, fs_handlers_1.default.isRetriableError),
+  statSyncRetry: retryify_1.retryifySync(fs.statSync, fs_handlers_1.default.isRetriableError),
+  writeSyncRetry: retryify_1.retryifySync(fs.writeSync, fs_handlers_1.default.isRetriableError)
+};
+fs$1.default = FS;
+var lang = {};
+Object.defineProperty(lang, "__esModule", { value: true });
+const Lang = {
+  isFunction: (x) => {
+    return typeof x === "function";
+  },
+  isString: (x) => {
+    return typeof x === "string";
+  },
+  isUndefined: (x) => {
+    return typeof x === "undefined";
+  }
+};
+lang.default = Lang;
+var scheduler = {};
+Object.defineProperty(scheduler, "__esModule", { value: true });
+const Queues = {};
+const Scheduler = {
+  next: (id2) => {
+    const queue = Queues[id2];
+    if (!queue)
+      return;
+    queue.shift();
+    const job = queue[0];
+    if (job) {
+      job(() => Scheduler.next(id2));
+    } else {
+      delete Queues[id2];
+    }
+  },
+  schedule: (id2) => {
+    return new Promise((resolve2) => {
+      let queue = Queues[id2];
+      if (!queue)
+        queue = Queues[id2] = [];
+      queue.push(resolve2);
+      if (queue.length > 1)
+        return;
+      resolve2(() => Scheduler.next(id2));
+    });
+  }
+};
+scheduler.default = Scheduler;
+var temp = {};
+Object.defineProperty(temp, "__esModule", { value: true });
+const path$2 = require$$0$1;
+const consts_1$1 = consts;
+const fs_1$1 = fs$1;
+const Temp = {
+  store: {},
+  create: (filePath) => {
+    const randomness = `000000${Math.floor(Math.random() * 16777215).toString(16)}`.slice(-6), timestamp = Date.now().toString().slice(-10), prefix = "tmp-", suffix = `.${prefix}${timestamp}${randomness}`, tempPath = `${filePath}${suffix}`;
+    return tempPath;
+  },
+  get: (filePath, creator, purge = true) => {
+    const tempPath = Temp.truncate(creator(filePath));
+    if (tempPath in Temp.store)
+      return Temp.get(filePath, creator, purge);
+    Temp.store[tempPath] = purge;
+    const disposer = () => delete Temp.store[tempPath];
+    return [tempPath, disposer];
+  },
+  purge: (filePath) => {
+    if (!Temp.store[filePath])
+      return;
+    delete Temp.store[filePath];
+    fs_1$1.default.unlinkAttempt(filePath);
+  },
+  purgeSync: (filePath) => {
+    if (!Temp.store[filePath])
+      return;
+    delete Temp.store[filePath];
+    fs_1$1.default.unlinkSyncAttempt(filePath);
+  },
+  purgeSyncAll: () => {
+    for (const filePath in Temp.store) {
+      Temp.purgeSync(filePath);
+    }
+  },
+  truncate: (filePath) => {
+    const basename = path$2.basename(filePath);
+    if (basename.length <= consts_1$1.LIMIT_BASENAME_LENGTH)
+      return filePath;
+    const truncable = /^(\.?)(.*?)((?:\.[^.]+)?(?:\.tmp-\d{10}[a-f0-9]{6})?)$/.exec(basename);
+    if (!truncable)
+      return filePath;
+    const truncationLength = basename.length - consts_1$1.LIMIT_BASENAME_LENGTH;
+    return `${filePath.slice(0, -basename.length)}${truncable[1]}${truncable[2].slice(0, -truncationLength)}${truncable[3]}`;
+  }
+};
+process.on("exit", Temp.purgeSyncAll);
+temp.default = Temp;
+Object.defineProperty(dist$1, "__esModule", { value: true });
+dist$1.writeFileSync = dist$1.writeFile = dist$1.readFileSync = dist$1.readFile = void 0;
+const path$1 = require$$0$1;
+const consts_1 = consts;
+const fs_1 = fs$1;
+const lang_1 = lang;
+const scheduler_1 = scheduler;
+const temp_1 = temp;
+function readFile(filePath, options = consts_1.DEFAULT_READ_OPTIONS) {
+  var _a;
+  if (lang_1.default.isString(options))
+    return readFile(filePath, { encoding: options });
+  const timeout = Date.now() + ((_a = options.timeout) !== null && _a !== void 0 ? _a : consts_1.DEFAULT_TIMEOUT_ASYNC);
+  return fs_1.default.readFileRetry(timeout)(filePath, options);
+}
+dist$1.readFile = readFile;
+function readFileSync(filePath, options = consts_1.DEFAULT_READ_OPTIONS) {
+  var _a;
+  if (lang_1.default.isString(options))
+    return readFileSync(filePath, { encoding: options });
+  const timeout = Date.now() + ((_a = options.timeout) !== null && _a !== void 0 ? _a : consts_1.DEFAULT_TIMEOUT_SYNC);
+  return fs_1.default.readFileSyncRetry(timeout)(filePath, options);
+}
+dist$1.readFileSync = readFileSync;
+const writeFile = (filePath, data, options, callback) => {
+  if (lang_1.default.isFunction(options))
+    return writeFile(filePath, data, consts_1.DEFAULT_WRITE_OPTIONS, options);
+  const promise = writeFileAsync(filePath, data, options);
+  if (callback)
+    promise.then(callback, callback);
+  return promise;
+};
+dist$1.writeFile = writeFile;
+const writeFileAsync = async (filePath, data, options = consts_1.DEFAULT_WRITE_OPTIONS) => {
+  var _a;
+  if (lang_1.default.isString(options))
+    return writeFileAsync(filePath, data, { encoding: options });
+  const timeout = Date.now() + ((_a = options.timeout) !== null && _a !== void 0 ? _a : consts_1.DEFAULT_TIMEOUT_ASYNC);
+  let schedulerCustomDisposer = null, schedulerDisposer = null, tempDisposer = null, tempPath = null, fd = null;
+  try {
+    if (options.schedule)
+      schedulerCustomDisposer = await options.schedule(filePath);
+    schedulerDisposer = await scheduler_1.default.schedule(filePath);
+    filePath = await fs_1.default.realpathAttempt(filePath) || filePath;
+    [tempPath, tempDisposer] = temp_1.default.get(filePath, options.tmpCreate || temp_1.default.create, !(options.tmpPurge === false));
+    const useStatChown = consts_1.IS_POSIX && lang_1.default.isUndefined(options.chown), useStatMode = lang_1.default.isUndefined(options.mode);
+    if (useStatChown || useStatMode) {
+      const stat = await fs_1.default.statAttempt(filePath);
+      if (stat) {
+        options = { ...options };
+        if (useStatChown)
+          options.chown = { uid: stat.uid, gid: stat.gid };
+        if (useStatMode)
+          options.mode = stat.mode;
+      }
+    }
+    const parentPath = path$1.dirname(filePath);
+    await fs_1.default.mkdirAttempt(parentPath, {
+      mode: consts_1.DEFAULT_FOLDER_MODE,
+      recursive: true
+    });
+    fd = await fs_1.default.openRetry(timeout)(tempPath, "w", options.mode || consts_1.DEFAULT_FILE_MODE);
+    if (options.tmpCreated)
+      options.tmpCreated(tempPath);
+    if (lang_1.default.isString(data)) {
+      await fs_1.default.writeRetry(timeout)(fd, data, 0, options.encoding || consts_1.DEFAULT_ENCODING);
+    } else if (!lang_1.default.isUndefined(data)) {
+      await fs_1.default.writeRetry(timeout)(fd, data, 0, data.length, 0);
+    }
+    if (options.fsync !== false) {
+      if (options.fsyncWait !== false) {
+        await fs_1.default.fsyncRetry(timeout)(fd);
+      } else {
+        fs_1.default.fsyncAttempt(fd);
+      }
+    }
+    await fs_1.default.closeRetry(timeout)(fd);
+    fd = null;
+    if (options.chown)
+      await fs_1.default.chownAttempt(tempPath, options.chown.uid, options.chown.gid);
+    if (options.mode)
+      await fs_1.default.chmodAttempt(tempPath, options.mode);
+    try {
+      await fs_1.default.renameRetry(timeout)(tempPath, filePath);
+    } catch (error2) {
+      if (error2.code !== "ENAMETOOLONG")
+        throw error2;
+      await fs_1.default.renameRetry(timeout)(tempPath, temp_1.default.truncate(filePath));
+    }
+    tempDisposer();
+    tempPath = null;
+  } finally {
+    if (fd)
+      await fs_1.default.closeAttempt(fd);
+    if (tempPath)
+      temp_1.default.purge(tempPath);
+    if (schedulerCustomDisposer)
+      schedulerCustomDisposer();
+    if (schedulerDisposer)
+      schedulerDisposer();
+  }
+};
+const writeFileSync = (filePath, data, options = consts_1.DEFAULT_WRITE_OPTIONS) => {
+  var _a;
+  if (lang_1.default.isString(options))
+    return writeFileSync(filePath, data, { encoding: options });
+  const timeout = Date.now() + ((_a = options.timeout) !== null && _a !== void 0 ? _a : consts_1.DEFAULT_TIMEOUT_SYNC);
+  let tempDisposer = null, tempPath = null, fd = null;
+  try {
+    filePath = fs_1.default.realpathSyncAttempt(filePath) || filePath;
+    [tempPath, tempDisposer] = temp_1.default.get(filePath, options.tmpCreate || temp_1.default.create, !(options.tmpPurge === false));
+    const useStatChown = consts_1.IS_POSIX && lang_1.default.isUndefined(options.chown), useStatMode = lang_1.default.isUndefined(options.mode);
+    if (useStatChown || useStatMode) {
+      const stat = fs_1.default.statSyncAttempt(filePath);
+      if (stat) {
+        options = { ...options };
+        if (useStatChown)
+          options.chown = { uid: stat.uid, gid: stat.gid };
+        if (useStatMode)
+          options.mode = stat.mode;
+      }
+    }
+    const parentPath = path$1.dirname(filePath);
+    fs_1.default.mkdirSyncAttempt(parentPath, {
+      mode: consts_1.DEFAULT_FOLDER_MODE,
+      recursive: true
+    });
+    fd = fs_1.default.openSyncRetry(timeout)(tempPath, "w", options.mode || consts_1.DEFAULT_FILE_MODE);
+    if (options.tmpCreated)
+      options.tmpCreated(tempPath);
+    if (lang_1.default.isString(data)) {
+      fs_1.default.writeSyncRetry(timeout)(fd, data, 0, options.encoding || consts_1.DEFAULT_ENCODING);
+    } else if (!lang_1.default.isUndefined(data)) {
+      fs_1.default.writeSyncRetry(timeout)(fd, data, 0, data.length, 0);
+    }
+    if (options.fsync !== false) {
+      if (options.fsyncWait !== false) {
+        fs_1.default.fsyncSyncRetry(timeout)(fd);
+      } else {
+        fs_1.default.fsyncAttempt(fd);
+      }
+    }
+    fs_1.default.closeSyncRetry(timeout)(fd);
+    fd = null;
+    if (options.chown)
+      fs_1.default.chownSyncAttempt(tempPath, options.chown.uid, options.chown.gid);
+    if (options.mode)
+      fs_1.default.chmodSyncAttempt(tempPath, options.mode);
+    try {
+      fs_1.default.renameSyncRetry(timeout)(tempPath, filePath);
+    } catch (error2) {
+      if (error2.code !== "ENAMETOOLONG")
+        throw error2;
+      fs_1.default.renameSyncRetry(timeout)(tempPath, temp_1.default.truncate(filePath));
+    }
+    tempDisposer();
+    tempPath = null;
+  } finally {
+    if (fd)
+      fs_1.default.closeSyncAttempt(fd);
+    if (tempPath)
+      temp_1.default.purge(tempPath);
+  }
+};
+dist$1.writeFileSync = writeFileSync;
+var ajv = {};
+var context = {};
+var dataType = {};
+var rules = {};
+Object.defineProperty(rules, "__esModule", { value: true });
+rules.getRules = rules.isJSONType = void 0;
+const _jsonTypes = ["string", "number", "integer", "boolean", "null", "object", "array"];
+const jsonTypes = new Set(_jsonTypes);
+function isJSONType(x) {
+  return typeof x == "string" && jsonTypes.has(x);
+}
+rules.isJSONType = isJSONType;
+function getRules() {
+  const groups = {
+    number: { type: "number", rules: [] },
+    string: { type: "string", rules: [] },
+    array: { type: "array", rules: [] },
+    object: { type: "object", rules: [] }
+  };
+  return {
+    types: { ...groups, integer: true, boolean: true, null: true },
+    rules: [{ rules: [] }, groups.number, groups.string, groups.array, groups.object],
+    post: { rules: [] },
+    all: {},
+    keywords: {}
+  };
+}
+rules.getRules = getRules;
+var applicability = {};
+Object.defineProperty(applicability, "__esModule", { value: true });
+applicability.shouldUseRule = applicability.shouldUseGroup = applicability.schemaHasRulesForType = void 0;
+function schemaHasRulesForType({ schema, self: self2 }, type2) {
+  const group = self2.RULES.types[type2];
+  return group && group !== true && shouldUseGroup(schema, group);
+}
+applicability.schemaHasRulesForType = schemaHasRulesForType;
+function shouldUseGroup(schema, group) {
+  return group.rules.some((rule) => shouldUseRule(schema, rule));
+}
+applicability.shouldUseGroup = shouldUseGroup;
+function shouldUseRule(schema, rule) {
+  var _a;
+  return schema[rule.keyword] !== void 0 || ((_a = rule.definition.implements) === null || _a === void 0 ? void 0 : _a.some((kwd) => schema[kwd] !== void 0));
+}
+applicability.shouldUseRule = shouldUseRule;
+var errors = {};
+var codegen = {};
+var code$1 = {};
+(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.getProperty = exports.safeStringify = exports.stringify = exports.strConcat = exports.addCodeArg = exports.str = exports._ = exports.nil = exports._Code = exports.Name = exports.IDENTIFIER = exports._CodeOrName = void 0;
+  class _CodeOrName {
+  }
+  exports._CodeOrName = _CodeOrName;
+  exports.IDENTIFIER = /^[a-z$_][a-z$_0-9]*$/i;
+  class Name extends _CodeOrName {
+    constructor(s) {
+      super();
+      if (!exports.IDENTIFIER.test(s))
+        throw new Error("CodeGen: name must be a valid identifier");
+      this.str = s;
+    }
+    toString() {
+      return this.str;
+    }
+    emptyStr() {
+      return false;
+    }
+    get names() {
+      return { [this.str]: 1 };
+    }
+  }
+  exports.Name = Name;
+  class _Code extends _CodeOrName {
+    constructor(code2) {
+      super();
+      this._items = typeof code2 === "string" ? [code2] : code2;
+    }
+    toString() {
+      return this.str;
+    }
+    emptyStr() {
+      if (this._items.length > 1)
+        return false;
+      const item = this._items[0];
+      return item === "" || item === '""';
+    }
+    get str() {
+      var _a;
+      return (_a = this._str) !== null && _a !== void 0 ? _a : this._str = this._items.reduce((s, c) => `${s}${c}`, "");
+    }
+    get names() {
+      var _a;
+      return (_a = this._names) !== null && _a !== void 0 ? _a : this._names = this._items.reduce((names2, c) => {
+        if (c instanceof Name)
+          names2[c.str] = (names2[c.str] || 0) + 1;
+        return names2;
+      }, {});
+    }
+  }
+  exports._Code = _Code;
+  exports.nil = new _Code("");
+  function _(strs, ...args) {
+    const code2 = [strs[0]];
+    let i = 0;
+    while (i < args.length) {
+      addCodeArg(code2, args[i]);
+      code2.push(strs[++i]);
+    }
+    return new _Code(code2);
+  }
+  exports._ = _;
+  const plus = new _Code("+");
+  function str(strs, ...args) {
+    const expr = [safeStringify(strs[0])];
+    let i = 0;
+    while (i < args.length) {
+      expr.push(plus);
+      addCodeArg(expr, args[i]);
+      expr.push(plus, safeStringify(strs[++i]));
+    }
+    optimize(expr);
+    return new _Code(expr);
+  }
+  exports.str = str;
+  function addCodeArg(code2, arg) {
+    if (arg instanceof _Code)
+      code2.push(...arg._items);
+    else if (arg instanceof Name)
+      code2.push(arg);
+    else
+      code2.push(interpolate(arg));
+  }
+  exports.addCodeArg = addCodeArg;
+  function optimize(expr) {
+    let i = 1;
+    while (i < expr.length - 1) {
+      if (expr[i] === plus) {
+        const res = mergeExprItems(expr[i - 1], expr[i + 1]);
+        if (res !== void 0) {
+          expr.splice(i - 1, 3, res);
+          continue;
+        }
+        expr[i++] = "+";
+      }
+      i++;
+    }
+  }
+  function mergeExprItems(a, b) {
+    if (b === '""')
+      return a;
+    if (a === '""')
+      return b;
+    if (typeof a == "string") {
+      if (b instanceof Name || a[a.length - 1] !== '"')
+        return;
+      if (typeof b != "string")
+        return `${a.slice(0, -1)}${b}"`;
+      if (b[0] === '"')
+        return a.slice(0, -1) + b.slice(1);
+      return;
+    }
+    if (typeof b == "string" && b[0] === '"' && !(a instanceof Name))
+      return `"${a}${b.slice(1)}`;
+    return;
+  }
+  function strConcat(c1, c2) {
+    return c2.emptyStr() ? c1 : c1.emptyStr() ? c2 : str`${c1}${c2}`;
+  }
+  exports.strConcat = strConcat;
+  function interpolate(x) {
+    return typeof x == "number" || typeof x == "boolean" || x === null ? x : safeStringify(Array.isArray(x) ? x.join(",") : x);
+  }
+  function stringify(x) {
+    return new _Code(safeStringify(x));
+  }
+  exports.stringify = stringify;
+  function safeStringify(x) {
+    return JSON.stringify(x).replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
+  }
+  exports.safeStringify = safeStringify;
+  function getProperty(key) {
+    return typeof key == "string" && exports.IDENTIFIER.test(key) ? new _Code(`.${key}`) : _`[${key}]`;
+  }
+  exports.getProperty = getProperty;
+})(code$1);
+var scope = {};
+(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.ValueScope = exports.ValueScopeName = exports.Scope = exports.varKinds = exports.UsedValueState = void 0;
+  const code_12 = code$1;
+  class ValueError extends Error {
+    constructor(name) {
+      super(`CodeGen: "code" for ${name} not defined`);
+      this.value = name.value;
+    }
+  }
+  var UsedValueState;
+  (function(UsedValueState2) {
+    UsedValueState2[UsedValueState2["Started"] = 0] = "Started";
+    UsedValueState2[UsedValueState2["Completed"] = 1] = "Completed";
+  })(UsedValueState = exports.UsedValueState || (exports.UsedValueState = {}));
+  exports.varKinds = {
+    const: new code_12.Name("const"),
+    let: new code_12.Name("let"),
+    var: new code_12.Name("var")
+  };
+  class Scope {
+    constructor({ prefixes, parent } = {}) {
+      this._names = {};
+      this._prefixes = prefixes;
+      this._parent = parent;
+    }
+    toName(nameOrPrefix) {
+      return nameOrPrefix instanceof code_12.Name ? nameOrPrefix : this.name(nameOrPrefix);
+    }
+    name(prefix) {
+      return new code_12.Name(this._newName(prefix));
+    }
+    _newName(prefix) {
+      const ng = this._names[prefix] || this._nameGroup(prefix);
+      return `${prefix}${ng.index++}`;
+    }
+    _nameGroup(prefix) {
+      var _a, _b;
+      if (((_b = (_a = this._parent) === null || _a === void 0 ? void 0 : _a._prefixes) === null || _b === void 0 ? void 0 : _b.has(prefix)) || this._prefixes && !this._prefixes.has(prefix)) {
+        throw new Error(`CodeGen: prefix "${prefix}" is not allowed in this scope`);
+      }
+      return this._names[prefix] = { prefix, index: 0 };
+    }
+  }
+  exports.Scope = Scope;
+  class ValueScopeName extends code_12.Name {
+    constructor(prefix, nameStr) {
+      super(nameStr);
+      this.prefix = prefix;
+    }
+    setValue(value, { property, itemIndex }) {
+      this.value = value;
+      this.scopePath = code_12._`.${new code_12.Name(property)}[${itemIndex}]`;
+    }
+  }
+  exports.ValueScopeName = ValueScopeName;
+  const line = code_12._`\n`;
+  class ValueScope extends Scope {
+    constructor(opts) {
+      super(opts);
+      this._values = {};
+      this._scope = opts.scope;
+      this.opts = { ...opts, _n: opts.lines ? line : code_12.nil };
+    }
+    get() {
+      return this._scope;
+    }
+    name(prefix) {
+      return new ValueScopeName(prefix, this._newName(prefix));
+    }
+    value(nameOrPrefix, value) {
+      var _a;
+      if (value.ref === void 0)
+        throw new Error("CodeGen: ref must be passed in value");
+      const name = this.toName(nameOrPrefix);
+      const { prefix } = name;
+      const valueKey = (_a = value.key) !== null && _a !== void 0 ? _a : value.ref;
+      let vs = this._values[prefix];
+      if (vs) {
+        const _name = vs.get(valueKey);
+        if (_name)
+          return _name;
+      } else {
+        vs = this._values[prefix] = /* @__PURE__ */ new Map();
+      }
+      vs.set(valueKey, name);
+      const s = this._scope[prefix] || (this._scope[prefix] = []);
+      const itemIndex = s.length;
+      s[itemIndex] = value.ref;
+      name.setValue(value, { property: prefix, itemIndex });
+      return name;
+    }
+    getValue(prefix, keyOrRef) {
+      const vs = this._values[prefix];
+      if (!vs)
+        return;
+      return vs.get(keyOrRef);
+    }
+    scopeRefs(scopeName, values = this._values) {
+      return this._reduceValues(values, (name) => {
+        if (name.scopePath === void 0)
+          throw new Error(`CodeGen: name "${name}" has no value`);
+        return code_12._`${scopeName}${name.scopePath}`;
+      });
+    }
+    scopeCode(values = this._values, usedValues, getCode) {
+      return this._reduceValues(values, (name) => {
+        if (name.value === void 0)
+          throw new Error(`CodeGen: name "${name}" has no value`);
+        return name.value.code;
+      }, usedValues, getCode);
+    }
+    _reduceValues(values, valueCode, usedValues = {}, getCode) {
+      let code2 = code_12.nil;
+      for (const prefix in values) {
+        const vs = values[prefix];
+        if (!vs)
+          continue;
+        const nameSet = usedValues[prefix] = usedValues[prefix] || /* @__PURE__ */ new Map();
+        vs.forEach((name) => {
+          if (nameSet.has(name))
+            return;
+          nameSet.set(name, UsedValueState.Started);
+          let c = valueCode(name);
+          if (c) {
+            const def2 = this.opts.es5 ? exports.varKinds.var : exports.varKinds.const;
+            code2 = code_12._`${code2}${def2} ${name} = ${c};${this.opts._n}`;
+          } else if (c = getCode === null || getCode === void 0 ? void 0 : getCode(name)) {
+            code2 = code_12._`${code2}${c}${this.opts._n}`;
+          } else {
+            throw new ValueError(name);
+          }
+          nameSet.set(name, UsedValueState.Completed);
+        });
+      }
+      return code2;
+    }
+  }
+  exports.ValueScope = ValueScope;
+})(scope);
+(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.or = exports.and = exports.not = exports.CodeGen = exports.operators = exports.varKinds = exports.ValueScopeName = exports.ValueScope = exports.Scope = exports.Name = exports.stringify = exports.getProperty = exports.nil = exports.strConcat = exports.str = exports._ = void 0;
+  const code_12 = code$1;
+  const scope_1 = scope;
+  var code_2 = code$1;
+  Object.defineProperty(exports, "_", { enumerable: true, get: function() {
+    return code_2._;
+  } });
+  Object.defineProperty(exports, "str", { enumerable: true, get: function() {
+    return code_2.str;
+  } });
+  Object.defineProperty(exports, "strConcat", { enumerable: true, get: function() {
+    return code_2.strConcat;
+  } });
+  Object.defineProperty(exports, "nil", { enumerable: true, get: function() {
+    return code_2.nil;
+  } });
+  Object.defineProperty(exports, "getProperty", { enumerable: true, get: function() {
+    return code_2.getProperty;
+  } });
+  Object.defineProperty(exports, "stringify", { enumerable: true, get: function() {
+    return code_2.stringify;
+  } });
+  Object.defineProperty(exports, "Name", { enumerable: true, get: function() {
+    return code_2.Name;
+  } });
+  var scope_2 = scope;
+  Object.defineProperty(exports, "Scope", { enumerable: true, get: function() {
+    return scope_2.Scope;
+  } });
+  Object.defineProperty(exports, "ValueScope", { enumerable: true, get: function() {
+    return scope_2.ValueScope;
+  } });
+  Object.defineProperty(exports, "ValueScopeName", { enumerable: true, get: function() {
+    return scope_2.ValueScopeName;
+  } });
+  Object.defineProperty(exports, "varKinds", { enumerable: true, get: function() {
+    return scope_2.varKinds;
+  } });
+  exports.operators = {
+    GT: new code_12._Code(">"),
+    GTE: new code_12._Code(">="),
+    LT: new code_12._Code("<"),
+    LTE: new code_12._Code("<="),
+    EQ: new code_12._Code("==="),
+    NEQ: new code_12._Code("!=="),
+    NOT: new code_12._Code("!"),
+    OR: new code_12._Code("||"),
+    AND: new code_12._Code("&&"),
+    ADD: new code_12._Code("+")
+  };
+  class Node {
+    optimizeNodes() {
+      return this;
+    }
+    optimizeNames(_names, _constants) {
+      return this;
+    }
+  }
+  class Def extends Node {
+    constructor(varKind, name, rhs) {
+      super();
+      this.varKind = varKind;
+      this.name = name;
+      this.rhs = rhs;
+    }
+    render({ es5, _n }) {
+      const varKind = es5 ? scope_1.varKinds.var : this.varKind;
+      const rhs = this.rhs === void 0 ? "" : ` = ${this.rhs}`;
+      return `${varKind} ${this.name}${rhs};` + _n;
+    }
+    optimizeNames(names2, constants2) {
+      if (!names2[this.name.str])
+        return;
+      if (this.rhs)
+        this.rhs = optimizeExpr(this.rhs, names2, constants2);
+      return this;
+    }
+    get names() {
+      return this.rhs instanceof code_12._CodeOrName ? this.rhs.names : {};
+    }
+  }
+  class Assign extends Node {
+    constructor(lhs, rhs, sideEffects) {
+      super();
+      this.lhs = lhs;
+      this.rhs = rhs;
+      this.sideEffects = sideEffects;
+    }
+    render({ _n }) {
+      return `${this.lhs} = ${this.rhs};` + _n;
+    }
+    optimizeNames(names2, constants2) {
+      if (this.lhs instanceof code_12.Name && !names2[this.lhs.str] && !this.sideEffects)
+        return;
+      this.rhs = optimizeExpr(this.rhs, names2, constants2);
+      return this;
+    }
+    get names() {
+      const names2 = this.lhs instanceof code_12.Name ? {} : { ...this.lhs.names };
+      return addExprNames(names2, this.rhs);
+    }
+  }
+  class AssignOp extends Assign {
+    constructor(lhs, op, rhs, sideEffects) {
+      super(lhs, rhs, sideEffects);
+      this.op = op;
+    }
+    render({ _n }) {
+      return `${this.lhs} ${this.op}= ${this.rhs};` + _n;
+    }
+  }
+  class Label extends Node {
+    constructor(label) {
+      super();
+      this.label = label;
+      this.names = {};
+    }
+    render({ _n }) {
+      return `${this.label}:` + _n;
+    }
+  }
+  class Break extends Node {
+    constructor(label) {
+      super();
+      this.label = label;
+      this.names = {};
+    }
+    render({ _n }) {
+      const label = this.label ? ` ${this.label}` : "";
+      return `break${label};` + _n;
+    }
+  }
+  class Throw extends Node {
+    constructor(error2) {
+      super();
+      this.error = error2;
+    }
+    render({ _n }) {
+      return `throw ${this.error};` + _n;
+    }
+    get names() {
+      return this.error.names;
+    }
+  }
+  class AnyCode extends Node {
+    constructor(code2) {
+      super();
+      this.code = code2;
+    }
+    render({ _n }) {
+      return `${this.code};` + _n;
+    }
+    optimizeNodes() {
+      return `${this.code}` ? this : void 0;
+    }
+    optimizeNames(names2, constants2) {
+      this.code = optimizeExpr(this.code, names2, constants2);
+      return this;
+    }
+    get names() {
+      return this.code instanceof code_12._CodeOrName ? this.code.names : {};
+    }
+  }
+  class ParentNode extends Node {
+    constructor(nodes = []) {
+      super();
+      this.nodes = nodes;
+    }
+    render(opts) {
+      return this.nodes.reduce((code2, n) => code2 + n.render(opts), "");
+    }
+    optimizeNodes() {
+      const { nodes } = this;
+      let i = nodes.length;
+      while (i--) {
+        const n = nodes[i].optimizeNodes();
+        if (Array.isArray(n))
+          nodes.splice(i, 1, ...n);
+        else if (n)
+          nodes[i] = n;
+        else
+          nodes.splice(i, 1);
+      }
+      return nodes.length > 0 ? this : void 0;
+    }
+    optimizeNames(names2, constants2) {
+      const { nodes } = this;
+      let i = nodes.length;
+      while (i--) {
+        const n = nodes[i];
+        if (n.optimizeNames(names2, constants2))
+          continue;
+        subtractNames(names2, n.names);
+        nodes.splice(i, 1);
+      }
+      return nodes.length > 0 ? this : void 0;
+    }
+    get names() {
+      return this.nodes.reduce((names2, n) => addNames(names2, n.names), {});
+    }
+  }
+  class BlockNode extends ParentNode {
+    render(opts) {
+      return "{" + opts._n + super.render(opts) + "}" + opts._n;
+    }
+  }
+  class Root extends ParentNode {
+  }
+  class Else extends BlockNode {
+  }
+  Else.kind = "else";
+  class If extends BlockNode {
+    constructor(condition, nodes) {
+      super(nodes);
+      this.condition = condition;
+    }
+    render(opts) {
+      let code2 = `if(${this.condition})` + super.render(opts);
+      if (this.else)
+        code2 += "else " + this.else.render(opts);
+      return code2;
+    }
+    optimizeNodes() {
+      super.optimizeNodes();
+      const cond = this.condition;
+      if (cond === true)
+        return this.nodes;
+      let e = this.else;
+      if (e) {
+        const ns = e.optimizeNodes();
+        e = this.else = Array.isArray(ns) ? new Else(ns) : ns;
+      }
+      if (e) {
+        if (cond === false)
+          return e instanceof If ? e : e.nodes;
+        if (this.nodes.length)
+          return this;
+        return new If(not2(cond), e instanceof If ? [e] : e.nodes);
+      }
+      if (cond === false || !this.nodes.length)
+        return void 0;
+      return this;
+    }
+    optimizeNames(names2, constants2) {
+      var _a;
+      this.else = (_a = this.else) === null || _a === void 0 ? void 0 : _a.optimizeNames(names2, constants2);
+      if (!(super.optimizeNames(names2, constants2) || this.else))
+        return;
+      this.condition = optimizeExpr(this.condition, names2, constants2);
+      return this;
+    }
+    get names() {
+      const names2 = super.names;
+      addExprNames(names2, this.condition);
+      if (this.else)
+        addNames(names2, this.else.names);
+      return names2;
+    }
+  }
+  If.kind = "if";
+  class For extends BlockNode {
+  }
+  For.kind = "for";
+  class ForLoop extends For {
+    constructor(iteration) {
+      super();
+      this.iteration = iteration;
+    }
+    render(opts) {
+      return `for(${this.iteration})` + super.render(opts);
+    }
+    optimizeNames(names2, constants2) {
+      if (!super.optimizeNames(names2, constants2))
+        return;
+      this.iteration = optimizeExpr(this.iteration, names2, constants2);
+      return this;
+    }
+    get names() {
+      return addNames(super.names, this.iteration.names);
+    }
+  }
+  class ForRange extends For {
+    constructor(varKind, name, from, to) {
+      super();
+      this.varKind = varKind;
+      this.name = name;
+      this.from = from;
+      this.to = to;
+    }
+    render(opts) {
+      const varKind = opts.es5 ? scope_1.varKinds.var : this.varKind;
+      const { name, from, to } = this;
+      return `for(${varKind} ${name}=${from}; ${name}<${to}; ${name}++)` + super.render(opts);
+    }
+    get names() {
+      const names2 = addExprNames(super.names, this.from);
+      return addExprNames(names2, this.to);
+    }
+  }
+  class ForIter extends For {
+    constructor(loop, varKind, name, iterable) {
+      super();
+      this.loop = loop;
+      this.varKind = varKind;
+      this.name = name;
+      this.iterable = iterable;
+    }
+    render(opts) {
+      return `for(${this.varKind} ${this.name} ${this.loop} ${this.iterable})` + super.render(opts);
+    }
+    optimizeNames(names2, constants2) {
+      if (!super.optimizeNames(names2, constants2))
+        return;
+      this.iterable = optimizeExpr(this.iterable, names2, constants2);
+      return this;
+    }
+    get names() {
+      return addNames(super.names, this.iterable.names);
+    }
+  }
+  class Func extends BlockNode {
+    constructor(name, args, async) {
+      super();
+      this.name = name;
+      this.args = args;
+      this.async = async;
+    }
+    render(opts) {
+      const _async = this.async ? "async " : "";
+      return `${_async}function ${this.name}(${this.args})` + super.render(opts);
+    }
+  }
+  Func.kind = "func";
+  class Return extends ParentNode {
+    render(opts) {
+      return "return " + super.render(opts);
+    }
+  }
+  Return.kind = "return";
+  class Try extends BlockNode {
+    render(opts) {
+      let code2 = "try" + super.render(opts);
+      if (this.catch)
+        code2 += this.catch.render(opts);
+      if (this.finally)
+        code2 += this.finally.render(opts);
+      return code2;
+    }
+    optimizeNodes() {
+      var _a, _b;
+      super.optimizeNodes();
+      (_a = this.catch) === null || _a === void 0 ? void 0 : _a.optimizeNodes();
+      (_b = this.finally) === null || _b === void 0 ? void 0 : _b.optimizeNodes();
+      return this;
+    }
+    optimizeNames(names2, constants2) {
+      var _a, _b;
+      super.optimizeNames(names2, constants2);
+      (_a = this.catch) === null || _a === void 0 ? void 0 : _a.optimizeNames(names2, constants2);
+      (_b = this.finally) === null || _b === void 0 ? void 0 : _b.optimizeNames(names2, constants2);
+      return this;
+    }
+    get names() {
+      const names2 = super.names;
+      if (this.catch)
+        addNames(names2, this.catch.names);
+      if (this.finally)
+        addNames(names2, this.finally.names);
+      return names2;
+    }
+  }
+  class Catch extends BlockNode {
+    constructor(error2) {
+      super();
+      this.error = error2;
+    }
+    render(opts) {
+      return `catch(${this.error})` + super.render(opts);
+    }
+  }
+  Catch.kind = "catch";
+  class Finally extends BlockNode {
+    render(opts) {
+      return "finally" + super.render(opts);
+    }
+  }
+  Finally.kind = "finally";
+  class CodeGen {
+    constructor(extScope, opts = {}) {
+      this._values = {};
+      this._blockStarts = [];
+      this._constants = {};
+      this.opts = { ...opts, _n: opts.lines ? "\n" : "" };
+      this._extScope = extScope;
+      this._scope = new scope_1.Scope({ parent: extScope });
+      this._nodes = [new Root()];
+    }
+    toString() {
+      return this._root.render(this.opts);
+    }
+    // returns unique name in the internal scope
+    name(prefix) {
+      return this._scope.name(prefix);
+    }
+    // reserves unique name in the external scope
+    scopeName(prefix) {
+      return this._extScope.name(prefix);
+    }
+    // reserves unique name in the external scope and assigns value to it
+    scopeValue(prefixOrName, value) {
+      const name = this._extScope.value(prefixOrName, value);
+      const vs = this._values[name.prefix] || (this._values[name.prefix] = /* @__PURE__ */ new Set());
+      vs.add(name);
+      return name;
+    }
+    getScopeValue(prefix, keyOrRef) {
+      return this._extScope.getValue(prefix, keyOrRef);
+    }
+    // return code that assigns values in the external scope to the names that are used internally
+    // (same names that were returned by gen.scopeName or gen.scopeValue)
+    scopeRefs(scopeName) {
+      return this._extScope.scopeRefs(scopeName, this._values);
+    }
+    scopeCode() {
+      return this._extScope.scopeCode(this._values);
+    }
+    _def(varKind, nameOrPrefix, rhs, constant) {
+      const name = this._scope.toName(nameOrPrefix);
+      if (rhs !== void 0 && constant)
+        this._constants[name.str] = rhs;
+      this._leafNode(new Def(varKind, name, rhs));
+      return name;
+    }
+    // `const` declaration (`var` in es5 mode)
+    const(nameOrPrefix, rhs, _constant) {
+      return this._def(scope_1.varKinds.const, nameOrPrefix, rhs, _constant);
+    }
+    // `let` declaration with optional assignment (`var` in es5 mode)
+    let(nameOrPrefix, rhs, _constant) {
+      return this._def(scope_1.varKinds.let, nameOrPrefix, rhs, _constant);
+    }
+    // `var` declaration with optional assignment
+    var(nameOrPrefix, rhs, _constant) {
+      return this._def(scope_1.varKinds.var, nameOrPrefix, rhs, _constant);
+    }
+    // assignment code
+    assign(lhs, rhs, sideEffects) {
+      return this._leafNode(new Assign(lhs, rhs, sideEffects));
+    }
+    // `+=` code
+    add(lhs, rhs) {
+      return this._leafNode(new AssignOp(lhs, exports.operators.ADD, rhs));
+    }
+    // appends passed SafeExpr to code or executes Block
+    code(c) {
+      if (typeof c == "function")
+        c();
+      else if (c !== code_12.nil)
+        this._leafNode(new AnyCode(c));
+      return this;
+    }
+    // returns code for object literal for the passed argument list of key-value pairs
+    object(...keyValues) {
+      const code2 = ["{"];
+      for (const [key, value] of keyValues) {
+        if (code2.length > 1)
+          code2.push(",");
+        code2.push(key);
+        if (key !== value || this.opts.es5) {
+          code2.push(":");
+          code_12.addCodeArg(code2, value);
+        }
+      }
+      code2.push("}");
+      return new code_12._Code(code2);
+    }
+    // `if` clause (or statement if `thenBody` and, optionally, `elseBody` are passed)
+    if(condition, thenBody, elseBody) {
+      this._blockNode(new If(condition));
+      if (thenBody && elseBody) {
+        this.code(thenBody).else().code(elseBody).endIf();
+      } else if (thenBody) {
+        this.code(thenBody).endIf();
+      } else if (elseBody) {
+        throw new Error('CodeGen: "else" body without "then" body');
+      }
+      return this;
+    }
+    // `else if` clause - invalid without `if` or after `else` clauses
+    elseIf(condition) {
+      return this._elseNode(new If(condition));
+    }
+    // `else` clause - only valid after `if` or `else if` clauses
+    else() {
+      return this._elseNode(new Else());
+    }
+    // end `if` statement (needed if gen.if was used only with condition)
+    endIf() {
+      return this._endBlockNode(If, Else);
+    }
+    _for(node, forBody) {
+      this._blockNode(node);
+      if (forBody)
+        this.code(forBody).endFor();
+      return this;
+    }
+    // a generic `for` clause (or statement if `forBody` is passed)
+    for(iteration, forBody) {
+      return this._for(new ForLoop(iteration), forBody);
+    }
+    // `for` statement for a range of values
+    forRange(nameOrPrefix, from, to, forBody, varKind = this.opts.es5 ? scope_1.varKinds.var : scope_1.varKinds.let) {
+      const name = this._scope.toName(nameOrPrefix);
+      return this._for(new ForRange(varKind, name, from, to), () => forBody(name));
+    }
+    // `for-of` statement (in es5 mode replace with a normal for loop)
+    forOf(nameOrPrefix, iterable, forBody, varKind = scope_1.varKinds.const) {
+      const name = this._scope.toName(nameOrPrefix);
+      if (this.opts.es5) {
+        const arr = iterable instanceof code_12.Name ? iterable : this.var("_arr", iterable);
+        return this.forRange("_i", 0, code_12._`${arr}.length`, (i) => {
+          this.var(name, code_12._`${arr}[${i}]`);
+          forBody(name);
+        });
+      }
+      return this._for(new ForIter("of", varKind, name, iterable), () => forBody(name));
+    }
+    // `for-in` statement.
+    // With option `ownProperties` replaced with a `for-of` loop for object keys
+    forIn(nameOrPrefix, obj, forBody, varKind = this.opts.es5 ? scope_1.varKinds.var : scope_1.varKinds.const) {
+      if (this.opts.ownProperties) {
+        return this.forOf(nameOrPrefix, code_12._`Object.keys(${obj})`, forBody);
+      }
+      const name = this._scope.toName(nameOrPrefix);
+      return this._for(new ForIter("in", varKind, name, obj), () => forBody(name));
+    }
+    // end `for` loop
+    endFor() {
+      return this._endBlockNode(For);
+    }
+    // `label` statement
+    label(label) {
+      return this._leafNode(new Label(label));
+    }
+    // `break` statement
+    break(label) {
+      return this._leafNode(new Break(label));
+    }
+    // `return` statement
+    return(value) {
+      const node = new Return();
+      this._blockNode(node);
+      this.code(value);
+      if (node.nodes.length !== 1)
+        throw new Error('CodeGen: "return" should have one node');
+      return this._endBlockNode(Return);
+    }
+    // `try` statement
+    try(tryBody, catchCode, finallyCode) {
+      if (!catchCode && !finallyCode)
+        throw new Error('CodeGen: "try" without "catch" and "finally"');
+      const node = new Try();
+      this._blockNode(node);
+      this.code(tryBody);
+      if (catchCode) {
+        const error2 = this.name("e");
+        this._currNode = node.catch = new Catch(error2);
+        catchCode(error2);
+      }
+      if (finallyCode) {
+        this._currNode = node.finally = new Finally();
+        this.code(finallyCode);
+      }
+      return this._endBlockNode(Catch, Finally);
+    }
+    // `throw` statement
+    throw(error2) {
+      return this._leafNode(new Throw(error2));
+    }
+    // start self-balancing block
+    block(body, nodeCount) {
+      this._blockStarts.push(this._nodes.length);
+      if (body)
+        this.code(body).endBlock(nodeCount);
+      return this;
+    }
+    // end the current self-balancing block
+    endBlock(nodeCount) {
+      const len = this._blockStarts.pop();
+      if (len === void 0)
+        throw new Error("CodeGen: not in self-balancing block");
+      const toClose = this._nodes.length - len;
+      if (toClose < 0 || nodeCount !== void 0 && toClose !== nodeCount) {
+        throw new Error(`CodeGen: wrong number of nodes: ${toClose} vs ${nodeCount} expected`);
+      }
+      this._nodes.length = len;
+      return this;
+    }
+    // `function` heading (or definition if funcBody is passed)
+    func(name, args = code_12.nil, async, funcBody) {
+      this._blockNode(new Func(name, args, async));
+      if (funcBody)
+        this.code(funcBody).endFunc();
+      return this;
+    }
+    // end function definition
+    endFunc() {
+      return this._endBlockNode(Func);
+    }
+    optimize(n = 1) {
+      while (n-- > 0) {
+        this._root.optimizeNodes();
+        this._root.optimizeNames(this._root.names, this._constants);
+      }
+    }
+    _leafNode(node) {
+      this._currNode.nodes.push(node);
+      return this;
+    }
+    _blockNode(node) {
+      this._currNode.nodes.push(node);
+      this._nodes.push(node);
+    }
+    _endBlockNode(N1, N2) {
+      const n = this._currNode;
+      if (n instanceof N1 || N2 && n instanceof N2) {
+        this._nodes.pop();
+        return this;
+      }
+      throw new Error(`CodeGen: not in block "${N2 ? `${N1.kind}/${N2.kind}` : N1.kind}"`);
+    }
+    _elseNode(node) {
+      const n = this._currNode;
+      if (!(n instanceof If)) {
+        throw new Error('CodeGen: "else" without "if"');
+      }
+      this._currNode = n.else = node;
+      return this;
+    }
+    get _root() {
+      return this._nodes[0];
+    }
+    get _currNode() {
+      const ns = this._nodes;
+      return ns[ns.length - 1];
+    }
+    set _currNode(node) {
+      const ns = this._nodes;
+      ns[ns.length - 1] = node;
+    }
+  }
+  exports.CodeGen = CodeGen;
+  function addNames(names2, from) {
+    for (const n in from)
+      names2[n] = (names2[n] || 0) + (from[n] || 0);
+    return names2;
+  }
+  function addExprNames(names2, from) {
+    return from instanceof code_12._CodeOrName ? addNames(names2, from.names) : names2;
+  }
+  function optimizeExpr(expr, names2, constants2) {
+    if (expr instanceof code_12.Name)
+      return replaceName(expr);
+    if (!canOptimize(expr))
+      return expr;
+    return new code_12._Code(expr._items.reduce((items2, c) => {
+      if (c instanceof code_12.Name)
+        c = replaceName(c);
+      if (c instanceof code_12._Code)
+        items2.push(...c._items);
+      else
+        items2.push(c);
+      return items2;
+    }, []));
+    function replaceName(n) {
+      const c = constants2[n.str];
+      if (c === void 0 || names2[n.str] !== 1)
+        return n;
+      delete names2[n.str];
+      return c;
+    }
+    function canOptimize(e) {
+      return e instanceof code_12._Code && e._items.some((c) => c instanceof code_12.Name && names2[c.str] === 1 && constants2[c.str] !== void 0);
+    }
+  }
+  function subtractNames(names2, from) {
+    for (const n in from)
+      names2[n] = (names2[n] || 0) - (from[n] || 0);
+  }
+  function not2(x) {
+    return typeof x == "boolean" || typeof x == "number" || x === null ? !x : code_12._`!${par(x)}`;
+  }
+  exports.not = not2;
+  const andCode = mappend(exports.operators.AND);
+  function and(...args) {
+    return args.reduce(andCode);
+  }
+  exports.and = and;
+  const orCode = mappend(exports.operators.OR);
+  function or(...args) {
+    return args.reduce(orCode);
+  }
+  exports.or = or;
+  function mappend(op) {
+    return (x, y) => x === code_12.nil ? y : y === code_12.nil ? x : code_12._`${par(x)} ${op} ${par(y)}`;
+  }
+  function par(x) {
+    return x instanceof code_12.Name ? x : code_12._`(${x})`;
+  }
+})(codegen);
+var names$1 = {};
+Object.defineProperty(names$1, "__esModule", { value: true });
+const codegen_1$m = codegen;
+const names = {
+  // validation function arguments
+  data: new codegen_1$m.Name("data"),
+  // args passed from referencing schema
+  valCxt: new codegen_1$m.Name("valCxt"),
+  dataPath: new codegen_1$m.Name("dataPath"),
+  parentData: new codegen_1$m.Name("parentData"),
+  parentDataProperty: new codegen_1$m.Name("parentDataProperty"),
+  rootData: new codegen_1$m.Name("rootData"),
+  dynamicAnchors: new codegen_1$m.Name("dynamicAnchors"),
+  // function scoped variables
+  vErrors: new codegen_1$m.Name("vErrors"),
+  errors: new codegen_1$m.Name("errors"),
+  this: new codegen_1$m.Name("this"),
+  // "globals"
+  self: new codegen_1$m.Name("self"),
+  scope: new codegen_1$m.Name("scope"),
+  // JTD serialize/parse name for JSON string and position
+  json: new codegen_1$m.Name("json"),
+  jsonPos: new codegen_1$m.Name("jsonPos"),
+  jsonLen: new codegen_1$m.Name("jsonLen"),
+  jsonPart: new codegen_1$m.Name("jsonPart")
+};
+names$1.default = names;
+(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.extendErrors = exports.resetErrorsCount = exports.reportExtraError = exports.reportError = exports.keyword$DataError = exports.keywordError = void 0;
+  const codegen_12 = codegen;
+  const names_12 = names$1;
+  exports.keywordError = {
+    message: ({ keyword: keyword2 }) => codegen_12.str`should pass "${keyword2}" keyword validation`
+  };
+  exports.keyword$DataError = {
+    message: ({ keyword: keyword2, schemaType }) => schemaType ? codegen_12.str`"${keyword2}" keyword must be ${schemaType} ($data)` : codegen_12.str`"${keyword2}" keyword is invalid ($data)`
+  };
+  function reportError(cxt, error2 = exports.keywordError, overrideAllErrors) {
+    const { it } = cxt;
+    const { gen, compositeRule, allErrors } = it;
+    const errObj = errorObjectCode(cxt, error2);
+    if (overrideAllErrors !== null && overrideAllErrors !== void 0 ? overrideAllErrors : compositeRule || allErrors) {
+      addError(gen, errObj);
+    } else {
+      returnErrors(it, codegen_12._`[${errObj}]`);
+    }
+  }
+  exports.reportError = reportError;
+  function reportExtraError(cxt, error2 = exports.keywordError) {
+    const { it } = cxt;
+    const { gen, compositeRule, allErrors } = it;
+    const errObj = errorObjectCode(cxt, error2);
+    addError(gen, errObj);
+    if (!(compositeRule || allErrors)) {
+      returnErrors(it, names_12.default.vErrors);
+    }
+  }
+  exports.reportExtraError = reportExtraError;
+  function resetErrorsCount(gen, errsCount) {
+    gen.assign(names_12.default.errors, errsCount);
+    gen.if(codegen_12._`${names_12.default.vErrors} !== null`, () => gen.if(errsCount, () => gen.assign(codegen_12._`${names_12.default.vErrors}.length`, errsCount), () => gen.assign(names_12.default.vErrors, null)));
+  }
+  exports.resetErrorsCount = resetErrorsCount;
+  function extendErrors({ gen, keyword: keyword2, schemaValue, data, errsCount, it }) {
+    if (errsCount === void 0)
+      throw new Error("ajv implementation error");
+    const err = gen.name("err");
+    gen.forRange("i", errsCount, names_12.default.errors, (i) => {
+      gen.const(err, codegen_12._`${names_12.default.vErrors}[${i}]`);
+      gen.if(codegen_12._`${err}.dataPath === undefined`, () => gen.assign(codegen_12._`${err}.dataPath`, codegen_12.strConcat(names_12.default.dataPath, it.errorPath)));
+      gen.assign(codegen_12._`${err}.schemaPath`, codegen_12.str`${it.errSchemaPath}/${keyword2}`);
+      if (it.opts.verbose) {
+        gen.assign(codegen_12._`${err}.schema`, schemaValue);
+        gen.assign(codegen_12._`${err}.data`, data);
+      }
+    });
+  }
+  exports.extendErrors = extendErrors;
+  function addError(gen, errObj) {
+    const err = gen.const("err", errObj);
+    gen.if(codegen_12._`${names_12.default.vErrors} === null`, () => gen.assign(names_12.default.vErrors, codegen_12._`[${err}]`), codegen_12._`${names_12.default.vErrors}.push(${err})`);
+    gen.code(codegen_12._`${names_12.default.errors}++`);
+  }
+  function returnErrors(it, errs) {
+    const { gen, validateName, schemaEnv } = it;
+    if (schemaEnv.$async) {
+      gen.throw(codegen_12._`new ${it.ValidationError}(${errs})`);
+    } else {
+      gen.assign(codegen_12._`${validateName}.errors`, errs);
+      gen.return(false);
+    }
+  }
+  const E = {
+    keyword: new codegen_12.Name("keyword"),
+    schemaPath: new codegen_12.Name("schemaPath"),
+    params: new codegen_12.Name("params"),
+    propertyName: new codegen_12.Name("propertyName"),
+    message: new codegen_12.Name("message"),
+    schema: new codegen_12.Name("schema"),
+    parentSchema: new codegen_12.Name("parentSchema"),
+    // JTD error properties
+    instancePath: new codegen_12.Name("instancePath")
+  };
+  function errorObjectCode(cxt, error2) {
+    const { createErrors, opts } = cxt.it;
+    if (createErrors === false)
+      return codegen_12._`{}`;
+    return (opts.jtd && !opts.ajvErrors ? jtdErrorObject : ajvErrorObject)(cxt, error2);
+  }
+  function jtdErrorObject(cxt, { message }) {
+    const { gen, keyword: keyword2, it } = cxt;
+    const { errorPath, errSchemaPath, opts } = it;
+    const keyValues = [
+      [E.instancePath, codegen_12.strConcat(names_12.default.dataPath, errorPath)],
+      [E.schemaPath, codegen_12.str`${errSchemaPath}/${keyword2}`]
+    ];
+    if (opts.messages) {
+      keyValues.push([E.message, typeof message == "function" ? message(cxt) : message]);
+    }
+    return gen.object(...keyValues);
+  }
+  function ajvErrorObject(cxt, error2) {
+    const { gen, keyword: keyword2, data, schemaValue, it } = cxt;
+    const { topSchemaRef, schemaPath, errorPath, errSchemaPath, propertyName, opts } = it;
+    const { params, message } = error2;
+    const keyValues = [
+      [E.keyword, keyword2],
+      [names_12.default.dataPath, codegen_12.strConcat(names_12.default.dataPath, errorPath)],
+      [E.schemaPath, codegen_12.str`${errSchemaPath}/${keyword2}`],
+      [E.params, typeof params == "function" ? params(cxt) : params || codegen_12._`{}`]
+    ];
+    if (propertyName)
+      keyValues.push([E.propertyName, propertyName]);
+    if (opts.messages) {
+      keyValues.push([E.message, typeof message == "function" ? message(cxt) : message]);
+    }
+    if (opts.verbose) {
+      keyValues.push([E.schema, schemaValue], [E.parentSchema, codegen_12._`${topSchemaRef}${schemaPath}`], [names_12.default.data, data]);
+    }
+    return gen.object(...keyValues);
+  }
+})(errors);
+var util = {};
+var validate = {};
+var boolSchema = {};
+Object.defineProperty(boolSchema, "__esModule", { value: true });
+boolSchema.boolOrEmptySchema = boolSchema.topBoolOrEmptySchema = void 0;
+const errors_1 = errors;
+const codegen_1$l = codegen;
+const names_1$3 = names$1;
+const boolError = {
+  message: "boolean schema is false"
+};
+function topBoolOrEmptySchema(it) {
+  const { gen, schema, validateName } = it;
+  if (schema === false) {
+    falseSchemaError(it, false);
+  } else if (typeof schema == "object" && schema.$async === true) {
+    gen.return(names_1$3.default.data);
+  } else {
+    gen.assign(codegen_1$l._`${validateName}.errors`, null);
+    gen.return(true);
+  }
+}
+boolSchema.topBoolOrEmptySchema = topBoolOrEmptySchema;
+function boolOrEmptySchema(it, valid2) {
+  const { gen, schema } = it;
+  if (schema === false) {
+    gen.var(valid2, false);
+    falseSchemaError(it);
+  } else {
+    gen.var(valid2, true);
+  }
+}
+boolSchema.boolOrEmptySchema = boolOrEmptySchema;
+function falseSchemaError(it, overrideAllErrors) {
+  const { gen, data } = it;
+  const cxt = {
+    gen,
+    keyword: "false schema",
+    data,
+    schema: false,
+    schemaCode: false,
+    schemaValue: false,
+    params: {},
+    it
+  };
+  errors_1.reportError(cxt, boolError, overrideAllErrors);
+}
+var iterate = {};
+var defaults = {};
+var hasRequiredDefaults;
+function requireDefaults() {
+  if (hasRequiredDefaults) return defaults;
+  hasRequiredDefaults = 1;
+  Object.defineProperty(defaults, "__esModule", { value: true });
+  defaults.assignDefaults = void 0;
+  const codegen_12 = codegen;
+  const _1 = requireValidate();
+  function assignDefaults(it, ty) {
+    const { properties: properties2, items: items2 } = it.schema;
+    if (ty === "object" && properties2) {
+      for (const key in properties2) {
+        assignDefault(it, key, properties2[key].default);
+      }
+    } else if (ty === "array" && Array.isArray(items2)) {
+      items2.forEach((sch, i) => assignDefault(it, i, sch.default));
+    }
+  }
+  defaults.assignDefaults = assignDefaults;
+  function assignDefault(it, prop, defaultValue) {
+    const { gen, compositeRule, data, opts } = it;
+    if (defaultValue === void 0)
+      return;
+    const childData = codegen_12._`${data}${codegen_12.getProperty(prop)}`;
+    if (compositeRule) {
+      _1.checkStrictMode(it, `default is ignored for: ${childData}`);
+      return;
+    }
+    let condition = codegen_12._`${childData} === undefined`;
+    if (opts.useDefaults === "empty") {
+      condition = codegen_12._`${condition} || ${childData} === null || ${childData} === ""`;
+    }
+    gen.if(condition, codegen_12._`${childData} = ${codegen_12.stringify(defaultValue)}`);
+  }
+  return defaults;
+}
+var keyword = {};
+var code = {};
+var subschema = {};
+var hasRequiredSubschema;
+function requireSubschema() {
+  if (hasRequiredSubschema) return subschema;
+  hasRequiredSubschema = 1;
+  (function(exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.applySubschema = exports.Type = void 0;
+    const validate_12 = requireValidate();
+    const util_12 = requireUtil();
+    const codegen_12 = codegen;
+    var Type;
+    (function(Type2) {
+      Type2[Type2["Num"] = 0] = "Num";
+      Type2[Type2["Str"] = 1] = "Str";
+    })(Type = exports.Type || (exports.Type = {}));
+    function applySubschema(it, appl, valid2) {
+      const subschema2 = getSubschema(it, appl);
+      extendSubschemaData(subschema2, it, appl);
+      extendSubschemaMode(subschema2, appl);
+      const nextContext = { ...it, ...subschema2, items: void 0, props: void 0 };
+      validate_12.subschemaCode(nextContext, valid2);
+      return nextContext;
+    }
+    exports.applySubschema = applySubschema;
+    function getSubschema(it, { keyword: keyword2, schemaProp, schema, schemaPath, errSchemaPath, topSchemaRef }) {
+      if (keyword2 !== void 0 && schema !== void 0) {
+        throw new Error('both "keyword" and "schema" passed, only one allowed');
+      }
+      if (keyword2 !== void 0) {
+        const sch = it.schema[keyword2];
+        return schemaProp === void 0 ? {
+          schema: sch,
+          schemaPath: codegen_12._`${it.schemaPath}${codegen_12.getProperty(keyword2)}`,
+          errSchemaPath: `${it.errSchemaPath}/${keyword2}`
+        } : {
+          schema: sch[schemaProp],
+          schemaPath: codegen_12._`${it.schemaPath}${codegen_12.getProperty(keyword2)}${codegen_12.getProperty(schemaProp)}`,
+          errSchemaPath: `${it.errSchemaPath}/${keyword2}/${util_12.escapeFragment(schemaProp)}`
+        };
+      }
+      if (schema !== void 0) {
+        if (schemaPath === void 0 || errSchemaPath === void 0 || topSchemaRef === void 0) {
+          throw new Error('"schemaPath", "errSchemaPath" and "topSchemaRef" are required with "schema"');
+        }
+        return {
+          schema,
+          schemaPath,
+          topSchemaRef,
+          errSchemaPath
+        };
+      }
+      throw new Error('either "keyword" or "schema" must be passed');
+    }
+    function extendSubschemaData(subschema2, it, { dataProp, dataPropType: dpType, data, dataTypes, propertyName }) {
+      if (data !== void 0 && dataProp !== void 0) {
+        throw new Error('both "data" and "dataProp" passed, only one allowed');
+      }
+      const { gen } = it;
+      if (dataProp !== void 0) {
+        const { errorPath, dataPathArr, opts } = it;
+        const nextData = gen.let("data", codegen_12._`${it.data}${codegen_12.getProperty(dataProp)}`, true);
+        dataContextProps(nextData);
+        subschema2.errorPath = codegen_12.str`${errorPath}${getErrorPath(dataProp, dpType, opts.jsPropertySyntax)}`;
+        subschema2.parentDataProperty = codegen_12._`${dataProp}`;
+        subschema2.dataPathArr = [...dataPathArr, subschema2.parentDataProperty];
+      }
+      if (data !== void 0) {
+        const nextData = data instanceof codegen_12.Name ? data : gen.let("data", data, true);
+        dataContextProps(nextData);
+        if (propertyName !== void 0)
+          subschema2.propertyName = propertyName;
+      }
+      if (dataTypes)
+        subschema2.dataTypes = dataTypes;
+      function dataContextProps(_nextData) {
+        subschema2.data = _nextData;
+        subschema2.dataLevel = it.dataLevel + 1;
+        subschema2.dataTypes = [];
+        it.definedProperties = /* @__PURE__ */ new Set();
+        subschema2.parentData = it.data;
+        subschema2.dataNames = [...it.dataNames, _nextData];
+      }
+    }
+    function extendSubschemaMode(subschema2, { jtdDiscriminator, jtdMetadata, compositeRule, createErrors, allErrors }) {
+      if (compositeRule !== void 0)
+        subschema2.compositeRule = compositeRule;
+      if (createErrors !== void 0)
+        subschema2.createErrors = createErrors;
+      if (allErrors !== void 0)
+        subschema2.allErrors = allErrors;
+      subschema2.jtdDiscriminator = jtdDiscriminator;
+      subschema2.jtdMetadata = jtdMetadata;
+    }
+    function getErrorPath(dataProp, dataPropType, jsPropertySyntax) {
+      if (dataProp instanceof codegen_12.Name) {
+        const isNumber = dataPropType === Type.Num;
+        return jsPropertySyntax ? isNumber ? codegen_12._`"[" + ${dataProp} + "]"` : codegen_12._`"['" + ${dataProp} + "']"` : isNumber ? codegen_12._`"/" + ${dataProp}` : codegen_12._`"/" + ${dataProp}.replace(/~/g, "~0").replace(/\\//g, "~1")`;
+      }
+      return jsPropertySyntax ? codegen_12.getProperty(dataProp).toString() : "/" + util_12.escapeJsonPointer(dataProp);
+    }
+  })(subschema);
+  return subschema;
+}
+var hasRequiredCode;
+function requireCode() {
+  if (hasRequiredCode) return code;
+  hasRequiredCode = 1;
+  Object.defineProperty(code, "__esModule", { value: true });
+  code.validateUnion = code.validateArray = code.usePattern = code.callValidateCode = code.schemaProperties = code.allSchemaProperties = code.noPropertyInData = code.propertyInData = code.isOwnProperty = code.hasPropFunc = code.reportMissingProp = code.checkMissingProp = code.checkReportMissingProp = void 0;
+  const codegen_12 = codegen;
+  const util_12 = requireUtil();
+  const subschema_12 = requireSubschema();
+  const names_12 = names$1;
+  function checkReportMissingProp(cxt, prop) {
+    const { gen, data, it } = cxt;
+    gen.if(noPropertyInData(gen, data, prop, it.opts.ownProperties), () => {
+      cxt.setParams({ missingProperty: codegen_12._`${prop}` }, true);
+      cxt.error();
+    });
+  }
+  code.checkReportMissingProp = checkReportMissingProp;
+  function checkMissingProp({ gen, data, it: { opts } }, properties2, missing) {
+    return codegen_12.or(...properties2.map((prop) => codegen_12.and(noPropertyInData(gen, data, prop, opts.ownProperties), codegen_12._`${missing} = ${prop}`)));
+  }
+  code.checkMissingProp = checkMissingProp;
+  function reportMissingProp(cxt, missing) {
+    cxt.setParams({ missingProperty: missing }, true);
+    cxt.error();
+  }
+  code.reportMissingProp = reportMissingProp;
+  function hasPropFunc(gen) {
+    return gen.scopeValue("func", {
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      ref: Object.prototype.hasOwnProperty,
+      code: codegen_12._`Object.prototype.hasOwnProperty`
+    });
+  }
+  code.hasPropFunc = hasPropFunc;
+  function isOwnProperty(gen, data, property) {
+    return codegen_12._`${hasPropFunc(gen)}.call(${data}, ${property})`;
+  }
+  code.isOwnProperty = isOwnProperty;
+  function propertyInData(gen, data, property, ownProperties) {
+    const cond = codegen_12._`${data}${codegen_12.getProperty(property)} !== undefined`;
+    return ownProperties ? codegen_12._`${cond} && ${isOwnProperty(gen, data, property)}` : cond;
+  }
+  code.propertyInData = propertyInData;
+  function noPropertyInData(gen, data, property, ownProperties) {
+    const cond = codegen_12._`${data}${codegen_12.getProperty(property)} === undefined`;
+    return ownProperties ? codegen_12.or(cond, codegen_12.not(isOwnProperty(gen, data, property))) : cond;
+  }
+  code.noPropertyInData = noPropertyInData;
+  function allSchemaProperties(schemaMap) {
+    return schemaMap ? Object.keys(schemaMap).filter((p) => p !== "__proto__") : [];
+  }
+  code.allSchemaProperties = allSchemaProperties;
+  function schemaProperties(it, schemaMap) {
+    return allSchemaProperties(schemaMap).filter((p) => !util_12.alwaysValidSchema(it, schemaMap[p]));
+  }
+  code.schemaProperties = schemaProperties;
+  function callValidateCode({ schemaCode, data, it: { gen, topSchemaRef, schemaPath, errorPath }, it }, func, context2, passSchema) {
+    const dataAndSchema = passSchema ? codegen_12._`${schemaCode}, ${data}, ${topSchemaRef}${schemaPath}` : data;
+    const valCxt = [
+      [names_12.default.dataPath, codegen_12.strConcat(names_12.default.dataPath, errorPath)],
+      [names_12.default.parentData, it.parentData],
+      [names_12.default.parentDataProperty, it.parentDataProperty],
+      [names_12.default.rootData, names_12.default.rootData]
+    ];
+    if (it.opts.dynamicRef)
+      valCxt.push([names_12.default.dynamicAnchors, names_12.default.dynamicAnchors]);
+    const args = codegen_12._`${dataAndSchema}, ${gen.object(...valCxt)}`;
+    return context2 !== codegen_12.nil ? codegen_12._`${func}.call(${context2}, ${args})` : codegen_12._`${func}(${args})`;
+  }
+  code.callValidateCode = callValidateCode;
+  function usePattern(gen, pattern2) {
+    return gen.scopeValue("pattern", {
+      key: pattern2,
+      ref: new RegExp(pattern2, "u"),
+      code: codegen_12._`new RegExp(${pattern2}, "u")`
+    });
+  }
+  code.usePattern = usePattern;
+  function validateArray(cxt) {
+    const { gen, data, keyword: keyword2, it } = cxt;
+    const valid2 = gen.name("valid");
+    if (it.allErrors) {
+      const validArr = gen.let("valid", true);
+      validateItems(() => gen.assign(validArr, false));
+      return validArr;
+    }
+    gen.var(valid2, true);
+    validateItems(() => gen.break());
+    return valid2;
+    function validateItems(notValid) {
+      const len = gen.const("len", codegen_12._`${data}.length`);
+      gen.forRange("i", 0, len, (i) => {
+        cxt.subschema({
+          keyword: keyword2,
+          dataProp: i,
+          dataPropType: subschema_12.Type.Num
+        }, valid2);
+        gen.if(codegen_12.not(valid2), notValid);
+      });
+    }
+  }
+  code.validateArray = validateArray;
+  function validateUnion(cxt) {
+    const { gen, schema, keyword: keyword2, it } = cxt;
+    if (!Array.isArray(schema))
+      throw new Error("ajv implementation error");
+    const alwaysValid = schema.some((sch) => util_12.alwaysValidSchema(it, sch));
+    if (alwaysValid && !it.opts.unevaluated)
+      return;
+    const valid2 = gen.let("valid", false);
+    const schValid = gen.name("_valid");
+    gen.block(() => schema.forEach((_sch, i) => {
+      const schCxt = cxt.subschema({
+        keyword: keyword2,
+        schemaProp: i,
+        compositeRule: true
+      }, schValid);
+      gen.assign(valid2, codegen_12._`${valid2} || ${schValid}`);
+      const merged = cxt.mergeValidEvaluated(schCxt, schValid);
+      if (!merged)
+        gen.if(codegen_12.not(valid2));
+    }));
+    cxt.result(valid2, () => cxt.reset(), () => cxt.error(true));
+  }
+  code.validateUnion = validateUnion;
+  return code;
+}
+var hasRequiredKeyword;
+function requireKeyword() {
+  if (hasRequiredKeyword) return keyword;
+  hasRequiredKeyword = 1;
+  Object.defineProperty(keyword, "__esModule", { value: true });
+  keyword.keywordCode = void 0;
+  const context_12 = requireContext();
+  const errors_12 = errors;
+  const code_12 = requireCode();
+  const codegen_12 = codegen;
+  const names_12 = names$1;
+  function keywordCode(it, keyword2, def2, ruleType) {
+    const cxt = new context_12.default(it, def2, keyword2);
+    if ("code" in def2) {
+      def2.code(cxt, ruleType);
+    } else if (cxt.$data && def2.validate) {
+      funcKeywordCode(cxt, def2);
+    } else if ("macro" in def2) {
+      macroKeywordCode(cxt, def2);
+    } else if (def2.compile || def2.validate) {
+      funcKeywordCode(cxt, def2);
+    }
+  }
+  keyword.keywordCode = keywordCode;
+  function macroKeywordCode(cxt, def2) {
+    const { gen, keyword: keyword2, schema, parentSchema, it } = cxt;
+    const macroSchema = def2.macro.call(it.self, schema, parentSchema, it);
+    const schemaRef = useKeyword(gen, keyword2, macroSchema);
+    if (it.opts.validateSchema !== false)
+      it.self.validateSchema(macroSchema, true);
+    const valid2 = gen.name("valid");
+    cxt.subschema({
+      schema: macroSchema,
+      schemaPath: codegen_12.nil,
+      errSchemaPath: `${it.errSchemaPath}/${keyword2}`,
+      topSchemaRef: schemaRef,
+      compositeRule: true
+    }, valid2);
+    cxt.pass(valid2, () => cxt.error(true));
+  }
+  function funcKeywordCode(cxt, def2) {
+    var _a;
+    const { gen, keyword: keyword2, schema, parentSchema, $data, it } = cxt;
+    checkAsync(it, def2);
+    const validate2 = !$data && def2.compile ? def2.compile.call(it.self, schema, parentSchema, it) : def2.validate;
+    const validateRef = useKeyword(gen, keyword2, validate2);
+    const valid2 = gen.let("valid");
+    cxt.block$data(valid2, validateKeyword);
+    cxt.ok((_a = def2.valid) !== null && _a !== void 0 ? _a : valid2);
+    function validateKeyword() {
+      if (def2.errors === false) {
+        assignValid();
+        if (def2.modifying)
+          modifyData(cxt);
+        reportErrs(() => cxt.error());
+      } else {
+        const ruleErrs = def2.async ? validateAsync() : validateSync();
+        if (def2.modifying)
+          modifyData(cxt);
+        reportErrs(() => addErrs(cxt, ruleErrs));
+      }
+    }
+    function validateAsync() {
+      const ruleErrs = gen.let("ruleErrs", null);
+      gen.try(() => assignValid(codegen_12._`await `), (e) => gen.assign(valid2, false).if(codegen_12._`${e} instanceof ${it.ValidationError}`, () => gen.assign(ruleErrs, codegen_12._`${e}.errors`), () => gen.throw(e)));
+      return ruleErrs;
+    }
+    function validateSync() {
+      const validateErrs = codegen_12._`${validateRef}.errors`;
+      gen.assign(validateErrs, null);
+      assignValid(codegen_12.nil);
+      return validateErrs;
+    }
+    function assignValid(_await = def2.async ? codegen_12._`await ` : codegen_12.nil) {
+      const passCxt = it.opts.passContext ? names_12.default.this : names_12.default.self;
+      const passSchema = !("compile" in def2 && !$data || def2.schema === false);
+      gen.assign(valid2, codegen_12._`${_await}${code_12.callValidateCode(cxt, validateRef, passCxt, passSchema)}`, def2.modifying);
+    }
+    function reportErrs(errors2) {
+      var _a2;
+      gen.if(codegen_12.not((_a2 = def2.valid) !== null && _a2 !== void 0 ? _a2 : valid2), errors2);
+    }
+  }
+  function modifyData(cxt) {
+    const { gen, data, it } = cxt;
+    gen.if(it.parentData, () => gen.assign(data, codegen_12._`${it.parentData}[${it.parentDataProperty}]`));
+  }
+  function addErrs(cxt, errs) {
+    const { gen } = cxt;
+    gen.if(codegen_12._`Array.isArray(${errs})`, () => {
+      gen.assign(names_12.default.vErrors, codegen_12._`${names_12.default.vErrors} === null ? ${errs} : ${names_12.default.vErrors}.concat(${errs})`).assign(names_12.default.errors, codegen_12._`${names_12.default.vErrors}.length`);
+      errors_12.extendErrors(cxt);
+    }, () => cxt.error());
+  }
+  function checkAsync({ schemaEnv }, def2) {
+    if (def2.async && !schemaEnv.$async)
+      throw new Error("async keyword in sync schema");
+  }
+  function useKeyword(gen, keyword2, result) {
+    if (result === void 0)
+      throw new Error(`keyword "${keyword2}" failed to compile`);
+    return gen.scopeValue("keyword", typeof result == "function" ? { ref: result } : { ref: result, code: codegen_12.stringify(result) });
+  }
+  return keyword;
+}
+var hasRequiredIterate;
+function requireIterate() {
+  if (hasRequiredIterate) return iterate;
+  hasRequiredIterate = 1;
+  Object.defineProperty(iterate, "__esModule", { value: true });
+  iterate.schemaKeywords = void 0;
+  const applicability_1 = applicability;
+  const dataType_12 = requireDataType();
+  const defaults_1 = requireDefaults();
+  const keyword_1 = requireKeyword();
+  const util_12 = requireUtil();
+  const _1 = requireValidate();
+  const codegen_12 = codegen;
+  const names_12 = names$1;
+  function schemaKeywords(it, types, typeErrors, errsCount) {
+    const { gen, schema, data, allErrors, opts, self: self2 } = it;
+    const { RULES } = self2;
+    if (schema.$ref && (opts.ignoreKeywordsWithRef || !util_12.schemaHasRulesButRef(schema, RULES))) {
+      gen.block(() => keyword_1.keywordCode(it, "$ref", RULES.all.$ref.definition));
+      return;
+    }
+    if (!opts.jtd)
+      checkStrictTypes(it, types);
+    gen.block(() => {
+      for (const group of RULES.rules)
+        groupKeywords(group);
+      groupKeywords(RULES.post);
+    });
+    function groupKeywords(group) {
+      if (!applicability_1.shouldUseGroup(schema, group))
+        return;
+      if (group.type) {
+        gen.if(dataType_12.checkDataType(group.type, data, opts.strict));
+        iterateKeywords(it, group);
+        if (types.length === 1 && types[0] === group.type && typeErrors) {
+          gen.else();
+          dataType_12.reportTypeError(it);
+        }
+        gen.endIf();
+      } else {
+        iterateKeywords(it, group);
+      }
+      if (!allErrors)
+        gen.if(codegen_12._`${names_12.default.errors} === ${errsCount || 0}`);
+    }
+  }
+  iterate.schemaKeywords = schemaKeywords;
+  function iterateKeywords(it, group) {
+    const { gen, schema, opts: { useDefaults } } = it;
+    if (useDefaults)
+      defaults_1.assignDefaults(it, group.type);
+    gen.block(() => {
+      for (const rule of group.rules) {
+        if (applicability_1.shouldUseRule(schema, rule)) {
+          keyword_1.keywordCode(it, rule.keyword, rule.definition, group.type);
+        }
+      }
+    });
+  }
+  function checkStrictTypes(it, types) {
+    if (it.schemaEnv.meta || !it.opts.strictTypes)
+      return;
+    checkContextTypes(it, types);
+    if (!it.opts.allowUnionTypes)
+      checkMultipleTypes(it, types);
+    checkKeywordTypes(it, it.dataTypes);
+  }
+  function checkContextTypes(it, types) {
+    if (!types.length)
+      return;
+    if (!it.dataTypes.length) {
+      it.dataTypes = types;
+      return;
+    }
+    types.forEach((t2) => {
+      if (!includesType(it.dataTypes, t2)) {
+        strictTypesError(it, `type "${t2}" not allowed by context "${it.dataTypes.join(",")}"`);
+      }
+    });
+    it.dataTypes = it.dataTypes.filter((t2) => includesType(types, t2));
+  }
+  function checkMultipleTypes(it, ts) {
+    if (ts.length > 1 && !(ts.length === 2 && ts.includes("null"))) {
+      strictTypesError(it, "use allowUnionTypes to allow union type keyword");
+    }
+  }
+  function checkKeywordTypes(it, ts) {
+    const rules2 = it.self.RULES.all;
+    for (const keyword2 in rules2) {
+      const rule = rules2[keyword2];
+      if (typeof rule == "object" && applicability_1.shouldUseRule(it.schema, rule)) {
+        const { type: type2 } = rule.definition;
+        if (type2.length && !type2.some((t2) => hasApplicableType(ts, t2))) {
+          strictTypesError(it, `missing type "${type2.join(",")}" for keyword "${keyword2}"`);
+        }
+      }
+    }
+  }
+  function hasApplicableType(schTs, kwdT) {
+    return schTs.includes(kwdT) || kwdT === "number" && schTs.includes("integer");
+  }
+  function includesType(ts, t2) {
+    return ts.includes(t2) || t2 === "integer" && ts.includes("number");
+  }
+  function strictTypesError(it, msg) {
+    const schemaPath = it.schemaEnv.baseId + it.errSchemaPath;
+    msg += ` at "${schemaPath}" (strictTypes)`;
+    _1.checkStrictMode(it, msg, it.opts.strictTypes);
+  }
+  return iterate;
+}
+var resolve$1 = {};
+var fastDeepEqual = function equal(a, b) {
+  if (a === b) return true;
+  if (a && b && typeof a == "object" && typeof b == "object") {
+    if (a.constructor !== b.constructor) return false;
+    var length, i, keys;
+    if (Array.isArray(a)) {
+      length = a.length;
+      if (length != b.length) return false;
+      for (i = length; i-- !== 0; )
+        if (!equal(a[i], b[i])) return false;
+      return true;
+    }
+    if (a.constructor === RegExp) return a.source === b.source && a.flags === b.flags;
+    if (a.valueOf !== Object.prototype.valueOf) return a.valueOf() === b.valueOf();
+    if (a.toString !== Object.prototype.toString) return a.toString() === b.toString();
+    keys = Object.keys(a);
+    length = keys.length;
+    if (length !== Object.keys(b).length) return false;
+    for (i = length; i-- !== 0; )
+      if (!Object.prototype.hasOwnProperty.call(b, keys[i])) return false;
+    for (i = length; i-- !== 0; ) {
+      var key = keys[i];
+      if (!equal(a[key], b[key])) return false;
+    }
+    return true;
+  }
+  return a !== a && b !== b;
+};
+var jsonSchemaTraverse = { exports: {} };
+var traverse = jsonSchemaTraverse.exports = function(schema, opts, cb) {
+  if (typeof opts == "function") {
+    cb = opts;
+    opts = {};
+  }
+  cb = opts.cb || cb;
+  var pre = typeof cb == "function" ? cb : cb.pre || function() {
+  };
+  var post = cb.post || function() {
+  };
+  _traverse(opts, pre, post, schema, "", schema);
+};
+traverse.keywords = {
+  additionalItems: true,
+  items: true,
+  contains: true,
+  additionalProperties: true,
+  propertyNames: true,
+  not: true,
+  if: true,
+  then: true,
+  else: true
+};
+traverse.arrayKeywords = {
+  items: true,
+  allOf: true,
+  anyOf: true,
+  oneOf: true
+};
+traverse.propsKeywords = {
+  $defs: true,
+  definitions: true,
+  properties: true,
+  patternProperties: true,
+  dependencies: true
+};
+traverse.skipKeywords = {
+  default: true,
+  enum: true,
+  const: true,
+  required: true,
+  maximum: true,
+  minimum: true,
+  exclusiveMaximum: true,
+  exclusiveMinimum: true,
+  multipleOf: true,
+  maxLength: true,
+  minLength: true,
+  pattern: true,
+  format: true,
+  maxItems: true,
+  minItems: true,
+  uniqueItems: true,
+  maxProperties: true,
+  minProperties: true
+};
+function _traverse(opts, pre, post, schema, jsonPtr, rootSchema, parentJsonPtr, parentKeyword, parentSchema, keyIndex) {
+  if (schema && typeof schema == "object" && !Array.isArray(schema)) {
+    pre(schema, jsonPtr, rootSchema, parentJsonPtr, parentKeyword, parentSchema, keyIndex);
+    for (var key in schema) {
+      var sch = schema[key];
+      if (Array.isArray(sch)) {
+        if (key in traverse.arrayKeywords) {
+          for (var i = 0; i < sch.length; i++)
+            _traverse(opts, pre, post, sch[i], jsonPtr + "/" + key + "/" + i, rootSchema, jsonPtr, key, schema, i);
+        }
+      } else if (key in traverse.propsKeywords) {
+        if (sch && typeof sch == "object") {
+          for (var prop in sch)
+            _traverse(opts, pre, post, sch[prop], jsonPtr + "/" + key + "/" + escapeJsonPtr(prop), rootSchema, jsonPtr, key, schema, prop);
+        }
+      } else if (key in traverse.keywords || opts.allKeys && !(key in traverse.skipKeywords)) {
+        _traverse(opts, pre, post, sch, jsonPtr + "/" + key, rootSchema, jsonPtr, key, schema);
+      }
+    }
+    post(schema, jsonPtr, rootSchema, parentJsonPtr, parentKeyword, parentSchema, keyIndex);
+  }
+}
+function escapeJsonPtr(str) {
+  return str.replace(/~/g, "~0").replace(/\//g, "~1");
+}
+var jsonSchemaTraverseExports = jsonSchemaTraverse.exports;
+var uri_all = { exports: {} };
+/** @license URI.js v4.4.1 (c) 2011 Gary Court. License: http://github.com/garycourt/uri-js */
+(function(module, exports) {
+  (function(global2, factory) {
+    factory(exports);
+  })(commonjsGlobal, function(exports2) {
+    function merge() {
+      for (var _len = arguments.length, sets = Array(_len), _key = 0; _key < _len; _key++) {
+        sets[_key] = arguments[_key];
+      }
+      if (sets.length > 1) {
+        sets[0] = sets[0].slice(0, -1);
+        var xl = sets.length - 1;
+        for (var x = 1; x < xl; ++x) {
+          sets[x] = sets[x].slice(1, -1);
+        }
+        sets[xl] = sets[xl].slice(1);
+        return sets.join("");
+      } else {
+        return sets[0];
+      }
+    }
+    function subexp(str) {
+      return "(?:" + str + ")";
+    }
+    function typeOf(o) {
+      return o === void 0 ? "undefined" : o === null ? "null" : Object.prototype.toString.call(o).split(" ").pop().split("]").shift().toLowerCase();
+    }
+    function toUpperCase(str) {
+      return str.toUpperCase();
+    }
+    function toArray(obj) {
+      return obj !== void 0 && obj !== null ? obj instanceof Array ? obj : typeof obj.length !== "number" || obj.split || obj.setInterval || obj.call ? [obj] : Array.prototype.slice.call(obj) : [];
+    }
+    function assign(target, source2) {
+      var obj = target;
+      if (source2) {
+        for (var key in source2) {
+          obj[key] = source2[key];
+        }
+      }
+      return obj;
+    }
+    function buildExps(isIRI) {
+      var ALPHA$$ = "[A-Za-z]", DIGIT$$ = "[0-9]", HEXDIG$$2 = merge(DIGIT$$, "[A-Fa-f]"), PCT_ENCODED$2 = subexp(subexp("%[EFef]" + HEXDIG$$2 + "%" + HEXDIG$$2 + HEXDIG$$2 + "%" + HEXDIG$$2 + HEXDIG$$2) + "|" + subexp("%[89A-Fa-f]" + HEXDIG$$2 + "%" + HEXDIG$$2 + HEXDIG$$2) + "|" + subexp("%" + HEXDIG$$2 + HEXDIG$$2)), GEN_DELIMS$$ = "[\\:\\/\\?\\#\\[\\]\\@]", SUB_DELIMS$$ = "[\\!\\$\\&\\'\\(\\)\\*\\+\\,\\;\\=]", RESERVED$$ = merge(GEN_DELIMS$$, SUB_DELIMS$$), UCSCHAR$$ = isIRI ? "[\\xA0-\\u200D\\u2010-\\u2029\\u202F-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF]" : "[]", IPRIVATE$$ = isIRI ? "[\\uE000-\\uF8FF]" : "[]", UNRESERVED$$2 = merge(ALPHA$$, DIGIT$$, "[\\-\\.\\_\\~]", UCSCHAR$$);
+      subexp(ALPHA$$ + merge(ALPHA$$, DIGIT$$, "[\\+\\-\\.]") + "*");
+      subexp(subexp(PCT_ENCODED$2 + "|" + merge(UNRESERVED$$2, SUB_DELIMS$$, "[\\:]")) + "*");
+      var DEC_OCTET_RELAXED$ = subexp(subexp("25[0-5]") + "|" + subexp("2[0-4]" + DIGIT$$) + "|" + subexp("1" + DIGIT$$ + DIGIT$$) + "|" + subexp("0?[1-9]" + DIGIT$$) + "|0?0?" + DIGIT$$), IPV4ADDRESS$ = subexp(DEC_OCTET_RELAXED$ + "\\." + DEC_OCTET_RELAXED$ + "\\." + DEC_OCTET_RELAXED$ + "\\." + DEC_OCTET_RELAXED$), H16$ = subexp(HEXDIG$$2 + "{1,4}"), LS32$ = subexp(subexp(H16$ + "\\:" + H16$) + "|" + IPV4ADDRESS$), IPV6ADDRESS1$ = subexp(subexp(H16$ + "\\:") + "{6}" + LS32$), IPV6ADDRESS2$ = subexp("\\:\\:" + subexp(H16$ + "\\:") + "{5}" + LS32$), IPV6ADDRESS3$ = subexp(subexp(H16$) + "?\\:\\:" + subexp(H16$ + "\\:") + "{4}" + LS32$), IPV6ADDRESS4$ = subexp(subexp(subexp(H16$ + "\\:") + "{0,1}" + H16$) + "?\\:\\:" + subexp(H16$ + "\\:") + "{3}" + LS32$), IPV6ADDRESS5$ = subexp(subexp(subexp(H16$ + "\\:") + "{0,2}" + H16$) + "?\\:\\:" + subexp(H16$ + "\\:") + "{2}" + LS32$), IPV6ADDRESS6$ = subexp(subexp(subexp(H16$ + "\\:") + "{0,3}" + H16$) + "?\\:\\:" + H16$ + "\\:" + LS32$), IPV6ADDRESS7$ = subexp(subexp(subexp(H16$ + "\\:") + "{0,4}" + H16$) + "?\\:\\:" + LS32$), IPV6ADDRESS8$ = subexp(subexp(subexp(H16$ + "\\:") + "{0,5}" + H16$) + "?\\:\\:" + H16$), IPV6ADDRESS9$ = subexp(subexp(subexp(H16$ + "\\:") + "{0,6}" + H16$) + "?\\:\\:"), IPV6ADDRESS$ = subexp([IPV6ADDRESS1$, IPV6ADDRESS2$, IPV6ADDRESS3$, IPV6ADDRESS4$, IPV6ADDRESS5$, IPV6ADDRESS6$, IPV6ADDRESS7$, IPV6ADDRESS8$, IPV6ADDRESS9$].join("|")), ZONEID$ = subexp(subexp(UNRESERVED$$2 + "|" + PCT_ENCODED$2) + "+");
+      subexp("[vV]" + HEXDIG$$2 + "+\\." + merge(UNRESERVED$$2, SUB_DELIMS$$, "[\\:]") + "+");
+      subexp(subexp(PCT_ENCODED$2 + "|" + merge(UNRESERVED$$2, SUB_DELIMS$$)) + "*");
+      var PCHAR$ = subexp(PCT_ENCODED$2 + "|" + merge(UNRESERVED$$2, SUB_DELIMS$$, "[\\:\\@]"));
+      subexp(subexp(PCT_ENCODED$2 + "|" + merge(UNRESERVED$$2, SUB_DELIMS$$, "[\\@]")) + "+");
+      subexp(subexp(PCHAR$ + "|" + merge("[\\/\\?]", IPRIVATE$$)) + "*");
+      return {
+        NOT_SCHEME: new RegExp(merge("[^]", ALPHA$$, DIGIT$$, "[\\+\\-\\.]"), "g"),
+        NOT_USERINFO: new RegExp(merge("[^\\%\\:]", UNRESERVED$$2, SUB_DELIMS$$), "g"),
+        NOT_HOST: new RegExp(merge("[^\\%\\[\\]\\:]", UNRESERVED$$2, SUB_DELIMS$$), "g"),
+        NOT_PATH: new RegExp(merge("[^\\%\\/\\:\\@]", UNRESERVED$$2, SUB_DELIMS$$), "g"),
+        NOT_PATH_NOSCHEME: new RegExp(merge("[^\\%\\/\\@]", UNRESERVED$$2, SUB_DELIMS$$), "g"),
+        NOT_QUERY: new RegExp(merge("[^\\%]", UNRESERVED$$2, SUB_DELIMS$$, "[\\:\\@\\/\\?]", IPRIVATE$$), "g"),
+        NOT_FRAGMENT: new RegExp(merge("[^\\%]", UNRESERVED$$2, SUB_DELIMS$$, "[\\:\\@\\/\\?]"), "g"),
+        ESCAPE: new RegExp(merge("[^]", UNRESERVED$$2, SUB_DELIMS$$), "g"),
+        UNRESERVED: new RegExp(UNRESERVED$$2, "g"),
+        OTHER_CHARS: new RegExp(merge("[^\\%]", UNRESERVED$$2, RESERVED$$), "g"),
+        PCT_ENCODED: new RegExp(PCT_ENCODED$2, "g"),
+        IPV4ADDRESS: new RegExp("^(" + IPV4ADDRESS$ + ")$"),
+        IPV6ADDRESS: new RegExp("^\\[?(" + IPV6ADDRESS$ + ")" + subexp(subexp("\\%25|\\%(?!" + HEXDIG$$2 + "{2})") + "(" + ZONEID$ + ")") + "?\\]?$")
+        //RFC 6874, with relaxed parsing rules
+      };
+    }
+    var URI_PROTOCOL = buildExps(false);
+    var IRI_PROTOCOL = buildExps(true);
+    var slicedToArray = /* @__PURE__ */ function() {
+      function sliceIterator(arr, i) {
+        var _arr = [];
+        var _n = true;
+        var _d = false;
+        var _e = void 0;
+        try {
+          for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+            _arr.push(_s.value);
+            if (i && _arr.length === i) break;
+          }
+        } catch (err) {
+          _d = true;
+          _e = err;
+        } finally {
+          try {
+            if (!_n && _i["return"]) _i["return"]();
+          } finally {
+            if (_d) throw _e;
+          }
+        }
+        return _arr;
+      }
+      return function(arr, i) {
+        if (Array.isArray(arr)) {
+          return arr;
+        } else if (Symbol.iterator in Object(arr)) {
+          return sliceIterator(arr, i);
+        } else {
+          throw new TypeError("Invalid attempt to destructure non-iterable instance");
+        }
+      };
+    }();
+    var toConsumableArray = function(arr) {
+      if (Array.isArray(arr)) {
+        for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+        return arr2;
+      } else {
+        return Array.from(arr);
+      }
+    };
+    var maxInt = 2147483647;
+    var base = 36;
+    var tMin = 1;
+    var tMax = 26;
+    var skew = 38;
+    var damp = 700;
+    var initialBias = 72;
+    var initialN = 128;
+    var delimiter = "-";
+    var regexPunycode = /^xn--/;
+    var regexNonASCII = /[^\0-\x7E]/;
+    var regexSeparators = /[\x2E\u3002\uFF0E\uFF61]/g;
+    var errors2 = {
+      "overflow": "Overflow: input needs wider integers to process",
+      "not-basic": "Illegal input >= 0x80 (not a basic code point)",
+      "invalid-input": "Invalid input"
+    };
+    var baseMinusTMin = base - tMin;
+    var floor = Math.floor;
+    var stringFromCharCode = String.fromCharCode;
+    function error$12(type2) {
+      throw new RangeError(errors2[type2]);
+    }
+    function map(array, fn) {
+      var result = [];
+      var length = array.length;
+      while (length--) {
+        result[length] = fn(array[length]);
+      }
+      return result;
+    }
+    function mapDomain(string, fn) {
+      var parts = string.split("@");
+      var result = "";
+      if (parts.length > 1) {
+        result = parts[0] + "@";
+        string = parts[1];
+      }
+      string = string.replace(regexSeparators, ".");
+      var labels = string.split(".");
+      var encoded = map(labels, fn).join(".");
+      return result + encoded;
+    }
+    function ucs2decode(string) {
+      var output = [];
+      var counter = 0;
+      var length = string.length;
+      while (counter < length) {
+        var value = string.charCodeAt(counter++);
+        if (value >= 55296 && value <= 56319 && counter < length) {
+          var extra = string.charCodeAt(counter++);
+          if ((extra & 64512) == 56320) {
+            output.push(((value & 1023) << 10) + (extra & 1023) + 65536);
+          } else {
+            output.push(value);
+            counter--;
+          }
+        } else {
+          output.push(value);
+        }
+      }
+      return output;
+    }
+    var ucs2encode = function ucs2encode2(array) {
+      return String.fromCodePoint.apply(String, toConsumableArray(array));
+    };
+    var basicToDigit = function basicToDigit2(codePoint) {
+      if (codePoint - 48 < 10) {
+        return codePoint - 22;
+      }
+      if (codePoint - 65 < 26) {
+        return codePoint - 65;
+      }
+      if (codePoint - 97 < 26) {
+        return codePoint - 97;
+      }
+      return base;
+    };
+    var digitToBasic = function digitToBasic2(digit, flag) {
+      return digit + 22 + 75 * (digit < 26) - ((flag != 0) << 5);
+    };
+    var adapt = function adapt2(delta, numPoints, firstTime) {
+      var k = 0;
+      delta = firstTime ? floor(delta / damp) : delta >> 1;
+      delta += floor(delta / numPoints);
+      for (
+        ;
+        /* no initialization */
+        delta > baseMinusTMin * tMax >> 1;
+        k += base
+      ) {
+        delta = floor(delta / baseMinusTMin);
+      }
+      return floor(k + (baseMinusTMin + 1) * delta / (delta + skew));
+    };
+    var decode = function decode2(input) {
+      var output = [];
+      var inputLength = input.length;
+      var i = 0;
+      var n = initialN;
+      var bias = initialBias;
+      var basic = input.lastIndexOf(delimiter);
+      if (basic < 0) {
+        basic = 0;
+      }
+      for (var j = 0; j < basic; ++j) {
+        if (input.charCodeAt(j) >= 128) {
+          error$12("not-basic");
+        }
+        output.push(input.charCodeAt(j));
+      }
+      for (var index = basic > 0 ? basic + 1 : 0; index < inputLength; ) {
+        var oldi = i;
+        for (
+          var w = 1, k = base;
+          ;
+          /* no condition */
+          k += base
+        ) {
+          if (index >= inputLength) {
+            error$12("invalid-input");
+          }
+          var digit = basicToDigit(input.charCodeAt(index++));
+          if (digit >= base || digit > floor((maxInt - i) / w)) {
+            error$12("overflow");
+          }
+          i += digit * w;
+          var t2 = k <= bias ? tMin : k >= bias + tMax ? tMax : k - bias;
+          if (digit < t2) {
+            break;
+          }
+          var baseMinusT = base - t2;
+          if (w > floor(maxInt / baseMinusT)) {
+            error$12("overflow");
+          }
+          w *= baseMinusT;
+        }
+        var out = output.length + 1;
+        bias = adapt(i - oldi, out, oldi == 0);
+        if (floor(i / out) > maxInt - n) {
+          error$12("overflow");
+        }
+        n += floor(i / out);
+        i %= out;
+        output.splice(i++, 0, n);
+      }
+      return String.fromCodePoint.apply(String, output);
+    };
+    var encode = function encode2(input) {
+      var output = [];
+      input = ucs2decode(input);
+      var inputLength = input.length;
+      var n = initialN;
+      var delta = 0;
+      var bias = initialBias;
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = void 0;
+      try {
+        for (var _iterator = input[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var _currentValue2 = _step.value;
+          if (_currentValue2 < 128) {
+            output.push(stringFromCharCode(_currentValue2));
+          }
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+      var basicLength = output.length;
+      var handledCPCount = basicLength;
+      if (basicLength) {
+        output.push(delimiter);
+      }
+      while (handledCPCount < inputLength) {
+        var m = maxInt;
+        var _iteratorNormalCompletion2 = true;
+        var _didIteratorError2 = false;
+        var _iteratorError2 = void 0;
+        try {
+          for (var _iterator2 = input[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+            var currentValue = _step2.value;
+            if (currentValue >= n && currentValue < m) {
+              m = currentValue;
+            }
+          }
+        } catch (err) {
+          _didIteratorError2 = true;
+          _iteratorError2 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+              _iterator2.return();
+            }
+          } finally {
+            if (_didIteratorError2) {
+              throw _iteratorError2;
+            }
+          }
+        }
+        var handledCPCountPlusOne = handledCPCount + 1;
+        if (m - n > floor((maxInt - delta) / handledCPCountPlusOne)) {
+          error$12("overflow");
+        }
+        delta += (m - n) * handledCPCountPlusOne;
+        n = m;
+        var _iteratorNormalCompletion3 = true;
+        var _didIteratorError3 = false;
+        var _iteratorError3 = void 0;
+        try {
+          for (var _iterator3 = input[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+            var _currentValue = _step3.value;
+            if (_currentValue < n && ++delta > maxInt) {
+              error$12("overflow");
+            }
+            if (_currentValue == n) {
+              var q = delta;
+              for (
+                var k = base;
+                ;
+                /* no condition */
+                k += base
+              ) {
+                var t2 = k <= bias ? tMin : k >= bias + tMax ? tMax : k - bias;
+                if (q < t2) {
+                  break;
+                }
+                var qMinusT = q - t2;
+                var baseMinusT = base - t2;
+                output.push(stringFromCharCode(digitToBasic(t2 + qMinusT % baseMinusT, 0)));
+                q = floor(qMinusT / baseMinusT);
+              }
+              output.push(stringFromCharCode(digitToBasic(q, 0)));
+              bias = adapt(delta, handledCPCountPlusOne, handledCPCount == basicLength);
+              delta = 0;
+              ++handledCPCount;
+            }
+          }
+        } catch (err) {
+          _didIteratorError3 = true;
+          _iteratorError3 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion3 && _iterator3.return) {
+              _iterator3.return();
+            }
+          } finally {
+            if (_didIteratorError3) {
+              throw _iteratorError3;
+            }
+          }
+        }
+        ++delta;
+        ++n;
+      }
+      return output.join("");
+    };
+    var toUnicode = function toUnicode2(input) {
+      return mapDomain(input, function(string) {
+        return regexPunycode.test(string) ? decode(string.slice(4).toLowerCase()) : string;
+      });
+    };
+    var toASCII = function toASCII2(input) {
+      return mapDomain(input, function(string) {
+        return regexNonASCII.test(string) ? "xn--" + encode(string) : string;
+      });
+    };
+    var punycode = {
+      /**
+       * A string representing the current Punycode.js version number.
+       * @memberOf punycode
+       * @type String
+       */
+      "version": "2.1.0",
+      /**
+       * An object of methods to convert from JavaScript's internal character
+       * representation (UCS-2) to Unicode code points, and back.
+       * @see <https://mathiasbynens.be/notes/javascript-encoding>
+       * @memberOf punycode
+       * @type Object
+       */
+      "ucs2": {
+        "decode": ucs2decode,
+        "encode": ucs2encode
+      },
+      "decode": decode,
+      "encode": encode,
+      "toASCII": toASCII,
+      "toUnicode": toUnicode
+    };
+    var SCHEMES = {};
+    function pctEncChar(chr) {
+      var c = chr.charCodeAt(0);
+      var e = void 0;
+      if (c < 16) e = "%0" + c.toString(16).toUpperCase();
+      else if (c < 128) e = "%" + c.toString(16).toUpperCase();
+      else if (c < 2048) e = "%" + (c >> 6 | 192).toString(16).toUpperCase() + "%" + (c & 63 | 128).toString(16).toUpperCase();
+      else e = "%" + (c >> 12 | 224).toString(16).toUpperCase() + "%" + (c >> 6 & 63 | 128).toString(16).toUpperCase() + "%" + (c & 63 | 128).toString(16).toUpperCase();
+      return e;
+    }
+    function pctDecChars(str) {
+      var newStr = "";
+      var i = 0;
+      var il = str.length;
+      while (i < il) {
+        var c = parseInt(str.substr(i + 1, 2), 16);
+        if (c < 128) {
+          newStr += String.fromCharCode(c);
+          i += 3;
+        } else if (c >= 194 && c < 224) {
+          if (il - i >= 6) {
+            var c2 = parseInt(str.substr(i + 4, 2), 16);
+            newStr += String.fromCharCode((c & 31) << 6 | c2 & 63);
+          } else {
+            newStr += str.substr(i, 6);
+          }
+          i += 6;
+        } else if (c >= 224) {
+          if (il - i >= 9) {
+            var _c = parseInt(str.substr(i + 4, 2), 16);
+            var c3 = parseInt(str.substr(i + 7, 2), 16);
+            newStr += String.fromCharCode((c & 15) << 12 | (_c & 63) << 6 | c3 & 63);
+          } else {
+            newStr += str.substr(i, 9);
+          }
+          i += 9;
+        } else {
+          newStr += str.substr(i, 3);
+          i += 3;
+        }
+      }
+      return newStr;
+    }
+    function _normalizeComponentEncoding(components, protocol) {
+      function decodeUnreserved2(str) {
+        var decStr = pctDecChars(str);
+        return !decStr.match(protocol.UNRESERVED) ? str : decStr;
+      }
+      if (components.scheme) components.scheme = String(components.scheme).replace(protocol.PCT_ENCODED, decodeUnreserved2).toLowerCase().replace(protocol.NOT_SCHEME, "");
+      if (components.userinfo !== void 0) components.userinfo = String(components.userinfo).replace(protocol.PCT_ENCODED, decodeUnreserved2).replace(protocol.NOT_USERINFO, pctEncChar).replace(protocol.PCT_ENCODED, toUpperCase);
+      if (components.host !== void 0) components.host = String(components.host).replace(protocol.PCT_ENCODED, decodeUnreserved2).toLowerCase().replace(protocol.NOT_HOST, pctEncChar).replace(protocol.PCT_ENCODED, toUpperCase);
+      if (components.path !== void 0) components.path = String(components.path).replace(protocol.PCT_ENCODED, decodeUnreserved2).replace(components.scheme ? protocol.NOT_PATH : protocol.NOT_PATH_NOSCHEME, pctEncChar).replace(protocol.PCT_ENCODED, toUpperCase);
+      if (components.query !== void 0) components.query = String(components.query).replace(protocol.PCT_ENCODED, decodeUnreserved2).replace(protocol.NOT_QUERY, pctEncChar).replace(protocol.PCT_ENCODED, toUpperCase);
+      if (components.fragment !== void 0) components.fragment = String(components.fragment).replace(protocol.PCT_ENCODED, decodeUnreserved2).replace(protocol.NOT_FRAGMENT, pctEncChar).replace(protocol.PCT_ENCODED, toUpperCase);
+      return components;
+    }
+    function _stripLeadingZeros(str) {
+      return str.replace(/^0*(.*)/, "$1") || "0";
+    }
+    function _normalizeIPv4(host, protocol) {
+      var matches = host.match(protocol.IPV4ADDRESS) || [];
+      var _matches = slicedToArray(matches, 2), address = _matches[1];
+      if (address) {
+        return address.split(".").map(_stripLeadingZeros).join(".");
+      } else {
+        return host;
+      }
+    }
+    function _normalizeIPv6(host, protocol) {
+      var matches = host.match(protocol.IPV6ADDRESS) || [];
+      var _matches2 = slicedToArray(matches, 3), address = _matches2[1], zone = _matches2[2];
+      if (address) {
+        var _address$toLowerCase$ = address.toLowerCase().split("::").reverse(), _address$toLowerCase$2 = slicedToArray(_address$toLowerCase$, 2), last = _address$toLowerCase$2[0], first = _address$toLowerCase$2[1];
+        var firstFields = first ? first.split(":").map(_stripLeadingZeros) : [];
+        var lastFields = last.split(":").map(_stripLeadingZeros);
+        var isLastFieldIPv4Address = protocol.IPV4ADDRESS.test(lastFields[lastFields.length - 1]);
+        var fieldCount = isLastFieldIPv4Address ? 7 : 8;
+        var lastFieldsStart = lastFields.length - fieldCount;
+        var fields = Array(fieldCount);
+        for (var x = 0; x < fieldCount; ++x) {
+          fields[x] = firstFields[x] || lastFields[lastFieldsStart + x] || "";
+        }
+        if (isLastFieldIPv4Address) {
+          fields[fieldCount - 1] = _normalizeIPv4(fields[fieldCount - 1], protocol);
+        }
+        var allZeroFields = fields.reduce(function(acc, field, index) {
+          if (!field || field === "0") {
+            var lastLongest = acc[acc.length - 1];
+            if (lastLongest && lastLongest.index + lastLongest.length === index) {
+              lastLongest.length++;
+            } else {
+              acc.push({ index, length: 1 });
+            }
+          }
+          return acc;
+        }, []);
+        var longestZeroFields = allZeroFields.sort(function(a, b) {
+          return b.length - a.length;
+        })[0];
+        var newHost = void 0;
+        if (longestZeroFields && longestZeroFields.length > 1) {
+          var newFirst = fields.slice(0, longestZeroFields.index);
+          var newLast = fields.slice(longestZeroFields.index + longestZeroFields.length);
+          newHost = newFirst.join(":") + "::" + newLast.join(":");
+        } else {
+          newHost = fields.join(":");
+        }
+        if (zone) {
+          newHost += "%" + zone;
+        }
+        return newHost;
+      } else {
+        return host;
+      }
+    }
+    var URI_PARSE = /^(?:([^:\/?#]+):)?(?:\/\/((?:([^\/?#@]*)@)?(\[[^\/?#\]]+\]|[^\/?#:]*)(?:\:(\d*))?))?([^?#]*)(?:\?([^#]*))?(?:#((?:.|\n|\r)*))?/i;
+    var NO_MATCH_IS_UNDEFINED = "".match(/(){0}/)[1] === void 0;
+    function parse2(uriString) {
+      var options = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
+      var components = {};
+      var protocol = options.iri !== false ? IRI_PROTOCOL : URI_PROTOCOL;
+      if (options.reference === "suffix") uriString = (options.scheme ? options.scheme + ":" : "") + "//" + uriString;
+      var matches = uriString.match(URI_PARSE);
+      if (matches) {
+        if (NO_MATCH_IS_UNDEFINED) {
+          components.scheme = matches[1];
+          components.userinfo = matches[3];
+          components.host = matches[4];
+          components.port = parseInt(matches[5], 10);
+          components.path = matches[6] || "";
+          components.query = matches[7];
+          components.fragment = matches[8];
+          if (isNaN(components.port)) {
+            components.port = matches[5];
+          }
+        } else {
+          components.scheme = matches[1] || void 0;
+          components.userinfo = uriString.indexOf("@") !== -1 ? matches[3] : void 0;
+          components.host = uriString.indexOf("//") !== -1 ? matches[4] : void 0;
+          components.port = parseInt(matches[5], 10);
+          components.path = matches[6] || "";
+          components.query = uriString.indexOf("?") !== -1 ? matches[7] : void 0;
+          components.fragment = uriString.indexOf("#") !== -1 ? matches[8] : void 0;
+          if (isNaN(components.port)) {
+            components.port = uriString.match(/\/\/(?:.|\n)*\:(?:\/|\?|\#|$)/) ? matches[4] : void 0;
+          }
+        }
+        if (components.host) {
+          components.host = _normalizeIPv6(_normalizeIPv4(components.host, protocol), protocol);
+        }
+        if (components.scheme === void 0 && components.userinfo === void 0 && components.host === void 0 && components.port === void 0 && !components.path && components.query === void 0) {
+          components.reference = "same-document";
+        } else if (components.scheme === void 0) {
+          components.reference = "relative";
+        } else if (components.fragment === void 0) {
+          components.reference = "absolute";
+        } else {
+          components.reference = "uri";
+        }
+        if (options.reference && options.reference !== "suffix" && options.reference !== components.reference) {
+          components.error = components.error || "URI is not a " + options.reference + " reference.";
+        }
+        var schemeHandler = SCHEMES[(options.scheme || components.scheme || "").toLowerCase()];
+        if (!options.unicodeSupport && (!schemeHandler || !schemeHandler.unicodeSupport)) {
+          if (components.host && (options.domainHost || schemeHandler && schemeHandler.domainHost)) {
+            try {
+              components.host = punycode.toASCII(components.host.replace(protocol.PCT_ENCODED, pctDecChars).toLowerCase());
+            } catch (e) {
+              components.error = components.error || "Host's domain name can not be converted to ASCII via punycode: " + e;
+            }
+          }
+          _normalizeComponentEncoding(components, URI_PROTOCOL);
+        } else {
+          _normalizeComponentEncoding(components, protocol);
+        }
+        if (schemeHandler && schemeHandler.parse) {
+          schemeHandler.parse(components, options);
+        }
+      } else {
+        components.error = components.error || "URI can not be parsed.";
+      }
+      return components;
+    }
+    function _recomposeAuthority(components, options) {
+      var protocol = options.iri !== false ? IRI_PROTOCOL : URI_PROTOCOL;
+      var uriTokens = [];
+      if (components.userinfo !== void 0) {
+        uriTokens.push(components.userinfo);
+        uriTokens.push("@");
+      }
+      if (components.host !== void 0) {
+        uriTokens.push(_normalizeIPv6(_normalizeIPv4(String(components.host), protocol), protocol).replace(protocol.IPV6ADDRESS, function(_, $1, $2) {
+          return "[" + $1 + ($2 ? "%25" + $2 : "") + "]";
+        }));
+      }
+      if (typeof components.port === "number" || typeof components.port === "string") {
+        uriTokens.push(":");
+        uriTokens.push(String(components.port));
+      }
+      return uriTokens.length ? uriTokens.join("") : void 0;
+    }
+    var RDS1 = /^\.\.?\//;
+    var RDS2 = /^\/\.(\/|$)/;
+    var RDS3 = /^\/\.\.(\/|$)/;
+    var RDS5 = /^\/?(?:.|\n)*?(?=\/|$)/;
+    function removeDotSegments(input) {
+      var output = [];
+      while (input.length) {
+        if (input.match(RDS1)) {
+          input = input.replace(RDS1, "");
+        } else if (input.match(RDS2)) {
+          input = input.replace(RDS2, "/");
+        } else if (input.match(RDS3)) {
+          input = input.replace(RDS3, "/");
+          output.pop();
+        } else if (input === "." || input === "..") {
+          input = "";
+        } else {
+          var im = input.match(RDS5);
+          if (im) {
+            var s = im[0];
+            input = input.slice(s.length);
+            output.push(s);
+          } else {
+            throw new Error("Unexpected dot segment condition");
+          }
+        }
+      }
+      return output.join("");
+    }
+    function serialize(components) {
+      var options = arguments.length > 1 && arguments[1] !== void 0 ? arguments[1] : {};
+      var protocol = options.iri ? IRI_PROTOCOL : URI_PROTOCOL;
+      var uriTokens = [];
+      var schemeHandler = SCHEMES[(options.scheme || components.scheme || "").toLowerCase()];
+      if (schemeHandler && schemeHandler.serialize) schemeHandler.serialize(components, options);
+      if (components.host) {
+        if (protocol.IPV6ADDRESS.test(components.host)) ;
+        else if (options.domainHost || schemeHandler && schemeHandler.domainHost) {
+          try {
+            components.host = !options.iri ? punycode.toASCII(components.host.replace(protocol.PCT_ENCODED, pctDecChars).toLowerCase()) : punycode.toUnicode(components.host);
+          } catch (e) {
+            components.error = components.error || "Host's domain name can not be converted to " + (!options.iri ? "ASCII" : "Unicode") + " via punycode: " + e;
+          }
+        }
+      }
+      _normalizeComponentEncoding(components, protocol);
+      if (options.reference !== "suffix" && components.scheme) {
+        uriTokens.push(components.scheme);
+        uriTokens.push(":");
+      }
+      var authority = _recomposeAuthority(components, options);
+      if (authority !== void 0) {
+        if (options.reference !== "suffix") {
+          uriTokens.push("//");
+        }
+        uriTokens.push(authority);
+        if (components.path && components.path.charAt(0) !== "/") {
+          uriTokens.push("/");
+        }
+      }
+      if (components.path !== void 0) {
+        var s = components.path;
+        if (!options.absolutePath && (!schemeHandler || !schemeHandler.absolutePath)) {
+          s = removeDotSegments(s);
+        }
+        if (authority === void 0) {
+          s = s.replace(/^\/\//, "/%2F");
+        }
+        uriTokens.push(s);
+      }
+      if (components.query !== void 0) {
+        uriTokens.push("?");
+        uriTokens.push(components.query);
+      }
+      if (components.fragment !== void 0) {
+        uriTokens.push("#");
+        uriTokens.push(components.fragment);
+      }
+      return uriTokens.join("");
+    }
+    function resolveComponents(base2, relative) {
+      var options = arguments.length > 2 && arguments[2] !== void 0 ? arguments[2] : {};
+      var skipNormalization = arguments[3];
+      var target = {};
+      if (!skipNormalization) {
+        base2 = parse2(serialize(base2, options), options);
+        relative = parse2(serialize(relative, options), options);
+      }
+      options = options || {};
+      if (!options.tolerant && relative.scheme) {
+        target.scheme = relative.scheme;
+        target.userinfo = relative.userinfo;
+        target.host = relative.host;
+        target.port = relative.port;
+        target.path = removeDotSegments(relative.path || "");
+        target.query = relative.query;
+      } else {
+        if (relative.userinfo !== void 0 || relative.host !== void 0 || relative.port !== void 0) {
+          target.userinfo = relative.userinfo;
+          target.host = relative.host;
+          target.port = relative.port;
+          target.path = removeDotSegments(relative.path || "");
+          target.query = relative.query;
+        } else {
+          if (!relative.path) {
+            target.path = base2.path;
+            if (relative.query !== void 0) {
+              target.query = relative.query;
+            } else {
+              target.query = base2.query;
+            }
+          } else {
+            if (relative.path.charAt(0) === "/") {
+              target.path = removeDotSegments(relative.path);
+            } else {
+              if ((base2.userinfo !== void 0 || base2.host !== void 0 || base2.port !== void 0) && !base2.path) {
+                target.path = "/" + relative.path;
+              } else if (!base2.path) {
+                target.path = relative.path;
+              } else {
+                target.path = base2.path.slice(0, base2.path.lastIndexOf("/") + 1) + relative.path;
+              }
+              target.path = removeDotSegments(target.path);
+            }
+            target.query = relative.query;
+          }
+          target.userinfo = base2.userinfo;
+          target.host = base2.host;
+          target.port = base2.port;
+        }
+        target.scheme = base2.scheme;
+      }
+      target.fragment = relative.fragment;
+      return target;
+    }
+    function resolve2(baseURI, relativeURI, options) {
+      var schemelessOptions = assign({ scheme: "null" }, options);
+      return serialize(resolveComponents(parse2(baseURI, schemelessOptions), parse2(relativeURI, schemelessOptions), schemelessOptions, true), schemelessOptions);
+    }
+    function normalize(uri, options) {
+      if (typeof uri === "string") {
+        uri = serialize(parse2(uri, options), options);
+      } else if (typeOf(uri) === "object") {
+        uri = parse2(serialize(uri, options), options);
+      }
+      return uri;
+    }
+    function equal3(uriA, uriB, options) {
+      if (typeof uriA === "string") {
+        uriA = serialize(parse2(uriA, options), options);
+      } else if (typeOf(uriA) === "object") {
+        uriA = serialize(uriA, options);
+      }
+      if (typeof uriB === "string") {
+        uriB = serialize(parse2(uriB, options), options);
+      } else if (typeOf(uriB) === "object") {
+        uriB = serialize(uriB, options);
+      }
+      return uriA === uriB;
+    }
+    function escapeComponent(str, options) {
+      return str && str.toString().replace(!options || !options.iri ? URI_PROTOCOL.ESCAPE : IRI_PROTOCOL.ESCAPE, pctEncChar);
+    }
+    function unescapeComponent(str, options) {
+      return str && str.toString().replace(!options || !options.iri ? URI_PROTOCOL.PCT_ENCODED : IRI_PROTOCOL.PCT_ENCODED, pctDecChars);
+    }
+    var handler = {
+      scheme: "http",
+      domainHost: true,
+      parse: function parse3(components, options) {
+        if (!components.host) {
+          components.error = components.error || "HTTP URIs must have a host.";
+        }
+        return components;
+      },
+      serialize: function serialize2(components, options) {
+        var secure = String(components.scheme).toLowerCase() === "https";
+        if (components.port === (secure ? 443 : 80) || components.port === "") {
+          components.port = void 0;
+        }
+        if (!components.path) {
+          components.path = "/";
+        }
+        return components;
+      }
+    };
+    var handler$1 = {
+      scheme: "https",
+      domainHost: handler.domainHost,
+      parse: handler.parse,
+      serialize: handler.serialize
+    };
+    function isSecure(wsComponents) {
+      return typeof wsComponents.secure === "boolean" ? wsComponents.secure : String(wsComponents.scheme).toLowerCase() === "wss";
+    }
+    var handler$2 = {
+      scheme: "ws",
+      domainHost: true,
+      parse: function parse3(components, options) {
+        var wsComponents = components;
+        wsComponents.secure = isSecure(wsComponents);
+        wsComponents.resourceName = (wsComponents.path || "/") + (wsComponents.query ? "?" + wsComponents.query : "");
+        wsComponents.path = void 0;
+        wsComponents.query = void 0;
+        return wsComponents;
+      },
+      serialize: function serialize2(wsComponents, options) {
+        if (wsComponents.port === (isSecure(wsComponents) ? 443 : 80) || wsComponents.port === "") {
+          wsComponents.port = void 0;
+        }
+        if (typeof wsComponents.secure === "boolean") {
+          wsComponents.scheme = wsComponents.secure ? "wss" : "ws";
+          wsComponents.secure = void 0;
+        }
+        if (wsComponents.resourceName) {
+          var _wsComponents$resourc = wsComponents.resourceName.split("?"), _wsComponents$resourc2 = slicedToArray(_wsComponents$resourc, 2), path2 = _wsComponents$resourc2[0], query = _wsComponents$resourc2[1];
+          wsComponents.path = path2 && path2 !== "/" ? path2 : void 0;
+          wsComponents.query = query;
+          wsComponents.resourceName = void 0;
+        }
+        wsComponents.fragment = void 0;
+        return wsComponents;
+      }
+    };
+    var handler$3 = {
+      scheme: "wss",
+      domainHost: handler$2.domainHost,
+      parse: handler$2.parse,
+      serialize: handler$2.serialize
+    };
+    var O = {};
+    var UNRESERVED$$ = "[A-Za-z0-9\\-\\.\\_\\~\\xA0-\\u200D\\u2010-\\u2029\\u202F-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFEF]";
+    var HEXDIG$$ = "[0-9A-Fa-f]";
+    var PCT_ENCODED$ = subexp(subexp("%[EFef]" + HEXDIG$$ + "%" + HEXDIG$$ + HEXDIG$$ + "%" + HEXDIG$$ + HEXDIG$$) + "|" + subexp("%[89A-Fa-f]" + HEXDIG$$ + "%" + HEXDIG$$ + HEXDIG$$) + "|" + subexp("%" + HEXDIG$$ + HEXDIG$$));
+    var ATEXT$$ = "[A-Za-z0-9\\!\\$\\%\\'\\*\\+\\-\\^\\_\\`\\{\\|\\}\\~]";
+    var QTEXT$$ = "[\\!\\$\\%\\'\\(\\)\\*\\+\\,\\-\\.0-9\\<\\>A-Z\\x5E-\\x7E]";
+    var VCHAR$$ = merge(QTEXT$$, '[\\"\\\\]');
+    var SOME_DELIMS$$ = "[\\!\\$\\'\\(\\)\\*\\+\\,\\;\\:\\@]";
+    var UNRESERVED = new RegExp(UNRESERVED$$, "g");
+    var PCT_ENCODED = new RegExp(PCT_ENCODED$, "g");
+    var NOT_LOCAL_PART = new RegExp(merge("[^]", ATEXT$$, "[\\.]", '[\\"]', VCHAR$$), "g");
+    var NOT_HFNAME = new RegExp(merge("[^]", UNRESERVED$$, SOME_DELIMS$$), "g");
+    var NOT_HFVALUE = NOT_HFNAME;
+    function decodeUnreserved(str) {
+      var decStr = pctDecChars(str);
+      return !decStr.match(UNRESERVED) ? str : decStr;
+    }
+    var handler$4 = {
+      scheme: "mailto",
+      parse: function parse$$1(components, options) {
+        var mailtoComponents = components;
+        var to = mailtoComponents.to = mailtoComponents.path ? mailtoComponents.path.split(",") : [];
+        mailtoComponents.path = void 0;
+        if (mailtoComponents.query) {
+          var unknownHeaders = false;
+          var headers = {};
+          var hfields = mailtoComponents.query.split("&");
+          for (var x = 0, xl = hfields.length; x < xl; ++x) {
+            var hfield = hfields[x].split("=");
+            switch (hfield[0]) {
+              case "to":
+                var toAddrs = hfield[1].split(",");
+                for (var _x = 0, _xl = toAddrs.length; _x < _xl; ++_x) {
+                  to.push(toAddrs[_x]);
+                }
+                break;
+              case "subject":
+                mailtoComponents.subject = unescapeComponent(hfield[1], options);
+                break;
+              case "body":
+                mailtoComponents.body = unescapeComponent(hfield[1], options);
+                break;
+              default:
+                unknownHeaders = true;
+                headers[unescapeComponent(hfield[0], options)] = unescapeComponent(hfield[1], options);
+                break;
+            }
+          }
+          if (unknownHeaders) mailtoComponents.headers = headers;
+        }
+        mailtoComponents.query = void 0;
+        for (var _x2 = 0, _xl2 = to.length; _x2 < _xl2; ++_x2) {
+          var addr = to[_x2].split("@");
+          addr[0] = unescapeComponent(addr[0]);
+          if (!options.unicodeSupport) {
+            try {
+              addr[1] = punycode.toASCII(unescapeComponent(addr[1], options).toLowerCase());
+            } catch (e) {
+              mailtoComponents.error = mailtoComponents.error || "Email address's domain name can not be converted to ASCII via punycode: " + e;
+            }
+          } else {
+            addr[1] = unescapeComponent(addr[1], options).toLowerCase();
+          }
+          to[_x2] = addr.join("@");
+        }
+        return mailtoComponents;
+      },
+      serialize: function serialize$$1(mailtoComponents, options) {
+        var components = mailtoComponents;
+        var to = toArray(mailtoComponents.to);
+        if (to) {
+          for (var x = 0, xl = to.length; x < xl; ++x) {
+            var toAddr = String(to[x]);
+            var atIdx = toAddr.lastIndexOf("@");
+            var localPart = toAddr.slice(0, atIdx).replace(PCT_ENCODED, decodeUnreserved).replace(PCT_ENCODED, toUpperCase).replace(NOT_LOCAL_PART, pctEncChar);
+            var domain = toAddr.slice(atIdx + 1);
+            try {
+              domain = !options.iri ? punycode.toASCII(unescapeComponent(domain, options).toLowerCase()) : punycode.toUnicode(domain);
+            } catch (e) {
+              components.error = components.error || "Email address's domain name can not be converted to " + (!options.iri ? "ASCII" : "Unicode") + " via punycode: " + e;
+            }
+            to[x] = localPart + "@" + domain;
+          }
+          components.path = to.join(",");
+        }
+        var headers = mailtoComponents.headers = mailtoComponents.headers || {};
+        if (mailtoComponents.subject) headers["subject"] = mailtoComponents.subject;
+        if (mailtoComponents.body) headers["body"] = mailtoComponents.body;
+        var fields = [];
+        for (var name in headers) {
+          if (headers[name] !== O[name]) {
+            fields.push(name.replace(PCT_ENCODED, decodeUnreserved).replace(PCT_ENCODED, toUpperCase).replace(NOT_HFNAME, pctEncChar) + "=" + headers[name].replace(PCT_ENCODED, decodeUnreserved).replace(PCT_ENCODED, toUpperCase).replace(NOT_HFVALUE, pctEncChar));
+          }
+        }
+        if (fields.length) {
+          components.query = fields.join("&");
+        }
+        return components;
+      }
+    };
+    var URN_PARSE = /^([^\:]+)\:(.*)/;
+    var handler$5 = {
+      scheme: "urn",
+      parse: function parse$$1(components, options) {
+        var matches = components.path && components.path.match(URN_PARSE);
+        var urnComponents = components;
+        if (matches) {
+          var scheme = options.scheme || urnComponents.scheme || "urn";
+          var nid = matches[1].toLowerCase();
+          var nss = matches[2];
+          var urnScheme = scheme + ":" + (options.nid || nid);
+          var schemeHandler = SCHEMES[urnScheme];
+          urnComponents.nid = nid;
+          urnComponents.nss = nss;
+          urnComponents.path = void 0;
+          if (schemeHandler) {
+            urnComponents = schemeHandler.parse(urnComponents, options);
+          }
+        } else {
+          urnComponents.error = urnComponents.error || "URN can not be parsed.";
+        }
+        return urnComponents;
+      },
+      serialize: function serialize$$1(urnComponents, options) {
+        var scheme = options.scheme || urnComponents.scheme || "urn";
+        var nid = urnComponents.nid;
+        var urnScheme = scheme + ":" + (options.nid || nid);
+        var schemeHandler = SCHEMES[urnScheme];
+        if (schemeHandler) {
+          urnComponents = schemeHandler.serialize(urnComponents, options);
+        }
+        var uriComponents = urnComponents;
+        var nss = urnComponents.nss;
+        uriComponents.path = (nid || options.nid) + ":" + nss;
+        return uriComponents;
+      }
+    };
+    var UUID = /^[0-9A-Fa-f]{8}(?:\-[0-9A-Fa-f]{4}){3}\-[0-9A-Fa-f]{12}$/;
+    var handler$6 = {
+      scheme: "urn:uuid",
+      parse: function parse3(urnComponents, options) {
+        var uuidComponents = urnComponents;
+        uuidComponents.uuid = uuidComponents.nss;
+        uuidComponents.nss = void 0;
+        if (!options.tolerant && (!uuidComponents.uuid || !uuidComponents.uuid.match(UUID))) {
+          uuidComponents.error = uuidComponents.error || "UUID is not valid.";
+        }
+        return uuidComponents;
+      },
+      serialize: function serialize2(uuidComponents, options) {
+        var urnComponents = uuidComponents;
+        urnComponents.nss = (uuidComponents.uuid || "").toLowerCase();
+        return urnComponents;
+      }
+    };
+    SCHEMES[handler.scheme] = handler;
+    SCHEMES[handler$1.scheme] = handler$1;
+    SCHEMES[handler$2.scheme] = handler$2;
+    SCHEMES[handler$3.scheme] = handler$3;
+    SCHEMES[handler$4.scheme] = handler$4;
+    SCHEMES[handler$5.scheme] = handler$5;
+    SCHEMES[handler$6.scheme] = handler$6;
+    exports2.SCHEMES = SCHEMES;
+    exports2.pctEncChar = pctEncChar;
+    exports2.pctDecChars = pctDecChars;
+    exports2.parse = parse2;
+    exports2.removeDotSegments = removeDotSegments;
+    exports2.serialize = serialize;
+    exports2.resolveComponents = resolveComponents;
+    exports2.resolve = resolve2;
+    exports2.normalize = normalize;
+    exports2.equal = equal3;
+    exports2.escapeComponent = escapeComponent;
+    exports2.unescapeComponent = unescapeComponent;
+    Object.defineProperty(exports2, "__esModule", { value: true });
+  });
+})(uri_all, uri_all.exports);
+var uri_allExports = uri_all.exports;
+var hasRequiredResolve;
+function requireResolve() {
+  if (hasRequiredResolve) return resolve$1;
+  hasRequiredResolve = 1;
+  Object.defineProperty(resolve$1, "__esModule", { value: true });
+  resolve$1.getSchemaRefs = resolve$1.resolveUrl = resolve$1.normalizeId = resolve$1._getFullPath = resolve$1.getFullPath = resolve$1.inlineRef = void 0;
+  const util_12 = requireUtil();
+  const equal3 = fastDeepEqual;
+  const traverse2 = jsonSchemaTraverseExports;
+  const URI2 = uri_allExports;
+  const SIMPLE_INLINED = /* @__PURE__ */ new Set([
+    "type",
+    "format",
+    "pattern",
+    "maxLength",
+    "minLength",
+    "maxProperties",
+    "minProperties",
+    "maxItems",
+    "minItems",
+    "maximum",
+    "minimum",
+    "uniqueItems",
+    "multipleOf",
+    "required",
+    "enum",
+    "const"
+  ]);
+  function inlineRef(schema, limit2 = true) {
+    if (typeof schema == "boolean")
+      return true;
+    if (limit2 === true)
+      return !hasRef(schema);
+    if (!limit2)
+      return false;
+    return countKeys(schema) <= limit2;
+  }
+  resolve$1.inlineRef = inlineRef;
+  const REF_KEYWORDS = /* @__PURE__ */ new Set([
+    "$ref",
+    "$recursiveRef",
+    "$recursiveAnchor",
+    "$dynamicRef",
+    "$dynamicAnchor"
+  ]);
+  function hasRef(schema) {
+    for (const key in schema) {
+      if (REF_KEYWORDS.has(key))
+        return true;
+      const sch = schema[key];
+      if (Array.isArray(sch) && sch.some(hasRef))
+        return true;
+      if (typeof sch == "object" && hasRef(sch))
+        return true;
+    }
+    return false;
+  }
+  function countKeys(schema) {
+    let count = 0;
+    for (const key in schema) {
+      if (key === "$ref")
+        return Infinity;
+      count++;
+      if (SIMPLE_INLINED.has(key))
+        continue;
+      if (typeof schema[key] == "object") {
+        util_12.eachItem(schema[key], (sch) => count += countKeys(sch));
+      }
+      if (count === Infinity)
+        return Infinity;
+    }
+    return count;
+  }
+  function getFullPath(id2 = "", normalize) {
+    if (normalize !== false)
+      id2 = normalizeId(id2);
+    const p = URI2.parse(id2);
+    return _getFullPath(p);
+  }
+  resolve$1.getFullPath = getFullPath;
+  function _getFullPath(p) {
+    return URI2.serialize(p).split("#")[0] + "#";
+  }
+  resolve$1._getFullPath = _getFullPath;
+  const TRAILING_SLASH_HASH = /#\/?$/;
+  function normalizeId(id2) {
+    return id2 ? id2.replace(TRAILING_SLASH_HASH, "") : "";
+  }
+  resolve$1.normalizeId = normalizeId;
+  function resolveUrl(baseId, id2) {
+    id2 = normalizeId(id2);
+    return URI2.resolve(baseId, id2);
+  }
+  resolve$1.resolveUrl = resolveUrl;
+  const ANCHOR = /^[a-z_][-a-z0-9._]*$/i;
+  function getSchemaRefs(schema) {
+    if (typeof schema == "boolean")
+      return {};
+    const schemaId = normalizeId(schema.$id);
+    const baseIds = { "": schemaId };
+    const pathPrefix = getFullPath(schemaId, false);
+    const localRefs = {};
+    const schemaRefs = /* @__PURE__ */ new Set();
+    traverse2(schema, { allKeys: true }, (sch, jsonPtr, _, parentJsonPtr) => {
+      if (parentJsonPtr === void 0)
+        return;
+      const fullPath = pathPrefix + jsonPtr;
+      let baseId = baseIds[parentJsonPtr];
+      if (typeof sch.$id == "string")
+        baseId = addRef.call(this, sch.$id);
+      addAnchor.call(this, sch.$anchor);
+      addAnchor.call(this, sch.$dynamicAnchor);
+      baseIds[jsonPtr] = baseId;
+      function addRef(ref2) {
+        ref2 = normalizeId(baseId ? URI2.resolve(baseId, ref2) : ref2);
+        if (schemaRefs.has(ref2))
+          throw ambiguos(ref2);
+        schemaRefs.add(ref2);
+        let schOrRef = this.refs[ref2];
+        if (typeof schOrRef == "string")
+          schOrRef = this.refs[schOrRef];
+        if (typeof schOrRef == "object") {
+          checkAmbiguosRef(sch, schOrRef.schema, ref2);
+        } else if (ref2 !== normalizeId(fullPath)) {
+          if (ref2[0] === "#") {
+            checkAmbiguosRef(sch, localRefs[ref2], ref2);
+            localRefs[ref2] = sch;
+          } else {
+            this.refs[ref2] = fullPath;
+          }
+        }
+        return ref2;
+      }
+      function addAnchor(anchor) {
+        if (typeof anchor == "string") {
+          if (!ANCHOR.test(anchor))
+            throw new Error(`invalid anchor "${anchor}"`);
+          addRef.call(this, `#${anchor}`);
+        }
+      }
+    });
+    return localRefs;
+    function checkAmbiguosRef(sch1, sch2, ref2) {
+      if (sch2 !== void 0 && !equal3(sch1, sch2))
+        throw ambiguos(ref2);
+    }
+    function ambiguos(ref2) {
+      return new Error(`reference "${ref2}" resolves to more than one schema`);
+    }
+  }
+  resolve$1.getSchemaRefs = getSchemaRefs;
+  return resolve$1;
+}
+var hasRequiredValidate;
+function requireValidate() {
+  if (hasRequiredValidate) return validate;
+  hasRequiredValidate = 1;
+  Object.defineProperty(validate, "__esModule", { value: true });
+  validate.checkStrictMode = validate.schemaCxtHasRules = validate.subschemaCode = validate.validateFunctionCode = void 0;
+  const boolSchema_1 = boolSchema;
+  const dataType_12 = requireDataType();
+  const iterate_1 = requireIterate();
+  const codegen_12 = codegen;
+  const names_12 = names$1;
+  const resolve_12 = requireResolve();
+  const util_12 = requireUtil();
+  function validateFunctionCode(it) {
+    if (isSchemaObj(it)) {
+      checkKeywords(it);
+      if (schemaCxtHasRules(it)) {
+        topSchemaObjCode(it);
+        return;
+      }
+    }
+    validateFunction(it, () => boolSchema_1.topBoolOrEmptySchema(it));
+  }
+  validate.validateFunctionCode = validateFunctionCode;
+  function validateFunction({ gen, validateName, schema, schemaEnv, opts }, body) {
+    if (opts.code.es5) {
+      gen.func(validateName, codegen_12._`${names_12.default.data}, ${names_12.default.valCxt}`, schemaEnv.$async, () => {
+        gen.code(codegen_12._`"use strict"; ${funcSourceUrl(schema, opts)}`);
+        destructureValCxtES5(gen, opts);
+        gen.code(body);
+      });
+    } else {
+      gen.func(validateName, codegen_12._`${names_12.default.data}, ${destructureValCxt(opts)}`, schemaEnv.$async, () => gen.code(funcSourceUrl(schema, opts)).code(body));
+    }
+  }
+  function destructureValCxt(opts) {
+    return codegen_12._`{${names_12.default.dataPath}="", ${names_12.default.parentData}, ${names_12.default.parentDataProperty}, ${names_12.default.rootData}=${names_12.default.data}${opts.dynamicRef ? codegen_12._`, ${names_12.default.dynamicAnchors}={}` : codegen_12.nil}}={}`;
+  }
+  function destructureValCxtES5(gen, opts) {
+    gen.if(names_12.default.valCxt, () => {
+      gen.var(names_12.default.dataPath, codegen_12._`${names_12.default.valCxt}.${names_12.default.dataPath}`);
+      gen.var(names_12.default.parentData, codegen_12._`${names_12.default.valCxt}.${names_12.default.parentData}`);
+      gen.var(names_12.default.parentDataProperty, codegen_12._`${names_12.default.valCxt}.${names_12.default.parentDataProperty}`);
+      gen.var(names_12.default.rootData, codegen_12._`${names_12.default.valCxt}.${names_12.default.rootData}`);
+      if (opts.dynamicRef)
+        gen.var(names_12.default.dynamicAnchors, codegen_12._`${names_12.default.valCxt}.${names_12.default.dynamicAnchors}`);
+    }, () => {
+      gen.var(names_12.default.dataPath, codegen_12._`""`);
+      gen.var(names_12.default.parentData, codegen_12._`undefined`);
+      gen.var(names_12.default.parentDataProperty, codegen_12._`undefined`);
+      gen.var(names_12.default.rootData, names_12.default.data);
+      if (opts.dynamicRef)
+        gen.var(names_12.default.dynamicAnchors, codegen_12._`{}`);
+    });
+  }
+  function topSchemaObjCode(it) {
+    const { schema, opts, gen } = it;
+    validateFunction(it, () => {
+      if (opts.$comment && schema.$comment)
+        commentKeyword(it);
+      checkNoDefault(it);
+      gen.let(names_12.default.vErrors, null);
+      gen.let(names_12.default.errors, 0);
+      if (opts.unevaluated)
+        resetEvaluated(it);
+      typeAndKeywords(it);
+      returnResults(it);
+    });
+    return;
+  }
+  function resetEvaluated(it) {
+    const { gen, validateName } = it;
+    it.evaluated = gen.const("evaluated", codegen_12._`${validateName}.evaluated`);
+    gen.if(codegen_12._`${it.evaluated}.dynamicProps`, () => gen.assign(codegen_12._`${it.evaluated}.props`, codegen_12._`undefined`));
+    gen.if(codegen_12._`${it.evaluated}.dynamicItems`, () => gen.assign(codegen_12._`${it.evaluated}.items`, codegen_12._`undefined`));
+  }
+  function funcSourceUrl(schema, opts) {
+    return typeof schema == "object" && schema.$id && (opts.code.source || opts.code.process) ? codegen_12._`/*# sourceURL=${schema.$id} */` : codegen_12.nil;
+  }
+  function subschemaCode(it, valid2) {
+    if (isSchemaObj(it)) {
+      checkKeywords(it);
+      if (schemaCxtHasRules(it)) {
+        subSchemaObjCode(it, valid2);
+        return;
+      }
+    }
+    boolSchema_1.boolOrEmptySchema(it, valid2);
+  }
+  validate.subschemaCode = subschemaCode;
+  function schemaCxtHasRules({ schema, self: self2 }) {
+    if (typeof schema == "boolean")
+      return !schema;
+    for (const key in schema)
+      if (self2.RULES.all[key])
+        return true;
+    return false;
+  }
+  validate.schemaCxtHasRules = schemaCxtHasRules;
+  function isSchemaObj(it) {
+    return typeof it.schema != "boolean";
+  }
+  function subSchemaObjCode(it, valid2) {
+    const { schema, gen, opts } = it;
+    if (opts.$comment && schema.$comment)
+      commentKeyword(it);
+    updateContext(it);
+    checkAsync(it);
+    const errsCount = gen.const("_errs", names_12.default.errors);
+    typeAndKeywords(it, errsCount);
+    gen.var(valid2, codegen_12._`${errsCount} === ${names_12.default.errors}`);
+  }
+  function checkKeywords(it) {
+    util_12.checkUnknownRules(it);
+    checkRefsAndKeywords(it);
+  }
+  function typeAndKeywords(it, errsCount) {
+    if (it.opts.jtd)
+      return iterate_1.schemaKeywords(it, [], false, errsCount);
+    const types = dataType_12.getSchemaTypes(it.schema);
+    const checkedTypes = dataType_12.coerceAndCheckDataType(it, types);
+    iterate_1.schemaKeywords(it, types, !checkedTypes, errsCount);
+  }
+  function checkRefsAndKeywords(it) {
+    const { schema, errSchemaPath, opts, self: self2 } = it;
+    if (schema.$ref && opts.ignoreKeywordsWithRef && util_12.schemaHasRulesButRef(schema, self2.RULES)) {
+      self2.logger.warn(`$ref: keywords ignored in schema at path "${errSchemaPath}"`);
+    }
+  }
+  function checkNoDefault(it) {
+    const { schema, opts } = it;
+    if (schema.default !== void 0 && opts.useDefaults && opts.strict) {
+      checkStrictMode(it, "default is ignored in the schema root");
+    }
+  }
+  function updateContext(it) {
+    if (it.schema.$id)
+      it.baseId = resolve_12.resolveUrl(it.baseId, it.schema.$id);
+  }
+  function checkAsync(it) {
+    if (it.schema.$async && !it.schemaEnv.$async)
+      throw new Error("async schema in sync schema");
+  }
+  function commentKeyword({ gen, schemaEnv, schema, errSchemaPath, opts }) {
+    const msg = schema.$comment;
+    if (opts.$comment === true) {
+      gen.code(codegen_12._`${names_12.default.self}.logger.log(${msg})`);
+    } else if (typeof opts.$comment == "function") {
+      const schemaPath = codegen_12.str`${errSchemaPath}/$comment`;
+      const rootName = gen.scopeValue("root", { ref: schemaEnv.root });
+      gen.code(codegen_12._`${names_12.default.self}.opts.$comment(${msg}, ${schemaPath}, ${rootName}.schema)`);
+    }
+  }
+  function returnResults(it) {
+    const { gen, schemaEnv, validateName, ValidationError, opts } = it;
+    if (schemaEnv.$async) {
+      gen.if(codegen_12._`${names_12.default.errors} === 0`, () => gen.return(names_12.default.data), () => gen.throw(codegen_12._`new ${ValidationError}(${names_12.default.vErrors})`));
+    } else {
+      gen.assign(codegen_12._`${validateName}.errors`, names_12.default.vErrors);
+      if (opts.unevaluated)
+        assignEvaluated(it);
+      gen.return(codegen_12._`${names_12.default.errors} === 0`);
+    }
+  }
+  function assignEvaluated({ gen, evaluated, props, items: items2 }) {
+    if (props instanceof codegen_12.Name)
+      gen.assign(codegen_12._`${evaluated}.props`, props);
+    if (items2 instanceof codegen_12.Name)
+      gen.assign(codegen_12._`${evaluated}.items`, items2);
+  }
+  function checkStrictMode(it, msg, mode = it.opts.strict) {
+    if (!mode)
+      return;
+    msg = `strict mode: ${msg}`;
+    if (mode === true)
+      throw new Error(msg);
+    it.self.logger.warn(msg);
+  }
+  validate.checkStrictMode = checkStrictMode;
+  return validate;
+}
+var hasRequiredUtil;
+function requireUtil() {
+  if (hasRequiredUtil) return util;
+  hasRequiredUtil = 1;
+  Object.defineProperty(util, "__esModule", { value: true });
+  util.func = util.setEvaluated = util.evaluatedPropsToName = util.mergeEvaluated = util.eachItem = util.unescapeJsonPointer = util.escapeJsonPointer = util.escapeFragment = util.unescapeFragment = util.schemaRefOrVal = util.schemaHasRulesButRef = util.schemaHasRules = util.checkUnknownRules = util.alwaysValidSchema = util.toHash = void 0;
+  const codegen_12 = codegen;
+  const validate_12 = requireValidate();
+  function toHash(arr) {
+    const hash = {};
+    for (const item of arr)
+      hash[item] = true;
+    return hash;
+  }
+  util.toHash = toHash;
+  function alwaysValidSchema(it, schema) {
+    if (typeof schema == "boolean")
+      return schema;
+    if (Object.keys(schema).length === 0)
+      return true;
+    checkUnknownRules(it, schema);
+    return !schemaHasRules(schema, it.self.RULES.all);
+  }
+  util.alwaysValidSchema = alwaysValidSchema;
+  function checkUnknownRules(it, schema = it.schema) {
+    const { opts, self: self2 } = it;
+    if (!opts.strict)
+      return;
+    if (typeof schema === "boolean")
+      return;
+    const rules2 = self2.RULES.keywords;
+    for (const key in schema) {
+      if (!rules2[key])
+        validate_12.checkStrictMode(it, `unknown keyword: "${key}"`);
+    }
+  }
+  util.checkUnknownRules = checkUnknownRules;
+  function schemaHasRules(schema, rules2) {
+    if (typeof schema == "boolean")
+      return !schema;
+    for (const key in schema)
+      if (rules2[key])
+        return true;
+    return false;
+  }
+  util.schemaHasRules = schemaHasRules;
+  function schemaHasRulesButRef(schema, RULES) {
+    if (typeof schema == "boolean")
+      return !schema;
+    for (const key in schema)
+      if (key !== "$ref" && RULES.all[key])
+        return true;
+    return false;
+  }
+  util.schemaHasRulesButRef = schemaHasRulesButRef;
+  function schemaRefOrVal({ topSchemaRef, schemaPath }, schema, keyword2, $data) {
+    if (!$data) {
+      if (typeof schema == "number" || typeof schema == "boolean")
+        return schema;
+      if (typeof schema == "string")
+        return codegen_12._`${schema}`;
+    }
+    return codegen_12._`${topSchemaRef}${schemaPath}${codegen_12.getProperty(keyword2)}`;
+  }
+  util.schemaRefOrVal = schemaRefOrVal;
+  function unescapeFragment(str) {
+    return unescapeJsonPointer(decodeURIComponent(str));
+  }
+  util.unescapeFragment = unescapeFragment;
+  function escapeFragment(str) {
+    return encodeURIComponent(escapeJsonPointer(str));
+  }
+  util.escapeFragment = escapeFragment;
+  function escapeJsonPointer(str) {
+    if (typeof str == "number")
+      return `${str}`;
+    return str.replace(/~/g, "~0").replace(/\//g, "~1");
+  }
+  util.escapeJsonPointer = escapeJsonPointer;
+  function unescapeJsonPointer(str) {
+    return str.replace(/~1/g, "/").replace(/~0/g, "~");
+  }
+  util.unescapeJsonPointer = unescapeJsonPointer;
+  function eachItem(xs, f) {
+    if (Array.isArray(xs)) {
+      for (const x of xs)
+        f(x);
+    } else {
+      f(xs);
+    }
+  }
+  util.eachItem = eachItem;
+  function makeMergeEvaluated({ mergeNames, mergeToName, mergeValues, resultToName }) {
+    return (gen, from, to, toName) => {
+      const res = to === void 0 ? from : to instanceof codegen_12.Name ? (from instanceof codegen_12.Name ? mergeNames(gen, from, to) : mergeToName(gen, from, to), to) : from instanceof codegen_12.Name ? (mergeToName(gen, to, from), from) : mergeValues(from, to);
+      return toName === codegen_12.Name && !(res instanceof codegen_12.Name) ? resultToName(gen, res) : res;
+    };
+  }
+  util.mergeEvaluated = {
+    props: makeMergeEvaluated({
+      mergeNames: (gen, from, to) => gen.if(codegen_12._`${to} !== true && ${from} !== undefined`, () => {
+        gen.if(codegen_12._`${from} === true`, () => gen.assign(to, true), () => gen.assign(to, codegen_12._`${to} || {}`).code(codegen_12._`Object.assign(${to}, ${from})`));
+      }),
+      mergeToName: (gen, from, to) => gen.if(codegen_12._`${to} !== true`, () => {
+        if (from === true) {
+          gen.assign(to, true);
+        } else {
+          gen.assign(to, codegen_12._`${to} || {}`);
+          setEvaluated(gen, to, from);
+        }
+      }),
+      mergeValues: (from, to) => from === true ? true : { ...from, ...to },
+      resultToName: evaluatedPropsToName
+    }),
+    items: makeMergeEvaluated({
+      mergeNames: (gen, from, to) => gen.if(codegen_12._`${to} !== true && ${from} !== undefined`, () => gen.assign(to, codegen_12._`${from} === true ? true : ${to} > ${from} ? ${to} : ${from}`)),
+      mergeToName: (gen, from, to) => gen.if(codegen_12._`${to} !== true`, () => gen.assign(to, from === true ? true : codegen_12._`${to} > ${from} ? ${to} : ${from}`)),
+      mergeValues: (from, to) => from === true ? true : Math.max(from, to),
+      resultToName: (gen, items2) => gen.var("items", items2)
+    })
+  };
+  function evaluatedPropsToName(gen, ps) {
+    if (ps === true)
+      return gen.var("props", true);
+    const props = gen.var("props", codegen_12._`{}`);
+    if (ps !== void 0)
+      setEvaluated(gen, props, ps);
+    return props;
+  }
+  util.evaluatedPropsToName = evaluatedPropsToName;
+  function setEvaluated(gen, props, ps) {
+    Object.keys(ps).forEach((p) => gen.assign(codegen_12._`${props}${codegen_12.getProperty(p)}`, true));
+  }
+  util.setEvaluated = setEvaluated;
+  function func(gen, f) {
+    return gen.scopeValue("func", {
+      ref: f,
+      code: f.code
+    });
+  }
+  util.func = func;
+  return util;
+}
+var hasRequiredDataType;
+function requireDataType() {
+  if (hasRequiredDataType) return dataType;
+  hasRequiredDataType = 1;
+  (function(exports) {
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.reportTypeError = exports.checkDataTypes = exports.checkDataType = exports.coerceAndCheckDataType = exports.getJSONTypes = exports.getSchemaTypes = exports.DataType = void 0;
+    const rules_1 = rules;
+    const applicability_1 = applicability;
+    const errors_12 = errors;
+    const codegen_12 = codegen;
+    const util_12 = requireUtil();
+    var DataType;
+    (function(DataType2) {
+      DataType2[DataType2["Correct"] = 0] = "Correct";
+      DataType2[DataType2["Wrong"] = 1] = "Wrong";
+    })(DataType = exports.DataType || (exports.DataType = {}));
+    function getSchemaTypes(schema) {
+      const types = getJSONTypes(schema.type);
+      const hasNull = types.includes("null");
+      if (hasNull) {
+        if (schema.nullable === false)
+          throw new Error("type: null contradicts nullable: false");
+      } else {
+        if (!types.length && schema.nullable !== void 0) {
+          throw new Error('"nullable" cannot be used without "type"');
+        }
+        if (schema.nullable === true)
+          types.push("null");
+      }
+      return types;
+    }
+    exports.getSchemaTypes = getSchemaTypes;
+    function getJSONTypes(ts) {
+      const types = Array.isArray(ts) ? ts : ts ? [ts] : [];
+      if (types.every(rules_1.isJSONType))
+        return types;
+      throw new Error("type must be JSONType or JSONType[]: " + types.join(","));
+    }
+    exports.getJSONTypes = getJSONTypes;
+    function coerceAndCheckDataType(it, types) {
+      const { gen, data, opts } = it;
+      const coerceTo = coerceToTypes(types, opts.coerceTypes);
+      const checkTypes = types.length > 0 && !(coerceTo.length === 0 && types.length === 1 && applicability_1.schemaHasRulesForType(it, types[0]));
+      if (checkTypes) {
+        const wrongType = checkDataTypes(types, data, opts.strict, DataType.Wrong);
+        gen.if(wrongType, () => {
+          if (coerceTo.length)
+            coerceData(it, types, coerceTo);
+          else
+            reportTypeError(it);
+        });
+      }
+      return checkTypes;
+    }
+    exports.coerceAndCheckDataType = coerceAndCheckDataType;
+    const COERCIBLE = /* @__PURE__ */ new Set(["string", "number", "integer", "boolean", "null"]);
+    function coerceToTypes(types, coerceTypes) {
+      return coerceTypes ? types.filter((t2) => COERCIBLE.has(t2) || coerceTypes === "array" && t2 === "array") : [];
+    }
+    function coerceData(it, types, coerceTo) {
+      const { gen, data, opts } = it;
+      const dataType2 = gen.let("dataType", codegen_12._`typeof ${data}`);
+      const coerced = gen.let("coerced", codegen_12._`undefined`);
+      if (opts.coerceTypes === "array") {
+        gen.if(codegen_12._`${dataType2} == 'object' && Array.isArray(${data}) && ${data}.length == 1`, () => gen.assign(data, codegen_12._`${data}[0]`).assign(dataType2, codegen_12._`typeof ${data}`).if(checkDataTypes(types, data, opts.strict), () => gen.assign(coerced, data)));
+      }
+      gen.if(codegen_12._`${coerced} !== undefined`);
+      for (const t2 of coerceTo) {
+        if (COERCIBLE.has(t2) || t2 === "array" && opts.coerceTypes === "array") {
+          coerceSpecificType(t2);
+        }
+      }
+      gen.else();
+      reportTypeError(it);
+      gen.endIf();
+      gen.if(codegen_12._`${coerced} !== undefined`, () => {
+        gen.assign(data, coerced);
+        assignParentData(it, coerced);
+      });
+      function coerceSpecificType(t2) {
+        switch (t2) {
+          case "string":
+            gen.elseIf(codegen_12._`${dataType2} == "number" || ${dataType2} == "boolean"`).assign(coerced, codegen_12._`"" + ${data}`).elseIf(codegen_12._`${data} === null`).assign(coerced, codegen_12._`""`);
+            return;
+          case "number":
+            gen.elseIf(codegen_12._`${dataType2} == "boolean" || ${data} === null
+              || (${dataType2} == "string" && ${data} && ${data} == +${data})`).assign(coerced, codegen_12._`+${data}`);
+            return;
+          case "integer":
+            gen.elseIf(codegen_12._`${dataType2} === "boolean" || ${data} === null
+              || (${dataType2} === "string" && ${data} && ${data} == +${data} && !(${data} % 1))`).assign(coerced, codegen_12._`+${data}`);
+            return;
+          case "boolean":
+            gen.elseIf(codegen_12._`${data} === "false" || ${data} === 0 || ${data} === null`).assign(coerced, false).elseIf(codegen_12._`${data} === "true" || ${data} === 1`).assign(coerced, true);
+            return;
+          case "null":
+            gen.elseIf(codegen_12._`${data} === "" || ${data} === 0 || ${data} === false`);
+            gen.assign(coerced, null);
+            return;
+          case "array":
+            gen.elseIf(codegen_12._`${dataType2} === "string" || ${dataType2} === "number"
+              || ${dataType2} === "boolean" || ${data} === null`).assign(coerced, codegen_12._`[${data}]`);
+        }
+      }
+    }
+    function assignParentData({ gen, parentData, parentDataProperty }, expr) {
+      gen.if(codegen_12._`${parentData} !== undefined`, () => gen.assign(codegen_12._`${parentData}[${parentDataProperty}]`, expr));
+    }
+    function checkDataType(dataType2, data, strictNums, correct = DataType.Correct) {
+      const EQ = correct === DataType.Correct ? codegen_12.operators.EQ : codegen_12.operators.NEQ;
+      let cond;
+      switch (dataType2) {
+        case "null":
+          return codegen_12._`${data} ${EQ} null`;
+        case "array":
+          cond = codegen_12._`Array.isArray(${data})`;
+          break;
+        case "object":
+          cond = codegen_12._`${data} && typeof ${data} == "object" && !Array.isArray(${data})`;
+          break;
+        case "integer":
+          cond = numCond(codegen_12._`!(${data} % 1) && !isNaN(${data})`);
+          break;
+        case "number":
+          cond = numCond();
+          break;
+        default:
+          return codegen_12._`typeof ${data} ${EQ} ${dataType2}`;
+      }
+      return correct === DataType.Correct ? cond : codegen_12.not(cond);
+      function numCond(_cond = codegen_12.nil) {
+        return codegen_12.and(codegen_12._`typeof ${data} == "number"`, _cond, strictNums ? codegen_12._`isFinite(${data})` : codegen_12.nil);
+      }
+    }
+    exports.checkDataType = checkDataType;
+    function checkDataTypes(dataTypes, data, strictNums, correct) {
+      if (dataTypes.length === 1) {
+        return checkDataType(dataTypes[0], data, strictNums, correct);
+      }
+      let cond;
+      const types = util_12.toHash(dataTypes);
+      if (types.array && types.object) {
+        const notObj = codegen_12._`typeof ${data} != "object"`;
+        cond = types.null ? notObj : codegen_12._`!${data} || ${notObj}`;
+        delete types.null;
+        delete types.array;
+        delete types.object;
+      } else {
+        cond = codegen_12.nil;
+      }
+      if (types.number)
+        delete types.integer;
+      for (const t2 in types)
+        cond = codegen_12.and(cond, checkDataType(t2, data, strictNums, correct));
+      return cond;
+    }
+    exports.checkDataTypes = checkDataTypes;
+    const typeError = {
+      message: ({ schema }) => codegen_12.str`should be ${schema}`,
+      params: ({ schema, schemaValue }) => typeof schema == "string" ? codegen_12._`{type: ${schema}}` : codegen_12._`{type: ${schemaValue}}`
+    };
+    function reportTypeError(it) {
+      const cxt = getTypeErrorContext(it);
+      errors_12.reportError(cxt, typeError);
+    }
+    exports.reportTypeError = reportTypeError;
+    function getTypeErrorContext(it) {
+      const { gen, data, schema } = it;
+      const schemaCode = util_12.schemaRefOrVal(it, schema, "type");
+      return {
+        gen,
+        keyword: "type",
+        data,
+        schema: schema.type,
+        schemaCode,
+        schemaValue: schemaCode,
+        parentSchema: schema,
+        params: {},
+        it
+      };
+    }
+  })(dataType);
+  return dataType;
+}
+var hasRequiredContext;
+function requireContext() {
+  if (hasRequiredContext) return context;
+  hasRequiredContext = 1;
+  Object.defineProperty(context, "__esModule", { value: true });
+  context.getData = void 0;
+  const dataType_12 = requireDataType();
+  const util_12 = requireUtil();
+  const errors_12 = errors;
+  const codegen_12 = codegen;
+  const names_12 = names$1;
+  const subschema_12 = requireSubschema();
+  class KeywordCxt {
+    constructor(it, def2, keyword2) {
+      validateKeywordUsage(it, def2, keyword2);
+      this.gen = it.gen;
+      this.allErrors = it.allErrors;
+      this.keyword = keyword2;
+      this.data = it.data;
+      this.schema = it.schema[keyword2];
+      this.$data = def2.$data && it.opts.$data && this.schema && this.schema.$data;
+      this.schemaValue = util_12.schemaRefOrVal(it, this.schema, keyword2, this.$data);
+      this.schemaType = def2.schemaType;
+      this.parentSchema = it.schema;
+      this.params = {};
+      this.it = it;
+      this.def = def2;
+      if (this.$data) {
+        this.schemaCode = it.gen.const("vSchema", getData(this.$data, it));
+      } else {
+        this.schemaCode = this.schemaValue;
+        if (!validSchemaType(this.schema, def2.schemaType, def2.allowUndefined)) {
+          throw new Error(`${keyword2} value must be ${JSON.stringify(def2.schemaType)}`);
+        }
+      }
+      if ("code" in def2 ? def2.trackErrors : def2.errors !== false) {
+        this.errsCount = it.gen.const("_errs", names_12.default.errors);
+      }
+    }
+    result(condition, successAction, failAction) {
+      this.gen.if(codegen_12.not(condition));
+      if (failAction)
+        failAction();
+      else
+        this.error();
+      if (successAction) {
+        this.gen.else();
+        successAction();
+        if (this.allErrors)
+          this.gen.endIf();
+      } else {
+        if (this.allErrors)
+          this.gen.endIf();
+        else
+          this.gen.else();
+      }
+    }
+    pass(condition, failAction) {
+      this.result(condition, void 0, failAction);
+    }
+    fail(condition) {
+      if (condition === void 0) {
+        this.error();
+        if (!this.allErrors)
+          this.gen.if(false);
+        return;
+      }
+      this.gen.if(condition);
+      this.error();
+      if (this.allErrors)
+        this.gen.endIf();
+      else
+        this.gen.else();
+    }
+    fail$data(condition) {
+      if (!this.$data)
+        return this.fail(condition);
+      const { schemaCode } = this;
+      this.fail(codegen_12._`${schemaCode} !== undefined && (${codegen_12.or(this.invalid$data(), condition)})`);
+    }
+    error(append) {
+      (append ? errors_12.reportExtraError : errors_12.reportError)(this, this.def.error);
+    }
+    $dataError() {
+      errors_12.reportError(this, this.def.$dataError || errors_12.keyword$DataError);
+    }
+    reset() {
+      if (this.errsCount === void 0)
+        throw new Error('add "trackErrors" to keyword definition');
+      errors_12.resetErrorsCount(this.gen, this.errsCount);
+    }
+    ok(cond) {
+      if (!this.allErrors)
+        this.gen.if(cond);
+    }
+    setParams(obj, assign) {
+      if (assign)
+        Object.assign(this.params, obj);
+      else
+        this.params = obj;
+    }
+    block$data(valid2, codeBlock, $dataValid = codegen_12.nil) {
+      this.gen.block(() => {
+        this.check$data(valid2, $dataValid);
+        codeBlock();
+      });
+    }
+    check$data(valid2 = codegen_12.nil, $dataValid = codegen_12.nil) {
+      if (!this.$data)
+        return;
+      const { gen, schemaCode, schemaType, def: def2 } = this;
+      gen.if(codegen_12.or(codegen_12._`${schemaCode} === undefined`, $dataValid));
+      if (valid2 !== codegen_12.nil)
+        gen.assign(valid2, true);
+      if (schemaType.length || def2.validateSchema) {
+        gen.elseIf(this.invalid$data());
+        this.$dataError();
+        if (valid2 !== codegen_12.nil)
+          gen.assign(valid2, false);
+      }
+      gen.else();
+    }
+    invalid$data() {
+      const { gen, schemaCode, schemaType, def: def2, it } = this;
+      return codegen_12.or(wrong$DataType(), invalid$DataSchema());
+      function wrong$DataType() {
+        if (schemaType.length) {
+          if (!(schemaCode instanceof codegen_12.Name))
+            throw new Error("ajv implementation error");
+          const st = Array.isArray(schemaType) ? schemaType : [schemaType];
+          return codegen_12._`${dataType_12.checkDataTypes(st, schemaCode, it.opts.strict, dataType_12.DataType.Wrong)}`;
+        }
+        return codegen_12.nil;
+      }
+      function invalid$DataSchema() {
+        if (def2.validateSchema) {
+          const validateSchemaRef = gen.scopeValue("validate$data", { ref: def2.validateSchema });
+          return codegen_12._`!${validateSchemaRef}(${schemaCode})`;
+        }
+        return codegen_12.nil;
+      }
+    }
+    subschema(appl, valid2) {
+      return subschema_12.applySubschema(this.it, appl, valid2);
+    }
+    mergeEvaluated(schemaCxt, toName) {
+      const { it, gen } = this;
+      if (!it.opts.unevaluated)
+        return;
+      if (it.props !== true && schemaCxt.props !== void 0) {
+        it.props = util_12.mergeEvaluated.props(gen, schemaCxt.props, it.props, toName);
+      }
+      if (it.items !== true && schemaCxt.items !== void 0) {
+        it.items = util_12.mergeEvaluated.items(gen, schemaCxt.items, it.items, toName);
+      }
+    }
+    mergeValidEvaluated(schemaCxt, valid2) {
+      const { it, gen } = this;
+      if (it.opts.unevaluated && (it.props !== true || it.items !== true)) {
+        gen.if(valid2, () => this.mergeEvaluated(schemaCxt, codegen_12.Name));
+        return true;
+      }
+    }
+  }
+  context.default = KeywordCxt;
+  function validSchemaType(schema, schemaType, allowUndefined = false) {
+    return !schemaType.length || schemaType.some((st) => st === "array" ? Array.isArray(schema) : st === "object" ? schema && typeof schema == "object" && !Array.isArray(schema) : typeof schema == st || allowUndefined && typeof schema == "undefined");
+  }
+  function validateKeywordUsage({ schema, opts, self: self2 }, def2, keyword2) {
+    if (Array.isArray(def2.keyword) ? !def2.keyword.includes(keyword2) : def2.keyword !== keyword2) {
+      throw new Error("ajv implementation error");
+    }
+    const deps = def2.dependencies;
+    if (deps === null || deps === void 0 ? void 0 : deps.some((kwd) => !Object.prototype.hasOwnProperty.call(schema, kwd))) {
+      throw new Error(`parent schema must have dependencies of ${keyword2}: ${deps.join(",")}`);
+    }
+    if (def2.validateSchema) {
+      const valid2 = def2.validateSchema(schema[keyword2]);
+      if (!valid2) {
+        const msg = "keyword value is invalid: " + self2.errorsText(def2.validateSchema.errors);
+        if (opts.validateSchema === "log")
+          self2.logger.error(msg);
+        else
+          throw new Error(msg);
+      }
+    }
+  }
+  const JSON_POINTER = /^\/(?:[^~]|~0|~1)*$/;
+  const RELATIVE_JSON_POINTER = /^([0-9]+)(#|\/(?:[^~]|~0|~1)*)?$/;
+  function getData($data, { dataLevel, dataNames, dataPathArr }) {
+    let jsonPointer;
+    let data;
+    if ($data === "")
+      return names_12.default.rootData;
+    if ($data[0] === "/") {
+      if (!JSON_POINTER.test($data))
+        throw new Error(`Invalid JSON-pointer: ${$data}`);
+      jsonPointer = $data;
+      data = names_12.default.rootData;
+    } else {
+      const matches = RELATIVE_JSON_POINTER.exec($data);
+      if (!matches)
+        throw new Error(`Invalid JSON-pointer: ${$data}`);
+      const up = +matches[1];
+      jsonPointer = matches[2];
+      if (jsonPointer === "#") {
+        if (up >= dataLevel)
+          throw new Error(errorMsg("property/index", up));
+        return dataPathArr[dataLevel - up];
+      }
+      if (up > dataLevel)
+        throw new Error(errorMsg("data", up));
+      data = dataNames[dataLevel - up];
+      if (!jsonPointer)
+        return data;
+    }
+    let expr = data;
+    const segments = jsonPointer.split("/");
+    for (const segment of segments) {
+      if (segment) {
+        data = codegen_12._`${data}${codegen_12.getProperty(util_12.unescapeJsonPointer(segment))}`;
+        expr = codegen_12._`${expr} && ${data}`;
+      }
+    }
+    return expr;
+    function errorMsg(pointerType, up) {
+      return `Cannot access ${pointerType} ${up} levels up, current level is ${dataLevel}`;
+    }
+  }
+  context.getData = getData;
+  return context;
+}
+var core$2 = {};
+var error_classes = { exports: {} };
+(function(module, exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.MissingRefError = exports.ValidationError = void 0;
+  const resolve_12 = requireResolve();
+  class ValidationError extends Error {
+    constructor(errors2) {
+      super("validation failed");
+      this.errors = errors2;
+      this.ajv = this.validation = true;
+    }
+  }
+  exports.ValidationError = ValidationError;
+  class MissingRefError extends Error {
+    constructor(baseId, ref2, msg) {
+      super(msg || `can't resolve reference ${ref2} from id ${baseId}`);
+      this.missingRef = resolve_12.resolveUrl(baseId, ref2);
+      this.missingSchema = resolve_12.normalizeId(resolve_12.getFullPath(this.missingRef));
+    }
+  }
+  exports.MissingRefError = MissingRefError;
+  module.exports = {
+    ValidationError,
+    MissingRefError
+  };
+})(error_classes, error_classes.exports);
+var error_classesExports = error_classes.exports;
+var compile = {};
+Object.defineProperty(compile, "__esModule", { value: true });
+compile.resolveSchema = compile.getCompilingSchema = compile.resolveRef = compile.compileSchema = compile.SchemaEnv = void 0;
+const codegen_1$k = codegen;
+const error_classes_1$1 = error_classesExports;
+const names_1$2 = names$1;
+const resolve_1 = requireResolve();
+const util_1$c = requireUtil();
+const validate_1$7 = requireValidate();
+const URI = uri_allExports;
+class SchemaEnv {
+  constructor(env2) {
+    var _a;
+    this.refs = {};
+    this.dynamicAnchors = {};
+    let schema;
+    if (typeof env2.schema == "object")
+      schema = env2.schema;
+    this.schema = env2.schema;
+    this.root = env2.root || this;
+    this.baseId = (_a = env2.baseId) !== null && _a !== void 0 ? _a : resolve_1.normalizeId(schema === null || schema === void 0 ? void 0 : schema.$id);
+    this.localRefs = env2.localRefs;
+    this.meta = env2.meta;
+    this.$async = schema === null || schema === void 0 ? void 0 : schema.$async;
+    this.refs = {};
+  }
+}
+compile.SchemaEnv = SchemaEnv;
+function compileSchema(sch) {
+  const _sch = getCompilingSchema.call(this, sch);
+  if (_sch)
+    return _sch;
+  const rootId = resolve_1.getFullPath(sch.root.baseId);
+  const { es5, lines } = this.opts.code;
+  const { ownProperties } = this.opts;
+  const gen = new codegen_1$k.CodeGen(this.scope, { es5, lines, ownProperties });
+  let _ValidationError;
+  if (sch.$async) {
+    _ValidationError = gen.scopeValue("Error", {
+      ref: error_classes_1$1.ValidationError,
+      code: codegen_1$k._`require("ajv/dist/compile/error_classes").ValidationError`
+    });
+  }
+  const validateName = gen.scopeName("validate");
+  sch.validateName = validateName;
+  const schemaCxt = {
+    gen,
+    allErrors: this.opts.allErrors,
+    data: names_1$2.default.data,
+    parentData: names_1$2.default.parentData,
+    parentDataProperty: names_1$2.default.parentDataProperty,
+    dataNames: [names_1$2.default.data],
+    dataPathArr: [codegen_1$k.nil],
+    dataLevel: 0,
+    dataTypes: [],
+    definedProperties: /* @__PURE__ */ new Set(),
+    topSchemaRef: gen.scopeValue("schema", this.opts.code.source === true ? { ref: sch.schema, code: codegen_1$k.stringify(sch.schema) } : { ref: sch.schema }),
+    validateName,
+    ValidationError: _ValidationError,
+    schema: sch.schema,
+    schemaEnv: sch,
+    rootId,
+    baseId: sch.baseId || rootId,
+    schemaPath: codegen_1$k.nil,
+    errSchemaPath: this.opts.jtd ? "" : "#",
+    errorPath: codegen_1$k._`""`,
+    opts: this.opts,
+    self: this
+  };
+  let sourceCode;
+  try {
+    this._compilations.add(sch);
+    validate_1$7.validateFunctionCode(schemaCxt);
+    gen.optimize(this.opts.code.optimize);
+    const validateCode = gen.toString();
+    sourceCode = `${gen.scopeRefs(names_1$2.default.scope)}return ${validateCode}`;
+    if (this.opts.code.process)
+      sourceCode = this.opts.code.process(sourceCode, sch);
+    const makeValidate = new Function(`${names_1$2.default.self}`, `${names_1$2.default.scope}`, sourceCode);
+    const validate2 = makeValidate(this, this.scope.get());
+    this.scope.value(validateName, { ref: validate2 });
+    validate2.errors = null;
+    validate2.schema = sch.schema;
+    validate2.schemaEnv = sch;
+    if (sch.$async)
+      validate2.$async = true;
+    if (this.opts.code.source === true) {
+      validate2.source = { validateName, validateCode, scopeValues: gen._values };
+    }
+    if (this.opts.unevaluated) {
+      const { props, items: items2 } = schemaCxt;
+      validate2.evaluated = {
+        props: props instanceof codegen_1$k.Name ? void 0 : props,
+        items: items2 instanceof codegen_1$k.Name ? void 0 : items2,
+        dynamicProps: props instanceof codegen_1$k.Name,
+        dynamicItems: items2 instanceof codegen_1$k.Name
+      };
+      if (validate2.source)
+        validate2.source.evaluated = codegen_1$k.stringify(validate2.evaluated);
+    }
+    sch.validate = validate2;
+    return sch;
+  } catch (e) {
+    delete sch.validate;
+    delete sch.validateName;
+    if (sourceCode)
+      this.logger.error("Error compiling schema, function code:", sourceCode);
+    throw e;
+  } finally {
+    this._compilations.delete(sch);
+  }
+}
+compile.compileSchema = compileSchema;
+function resolveRef(root, baseId, ref2) {
+  var _a;
+  ref2 = resolve_1.resolveUrl(baseId, ref2);
+  const schOrFunc = root.refs[ref2];
+  if (schOrFunc)
+    return schOrFunc;
+  let _sch = resolve.call(this, root, ref2);
+  if (_sch === void 0) {
+    const schema = (_a = root.localRefs) === null || _a === void 0 ? void 0 : _a[ref2];
+    if (schema)
+      _sch = new SchemaEnv({ schema, root, baseId });
+  }
+  if (_sch === void 0)
+    return;
+  return root.refs[ref2] = inlineOrCompile.call(this, _sch);
+}
+compile.resolveRef = resolveRef;
+function inlineOrCompile(sch) {
+  if (resolve_1.inlineRef(sch.schema, this.opts.inlineRefs))
+    return sch.schema;
+  return sch.validate ? sch : compileSchema.call(this, sch);
+}
+function getCompilingSchema(schEnv) {
+  for (const sch of this._compilations) {
+    if (sameSchemaEnv(sch, schEnv))
+      return sch;
+  }
+}
+compile.getCompilingSchema = getCompilingSchema;
+function sameSchemaEnv(s1, s2) {
+  return s1.schema === s2.schema && s1.root === s2.root && s1.baseId === s2.baseId;
+}
+function resolve(root, ref2) {
+  let sch;
+  while (typeof (sch = this.refs[ref2]) == "string")
+    ref2 = sch;
+  return sch || this.schemas[ref2] || resolveSchema.call(this, root, ref2);
+}
+function resolveSchema(root, ref2) {
+  const p = URI.parse(ref2);
+  const refPath = resolve_1._getFullPath(p);
+  let baseId = resolve_1.getFullPath(root.baseId);
+  if (Object.keys(root.schema).length > 0 && refPath === baseId) {
+    return getJsonPointer.call(this, p, root);
+  }
+  const id2 = resolve_1.normalizeId(refPath);
+  const schOrRef = this.refs[id2] || this.schemas[id2];
+  if (typeof schOrRef == "string") {
+    const sch = resolveSchema.call(this, root, schOrRef);
+    if (typeof (sch === null || sch === void 0 ? void 0 : sch.schema) !== "object")
+      return;
+    return getJsonPointer.call(this, p, sch);
+  }
+  if (typeof (schOrRef === null || schOrRef === void 0 ? void 0 : schOrRef.schema) !== "object")
+    return;
+  if (!schOrRef.validate)
+    compileSchema.call(this, schOrRef);
+  if (id2 === resolve_1.normalizeId(ref2)) {
+    const { schema } = schOrRef;
+    if (schema.$id)
+      baseId = resolve_1.resolveUrl(baseId, schema.$id);
+    return new SchemaEnv({ schema, root, baseId });
+  }
+  return getJsonPointer.call(this, p, schOrRef);
+}
+compile.resolveSchema = resolveSchema;
+const PREVENT_SCOPE_CHANGE = /* @__PURE__ */ new Set([
+  "properties",
+  "patternProperties",
+  "enum",
+  "dependencies",
+  "definitions"
+]);
+function getJsonPointer(parsedRef, { baseId, schema, root }) {
+  var _a;
+  if (((_a = parsedRef.fragment) === null || _a === void 0 ? void 0 : _a[0]) !== "/")
+    return;
+  for (const part of parsedRef.fragment.slice(1).split("/")) {
+    if (typeof schema == "boolean")
+      return;
+    schema = schema[util_1$c.unescapeFragment(part)];
+    if (schema === void 0)
+      return;
+    if (!PREVENT_SCOPE_CHANGE.has(part) && typeof schema == "object" && schema.$id) {
+      baseId = resolve_1.resolveUrl(baseId, schema.$id);
+    }
+  }
+  let env2;
+  if (typeof schema != "boolean" && schema.$ref && !util_1$c.schemaHasRulesButRef(schema, this.RULES)) {
+    const $ref = resolve_1.resolveUrl(baseId, schema.$ref);
+    env2 = resolveSchema.call(this, root, $ref);
+  }
+  env2 = env2 || new SchemaEnv({ schema, root, baseId });
+  if (env2.schema !== env2.root.schema)
+    return env2;
+  return void 0;
+}
+const $id$1 = "https://raw.githubusercontent.com/ajv-validator/ajv/master/lib/refs/data.json#";
+const description = "Meta-schema for $data reference (JSON AnySchema extension proposal)";
+const type$1 = "object";
+const required$1 = [
+  "$data"
+];
+const properties$2 = {
+  $data: {
+    type: "string",
+    anyOf: [
+      {
+        format: "relative-json-pointer"
+      },
+      {
+        format: "json-pointer"
+      }
+    ]
+  }
+};
+const additionalProperties$1 = false;
+const require$$8 = {
+  $id: $id$1,
+  description,
+  type: type$1,
+  required: required$1,
+  properties: properties$2,
+  additionalProperties: additionalProperties$1
+};
+(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.CodeGen = exports.Name = exports.nil = exports.stringify = exports.str = exports._ = exports.KeywordCxt = void 0;
+  const context_12 = requireContext();
+  exports.KeywordCxt = context_12.default;
+  var codegen_12 = codegen;
+  Object.defineProperty(exports, "_", { enumerable: true, get: function() {
+    return codegen_12._;
+  } });
+  Object.defineProperty(exports, "str", { enumerable: true, get: function() {
+    return codegen_12.str;
+  } });
+  Object.defineProperty(exports, "stringify", { enumerable: true, get: function() {
+    return codegen_12.stringify;
+  } });
+  Object.defineProperty(exports, "nil", { enumerable: true, get: function() {
+    return codegen_12.nil;
+  } });
+  Object.defineProperty(exports, "Name", { enumerable: true, get: function() {
+    return codegen_12.Name;
+  } });
+  Object.defineProperty(exports, "CodeGen", { enumerable: true, get: function() {
+    return codegen_12.CodeGen;
+  } });
+  const error_classes_12 = error_classesExports;
+  const rules_1 = rules;
+  const compile_12 = compile;
+  const codegen_2 = codegen;
+  const resolve_12 = requireResolve();
+  const dataType_12 = requireDataType();
+  const util_12 = requireUtil();
+  const $dataRefSchema = require$$8;
+  const META_IGNORE_OPTIONS = ["removeAdditional", "useDefaults", "coerceTypes"];
+  const EXT_SCOPE_NAMES = /* @__PURE__ */ new Set([
+    "validate",
+    "serialize",
+    "parse",
+    "wrapper",
+    "root",
+    "schema",
+    "keyword",
+    "pattern",
+    "formats",
+    "validate$data",
+    "func",
+    "obj",
+    "Error"
+  ]);
+  const removedOptions = {
+    errorDataPath: "",
+    format: "`validateFormats: false` can be used instead.",
+    nullable: '"nullable" keyword is supported by default.',
+    jsonPointers: "Deprecated jsPropertySyntax can be used instead.",
+    extendRefs: "Deprecated ignoreKeywordsWithRef can be used instead.",
+    missingRefs: "Pass empty schema with $id that should be ignored to ajv.addSchema.",
+    processCode: "Use option `code: {process: (code, schemaEnv: object) => string}`",
+    sourceCode: "Use option `code: {source: true}`",
+    schemaId: "JSON Schema draft-04 is not supported in Ajv v7.",
+    strictDefaults: "It is default now, see option `strict`.",
+    strictKeywords: "It is default now, see option `strict`.",
+    strictNumbers: "It is default now, see option `strict`.",
+    uniqueItems: '"uniqueItems" keyword is always validated.',
+    unknownFormats: "Disable strict mode or pass `true` to `ajv.addFormat` (or `formats` option).",
+    cache: "Map is used as cache, schema object as key.",
+    serialize: "Map is used as cache, schema object as key."
+  };
+  const deprecatedOptions = {
+    ignoreKeywordsWithRef: "",
+    jsPropertySyntax: "",
+    unicode: '"minLength"/"maxLength" account for unicode characters by default.'
+  };
+  function requiredOptions(o) {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+    const strict = (_a = o.strict) !== null && _a !== void 0 ? _a : true;
+    const strictLog = strict ? "log" : false;
+    const _optz = (_b = o.code) === null || _b === void 0 ? void 0 : _b.optimize;
+    const optimize = _optz === true || _optz === void 0 ? 1 : _optz || 0;
+    return {
+      strict,
+      strictTypes: (_c = o.strictTypes) !== null && _c !== void 0 ? _c : strictLog,
+      strictTuples: (_d = o.strictTuples) !== null && _d !== void 0 ? _d : strictLog,
+      code: o.code ? { ...o.code, optimize } : { optimize },
+      loopRequired: (_e = o.loopRequired) !== null && _e !== void 0 ? _e : Infinity,
+      loopEnum: (_f = o.loopEnum) !== null && _f !== void 0 ? _f : Infinity,
+      meta: (_g = o.meta) !== null && _g !== void 0 ? _g : true,
+      messages: (_h = o.messages) !== null && _h !== void 0 ? _h : true,
+      inlineRefs: (_j = o.inlineRefs) !== null && _j !== void 0 ? _j : true,
+      addUsedSchema: (_k = o.addUsedSchema) !== null && _k !== void 0 ? _k : true,
+      validateSchema: (_l = o.validateSchema) !== null && _l !== void 0 ? _l : true,
+      validateFormats: (_m = o.validateFormats) !== null && _m !== void 0 ? _m : true
+    };
+  }
+  class Ajv {
+    constructor(opts = {}) {
+      this.schemas = {};
+      this.refs = {};
+      this.formats = {};
+      this._compilations = /* @__PURE__ */ new Set();
+      this._loading = {};
+      this._cache = /* @__PURE__ */ new Map();
+      opts = this.opts = { ...opts, ...requiredOptions(opts) };
+      const { es5, lines } = this.opts.code;
+      this.scope = new codegen_2.ValueScope({ scope: {}, prefixes: EXT_SCOPE_NAMES, es5, lines });
+      this.logger = getLogger(opts.logger);
+      const formatOpt = opts.validateFormats;
+      opts.validateFormats = false;
+      this.RULES = rules_1.getRules();
+      checkOptions.call(this, removedOptions, opts, "NOT SUPPORTED");
+      checkOptions.call(this, deprecatedOptions, opts, "DEPRECATED", "warn");
+      this._metaOpts = getMetaSchemaOptions.call(this);
+      if (opts.formats)
+        addInitialFormats.call(this);
+      this._addVocabularies();
+      this._addDefaultMetaSchema();
+      if (opts.keywords)
+        addInitialKeywords.call(this, opts.keywords);
+      if (typeof opts.meta == "object")
+        this.addMetaSchema(opts.meta);
+      addInitialSchemas.call(this);
+      opts.validateFormats = formatOpt;
+    }
+    _addVocabularies() {
+      this.addKeyword("$async");
+    }
+    _addDefaultMetaSchema() {
+      const { $data, meta } = this.opts;
+      if (meta && $data)
+        this.addMetaSchema($dataRefSchema, $dataRefSchema.$id, false);
+    }
+    defaultMeta() {
+      const { meta } = this.opts;
+      return this.opts.defaultMeta = typeof meta == "object" ? meta.$id || meta : void 0;
+    }
+    validate(schemaKeyRef, data) {
+      let v;
+      if (typeof schemaKeyRef == "string") {
+        v = this.getSchema(schemaKeyRef);
+        if (!v)
+          throw new Error(`no schema with key or ref "${schemaKeyRef}"`);
+      } else {
+        v = this.compile(schemaKeyRef);
+      }
+      const valid2 = v(data);
+      if (!("$async" in v))
+        this.errors = v.errors;
+      return valid2;
+    }
+    compile(schema, _meta) {
+      const sch = this._addSchema(schema, _meta);
+      return sch.validate || this._compileSchemaEnv(sch);
+    }
+    compileAsync(schema, meta) {
+      if (typeof this.opts.loadSchema != "function") {
+        throw new Error("options.loadSchema should be a function");
+      }
+      const { loadSchema } = this.opts;
+      return runCompileAsync.call(this, schema, meta);
+      async function runCompileAsync(_schema, _meta) {
+        await loadMetaSchema.call(this, _schema.$schema);
+        const sch = this._addSchema(_schema, _meta);
+        return sch.validate || _compileAsync.call(this, sch);
+      }
+      async function loadMetaSchema($ref) {
+        if ($ref && !this.getSchema($ref)) {
+          await runCompileAsync.call(this, { $ref }, true);
+        }
+      }
+      async function _compileAsync(sch) {
+        try {
+          return this._compileSchemaEnv(sch);
+        } catch (e) {
+          if (!(e instanceof error_classes_12.MissingRefError))
+            throw e;
+          checkLoaded.call(this, e);
+          await loadMissingSchema.call(this, e.missingSchema);
+          return _compileAsync.call(this, sch);
+        }
+      }
+      function checkLoaded({ missingSchema: ref2, missingRef }) {
+        if (this.refs[ref2]) {
+          throw new Error(`AnySchema ${ref2} is loaded but ${missingRef} cannot be resolved`);
+        }
+      }
+      async function loadMissingSchema(ref2) {
+        const _schema = await _loadSchema.call(this, ref2);
+        if (!this.refs[ref2])
+          await loadMetaSchema.call(this, _schema.$schema);
+        if (!this.refs[ref2])
+          this.addSchema(_schema, ref2, meta);
+      }
+      async function _loadSchema(ref2) {
+        const p = this._loading[ref2];
+        if (p)
+          return p;
+        try {
+          return await (this._loading[ref2] = loadSchema(ref2));
+        } finally {
+          delete this._loading[ref2];
+        }
+      }
+    }
+    // Adds schema to the instance
+    addSchema(schema, key, _meta, _validateSchema = this.opts.validateSchema) {
+      if (Array.isArray(schema)) {
+        for (const sch of schema)
+          this.addSchema(sch, void 0, _meta, _validateSchema);
+        return this;
+      }
+      let id2;
+      if (typeof schema === "object") {
+        id2 = schema.$id;
+        if (id2 !== void 0 && typeof id2 != "string")
+          throw new Error("schema id must be string");
+      }
+      key = resolve_12.normalizeId(key || id2);
+      this._checkUnique(key);
+      this.schemas[key] = this._addSchema(schema, _meta, _validateSchema, true);
+      return this;
+    }
+    // Add schema that will be used to validate other schemas
+    // options in META_IGNORE_OPTIONS are alway set to false
+    addMetaSchema(schema, key, _validateSchema = this.opts.validateSchema) {
+      this.addSchema(schema, key, true, _validateSchema);
+      return this;
+    }
+    //  Validate schema against its meta-schema
+    validateSchema(schema, throwOrLogError) {
+      if (typeof schema == "boolean")
+        return true;
+      let $schema2;
+      $schema2 = schema.$schema;
+      if ($schema2 !== void 0 && typeof $schema2 != "string") {
+        throw new Error("$schema must be a string");
+      }
+      $schema2 = $schema2 || this.opts.defaultMeta || this.defaultMeta();
+      if (!$schema2) {
+        this.logger.warn("meta-schema not available");
+        this.errors = null;
+        return true;
+      }
+      const valid2 = this.validate($schema2, schema);
+      if (!valid2 && throwOrLogError) {
+        const message = "schema is invalid: " + this.errorsText();
+        if (this.opts.validateSchema === "log")
+          this.logger.error(message);
+        else
+          throw new Error(message);
+      }
+      return valid2;
+    }
+    // Get compiled schema by `key` or `ref`.
+    // (`key` that was passed to `addSchema` or full schema reference - `schema.$id` or resolved id)
+    getSchema(keyRef) {
+      let sch;
+      while (typeof (sch = getSchEnv.call(this, keyRef)) == "string")
+        keyRef = sch;
+      if (sch === void 0) {
+        const root = new compile_12.SchemaEnv({ schema: {} });
+        sch = compile_12.resolveSchema.call(this, root, keyRef);
+        if (!sch)
+          return;
+        this.refs[keyRef] = sch;
+      }
+      return sch.validate || this._compileSchemaEnv(sch);
+    }
+    // Remove cached schema(s).
+    // If no parameter is passed all schemas but meta-schemas are removed.
+    // If RegExp is passed all schemas with key/id matching pattern but meta-schemas are removed.
+    // Even if schema is referenced by other schemas it still can be removed as other schemas have local references.
+    removeSchema(schemaKeyRef) {
+      if (schemaKeyRef instanceof RegExp) {
+        this._removeAllSchemas(this.schemas, schemaKeyRef);
+        this._removeAllSchemas(this.refs, schemaKeyRef);
+        return this;
+      }
+      switch (typeof schemaKeyRef) {
+        case "undefined":
+          this._removeAllSchemas(this.schemas);
+          this._removeAllSchemas(this.refs);
+          this._cache.clear();
+          return this;
+        case "string": {
+          const sch = getSchEnv.call(this, schemaKeyRef);
+          if (typeof sch == "object")
+            this._cache.delete(sch.schema);
+          delete this.schemas[schemaKeyRef];
+          delete this.refs[schemaKeyRef];
+          return this;
+        }
+        case "object": {
+          const cacheKey = schemaKeyRef;
+          this._cache.delete(cacheKey);
+          let id2 = schemaKeyRef.$id;
+          if (id2) {
+            id2 = resolve_12.normalizeId(id2);
+            delete this.schemas[id2];
+            delete this.refs[id2];
+          }
+          return this;
+        }
+        default:
+          throw new Error("ajv.removeSchema: invalid parameter");
+      }
+    }
+    // add "vocabulary" - a collection of keywords
+    addVocabulary(definitions2) {
+      for (const def2 of definitions2)
+        this.addKeyword(def2);
+      return this;
+    }
+    addKeyword(kwdOrDef, def2) {
+      let keyword2;
+      if (typeof kwdOrDef == "string") {
+        keyword2 = kwdOrDef;
+        if (typeof def2 == "object") {
+          this.logger.warn("these parameters are deprecated, see docs for addKeyword");
+          def2.keyword = keyword2;
+        }
+      } else if (typeof kwdOrDef == "object" && def2 === void 0) {
+        def2 = kwdOrDef;
+        keyword2 = def2.keyword;
+        if (Array.isArray(keyword2) && !keyword2.length) {
+          throw new Error("addKeywords: keyword must be string or non-empty array");
+        }
+      } else {
+        throw new Error("invalid addKeywords parameters");
+      }
+      checkKeyword.call(this, keyword2, def2);
+      if (!def2) {
+        util_12.eachItem(keyword2, (kwd) => addRule.call(this, kwd));
+        return this;
+      }
+      keywordMetaschema.call(this, def2);
+      const definition = {
+        ...def2,
+        type: dataType_12.getJSONTypes(def2.type),
+        schemaType: dataType_12.getJSONTypes(def2.schemaType)
+      };
+      util_12.eachItem(keyword2, definition.type.length === 0 ? (k) => addRule.call(this, k, definition) : (k) => definition.type.forEach((t2) => addRule.call(this, k, definition, t2)));
+      return this;
+    }
+    getKeyword(keyword2) {
+      const rule = this.RULES.all[keyword2];
+      return typeof rule == "object" ? rule.definition : !!rule;
+    }
+    // Remove keyword
+    removeKeyword(keyword2) {
+      const { RULES } = this;
+      delete RULES.keywords[keyword2];
+      delete RULES.all[keyword2];
+      for (const group of RULES.rules) {
+        const i = group.rules.findIndex((rule) => rule.keyword === keyword2);
+        if (i >= 0)
+          group.rules.splice(i, 1);
+      }
+      return this;
+    }
+    // Add format
+    addFormat(name, format2) {
+      if (typeof format2 == "string")
+        format2 = new RegExp(format2);
+      this.formats[name] = format2;
+      return this;
+    }
+    errorsText(errors2 = this.errors, { separator = ", ", dataVar = "data" } = {}) {
+      if (!errors2 || errors2.length === 0)
+        return "No errors";
+      return errors2.map((e) => `${dataVar}${e.dataPath} ${e.message}`).reduce((text, msg) => text + separator + msg);
+    }
+    $dataMetaSchema(metaSchema, keywordsJsonPointers) {
+      const rules2 = this.RULES.all;
+      metaSchema = JSON.parse(JSON.stringify(metaSchema));
+      for (const jsonPointer of keywordsJsonPointers) {
+        const segments = jsonPointer.split("/").slice(1);
+        let keywords = metaSchema;
+        for (const seg of segments)
+          keywords = keywords[seg];
+        for (const key in rules2) {
+          const rule = rules2[key];
+          if (typeof rule != "object")
+            continue;
+          const { $data } = rule.definition;
+          const schema = keywords[key];
+          if ($data && schema)
+            keywords[key] = schemaOrData(schema);
+        }
+      }
+      return metaSchema;
+    }
+    _removeAllSchemas(schemas, regex) {
+      for (const keyRef in schemas) {
+        const sch = schemas[keyRef];
+        if (!regex || regex.test(keyRef)) {
+          if (typeof sch == "string") {
+            delete schemas[keyRef];
+          } else if (sch && !sch.meta) {
+            this._cache.delete(sch.schema);
+            delete schemas[keyRef];
+          }
+        }
+      }
+    }
+    _addSchema(schema, meta, validateSchema = this.opts.validateSchema, addSchema = this.opts.addUsedSchema) {
+      if (typeof schema != "object") {
+        if (this.opts.jtd)
+          throw new Error("schema must be object");
+        else if (typeof schema != "boolean")
+          throw new Error("schema must be object or boolean");
+      }
+      let sch = this._cache.get(schema);
+      if (sch !== void 0)
+        return sch;
+      const localRefs = resolve_12.getSchemaRefs.call(this, schema);
+      sch = new compile_12.SchemaEnv({ schema, meta, localRefs });
+      this._cache.set(sch.schema, sch);
+      const id2 = sch.baseId;
+      if (addSchema && !id2.startsWith("#")) {
+        if (id2)
+          this._checkUnique(id2);
+        this.refs[id2] = sch;
+      }
+      if (validateSchema)
+        this.validateSchema(schema, true);
+      return sch;
+    }
+    _checkUnique(id2) {
+      if (this.schemas[id2] || this.refs[id2]) {
+        throw new Error(`schema with key or id "${id2}" already exists`);
+      }
+    }
+    _compileSchemaEnv(sch) {
+      if (sch.meta)
+        this._compileMetaSchema(sch);
+      else
+        compile_12.compileSchema.call(this, sch);
+      if (!sch.validate)
+        throw new Error("ajv implementation error");
+      return sch.validate;
+    }
+    _compileMetaSchema(sch) {
+      const currentOpts = this.opts;
+      this.opts = this._metaOpts;
+      try {
+        compile_12.compileSchema.call(this, sch);
+      } finally {
+        this.opts = currentOpts;
+      }
+    }
+  }
+  exports.default = Ajv;
+  Ajv.ValidationError = error_classes_12.ValidationError;
+  Ajv.MissingRefError = error_classes_12.MissingRefError;
+  function checkOptions(checkOpts, options, msg, log = "error") {
+    for (const key in checkOpts) {
+      const opt = key;
+      if (opt in options)
+        this.logger[log](`${msg}: option ${key}. ${checkOpts[opt]}`);
+    }
+  }
+  function getSchEnv(keyRef) {
+    keyRef = resolve_12.normalizeId(keyRef);
+    return this.schemas[keyRef] || this.refs[keyRef];
+  }
+  function addInitialSchemas() {
+    const optsSchemas = this.opts.schemas;
+    if (!optsSchemas)
+      return;
+    if (Array.isArray(optsSchemas))
+      this.addSchema(optsSchemas);
+    else
+      for (const key in optsSchemas)
+        this.addSchema(optsSchemas[key], key);
+  }
+  function addInitialFormats() {
+    for (const name in this.opts.formats) {
+      const format2 = this.opts.formats[name];
+      if (format2)
+        this.addFormat(name, format2);
+    }
+  }
+  function addInitialKeywords(defs) {
+    if (Array.isArray(defs)) {
+      this.addVocabulary(defs);
+      return;
+    }
+    this.logger.warn("keywords option as map is deprecated, pass array");
+    for (const keyword2 in defs) {
+      const def2 = defs[keyword2];
+      if (!def2.keyword)
+        def2.keyword = keyword2;
+      this.addKeyword(def2);
+    }
+  }
+  function getMetaSchemaOptions() {
+    const metaOpts = { ...this.opts };
+    for (const opt of META_IGNORE_OPTIONS)
+      delete metaOpts[opt];
+    return metaOpts;
+  }
+  const noLogs = { log() {
+  }, warn() {
+  }, error() {
+  } };
+  function getLogger(logger) {
+    if (logger === false)
+      return noLogs;
+    if (logger === void 0)
+      return console;
+    if (logger.log && logger.warn && logger.error)
+      return logger;
+    throw new Error("logger must implement log, warn and error methods");
+  }
+  const KEYWORD_NAME = /^[a-z_$][a-z0-9_$:-]*$/i;
+  function checkKeyword(keyword2, def2) {
+    const { RULES } = this;
+    util_12.eachItem(keyword2, (kwd) => {
+      if (RULES.keywords[kwd])
+        throw new Error(`Keyword ${kwd} is already defined`);
+      if (!KEYWORD_NAME.test(kwd))
+        throw new Error(`Keyword ${kwd} has invalid name`);
+    });
+    if (!def2)
+      return;
+    if (def2.$data && !("code" in def2 || "validate" in def2)) {
+      throw new Error('$data keyword must have "code" or "validate" function');
+    }
+  }
+  function addRule(keyword2, definition, dataType2) {
+    var _a;
+    const post = definition === null || definition === void 0 ? void 0 : definition.post;
+    if (dataType2 && post)
+      throw new Error('keyword with "post" flag cannot have "type"');
+    const { RULES } = this;
+    let ruleGroup = post ? RULES.post : RULES.rules.find(({ type: t2 }) => t2 === dataType2);
+    if (!ruleGroup) {
+      ruleGroup = { type: dataType2, rules: [] };
+      RULES.rules.push(ruleGroup);
+    }
+    RULES.keywords[keyword2] = true;
+    if (!definition)
+      return;
+    const rule = {
+      keyword: keyword2,
+      definition: {
+        ...definition,
+        type: dataType_12.getJSONTypes(definition.type),
+        schemaType: dataType_12.getJSONTypes(definition.schemaType)
+      }
+    };
+    if (definition.before)
+      addBeforeRule.call(this, ruleGroup, rule, definition.before);
+    else
+      ruleGroup.rules.push(rule);
+    RULES.all[keyword2] = rule;
+    (_a = definition.implements) === null || _a === void 0 ? void 0 : _a.forEach((kwd) => this.addKeyword(kwd));
+  }
+  function addBeforeRule(ruleGroup, rule, before) {
+    const i = ruleGroup.rules.findIndex((_rule) => _rule.keyword === before);
+    if (i >= 0) {
+      ruleGroup.rules.splice(i, 0, rule);
+    } else {
+      ruleGroup.rules.push(rule);
+      this.logger.warn(`rule ${before} is not defined`);
+    }
+  }
+  function keywordMetaschema(def2) {
+    let { metaSchema } = def2;
+    if (metaSchema === void 0)
+      return;
+    if (def2.$data && this.opts.$data)
+      metaSchema = schemaOrData(metaSchema);
+    def2.validateSchema = this.compile(metaSchema, true);
+  }
+  const $dataRef = {
+    $ref: "https://raw.githubusercontent.com/ajv-validator/ajv/master/lib/refs/data.json#"
+  };
+  function schemaOrData(schema) {
+    return { anyOf: [schema, $dataRef] };
+  }
+})(core$2);
+var draft7 = {};
+var core$1 = {};
+var id = {};
+Object.defineProperty(id, "__esModule", { value: true });
+const def$p = {
+  keyword: "id",
+  code() {
+    throw new Error('NOT SUPPORTED: keyword "id", use "$id" for schema ID');
+  }
+};
+id.default = def$p;
+var ref = {};
+Object.defineProperty(ref, "__esModule", { value: true });
+ref.callRef = ref.getValidate = void 0;
+const error_classes_1 = error_classesExports;
+const code_1$7 = requireCode();
+const codegen_1$j = codegen;
+const names_1$1 = names$1;
+const compile_1 = compile;
+const util_1$b = requireUtil();
+const def$o = {
+  keyword: "$ref",
+  schemaType: "string",
+  code(cxt) {
+    const { gen, schema, it } = cxt;
+    const { baseId, schemaEnv: env2, validateName, opts, self: self2 } = it;
+    if (schema === "#" || schema === "#/")
+      return callRootRef();
+    const schOrEnv = compile_1.resolveRef.call(self2, env2.root, baseId, schema);
+    if (schOrEnv === void 0)
+      throw new error_classes_1.MissingRefError(baseId, schema);
+    if (schOrEnv instanceof compile_1.SchemaEnv)
+      return callValidate(schOrEnv);
+    return inlineRefSchema(schOrEnv);
+    function callRootRef() {
+      if (env2 === env2.root)
+        return callRef(cxt, validateName, env2, env2.$async);
+      const rootName = gen.scopeValue("root", { ref: env2.root });
+      return callRef(cxt, codegen_1$j._`${rootName}.validate`, env2.root, env2.root.$async);
+    }
+    function callValidate(sch) {
+      const v = getValidate(cxt, sch);
+      callRef(cxt, v, sch, sch.$async);
+    }
+    function inlineRefSchema(sch) {
+      const schName = gen.scopeValue("schema", opts.code.source === true ? { ref: sch, code: codegen_1$j.stringify(sch) } : { ref: sch });
+      const valid2 = gen.name("valid");
+      const schCxt = cxt.subschema({
+        schema: sch,
+        dataTypes: [],
+        schemaPath: codegen_1$j.nil,
+        topSchemaRef: schName,
+        errSchemaPath: schema
+      }, valid2);
+      cxt.mergeEvaluated(schCxt);
+      cxt.ok(valid2);
+    }
+  }
+};
+function getValidate(cxt, sch) {
+  const { gen } = cxt;
+  return sch.validate ? gen.scopeValue("validate", { ref: sch.validate }) : codegen_1$j._`${gen.scopeValue("wrapper", { ref: sch })}.validate`;
+}
+ref.getValidate = getValidate;
+function callRef(cxt, v, sch, $async) {
+  const { gen, it } = cxt;
+  const { allErrors, schemaEnv: env2, opts } = it;
+  const passCxt = opts.passContext ? names_1$1.default.this : codegen_1$j.nil;
+  if ($async)
+    callAsyncRef();
+  else
+    callSyncRef();
+  function callAsyncRef() {
+    if (!env2.$async)
+      throw new Error("async schema referenced by sync schema");
+    const valid2 = gen.let("valid");
+    gen.try(() => {
+      gen.code(codegen_1$j._`await ${code_1$7.callValidateCode(cxt, v, passCxt)}`);
+      addEvaluatedFrom(v);
+      if (!allErrors)
+        gen.assign(valid2, true);
+    }, (e) => {
+      gen.if(codegen_1$j._`!(${e} instanceof ${it.ValidationError})`, () => gen.throw(e));
+      addErrorsFrom(e);
+      if (!allErrors)
+        gen.assign(valid2, false);
+    });
+    cxt.ok(valid2);
+  }
+  function callSyncRef() {
+    cxt.result(code_1$7.callValidateCode(cxt, v, passCxt), () => addEvaluatedFrom(v), () => addErrorsFrom(v));
+  }
+  function addErrorsFrom(source2) {
+    const errs = codegen_1$j._`${source2}.errors`;
+    gen.assign(names_1$1.default.vErrors, codegen_1$j._`${names_1$1.default.vErrors} === null ? ${errs} : ${names_1$1.default.vErrors}.concat(${errs})`);
+    gen.assign(names_1$1.default.errors, codegen_1$j._`${names_1$1.default.vErrors}.length`);
+  }
+  function addEvaluatedFrom(source2) {
+    var _a;
+    if (!it.opts.unevaluated)
+      return;
+    const schEvaluated = (_a = sch === null || sch === void 0 ? void 0 : sch.validate) === null || _a === void 0 ? void 0 : _a.evaluated;
+    if (it.props !== true) {
+      if (schEvaluated && !schEvaluated.dynamicProps) {
+        if (schEvaluated.props !== void 0) {
+          it.props = util_1$b.mergeEvaluated.props(gen, schEvaluated.props, it.props);
+        }
+      } else {
+        const props = gen.var("props", codegen_1$j._`${source2}.evaluated.props`);
+        it.props = util_1$b.mergeEvaluated.props(gen, props, it.props, codegen_1$j.Name);
+      }
+    }
+    if (it.items !== true) {
+      if (schEvaluated && !schEvaluated.dynamicItems) {
+        if (schEvaluated.items !== void 0) {
+          it.items = util_1$b.mergeEvaluated.items(gen, schEvaluated.items, it.items);
+        }
+      } else {
+        const items2 = gen.var("items", codegen_1$j._`${source2}.evaluated.items`);
+        it.items = util_1$b.mergeEvaluated.items(gen, items2, it.items, codegen_1$j.Name);
+      }
+    }
+  }
+}
+ref.callRef = callRef;
+ref.default = def$o;
+Object.defineProperty(core$1, "__esModule", { value: true });
+const id_1 = id;
+const ref_1 = ref;
+const core = [
+  "$schema",
+  "$id",
+  "$defs",
+  "$vocabulary",
+  { keyword: "$comment" },
+  "definitions",
+  id_1.default,
+  ref_1.default
+];
+core$1.default = core;
+var validation$1 = {};
+var limitNumber = {};
+Object.defineProperty(limitNumber, "__esModule", { value: true });
+const codegen_1$i = codegen;
+const ops = codegen_1$i.operators;
+const KWDs = {
+  maximum: { okStr: "<=", ok: ops.LTE, fail: ops.GT },
+  minimum: { okStr: ">=", ok: ops.GTE, fail: ops.LT },
+  exclusiveMaximum: { okStr: "<", ok: ops.LT, fail: ops.GTE },
+  exclusiveMinimum: { okStr: ">", ok: ops.GT, fail: ops.LTE }
+};
+const error$g = {
+  message: ({ keyword: keyword2, schemaCode }) => codegen_1$i.str`should be ${KWDs[keyword2].okStr} ${schemaCode}`,
+  params: ({ keyword: keyword2, schemaCode }) => codegen_1$i._`{comparison: ${KWDs[keyword2].okStr}, limit: ${schemaCode}}`
+};
+const def$n = {
+  keyword: Object.keys(KWDs),
+  type: "number",
+  schemaType: "number",
+  $data: true,
+  error: error$g,
+  code(cxt) {
+    const { keyword: keyword2, data, schemaCode } = cxt;
+    cxt.fail$data(codegen_1$i._`${data} ${KWDs[keyword2].fail} ${schemaCode} || isNaN(${data})`);
+  }
+};
+limitNumber.default = def$n;
+var multipleOf = {};
+Object.defineProperty(multipleOf, "__esModule", { value: true });
+const codegen_1$h = codegen;
+const error$f = {
+  message: ({ schemaCode }) => codegen_1$h.str`should be multiple of ${schemaCode}`,
+  params: ({ schemaCode }) => codegen_1$h._`{multipleOf: ${schemaCode}}`
+};
+const def$m = {
+  keyword: "multipleOf",
+  type: "number",
+  schemaType: "number",
+  $data: true,
+  error: error$f,
+  code(cxt) {
+    const { gen, data, schemaCode, it } = cxt;
+    const prec = it.opts.multipleOfPrecision;
+    const res = gen.let("res");
+    const invalid = prec ? codegen_1$h._`Math.abs(Math.round(${res}) - ${res}) > 1e-${prec}` : codegen_1$h._`${res} !== parseInt(${res})`;
+    cxt.fail$data(codegen_1$h._`(${schemaCode} === 0 || (${res} = ${data}/${schemaCode}, ${invalid}))`);
+  }
+};
+multipleOf.default = def$m;
+var limitLength = {};
+var ucs2length$1 = {};
+Object.defineProperty(ucs2length$1, "__esModule", { value: true });
+function ucs2length(str) {
+  const len = str.length;
+  let length = 0;
+  let pos = 0;
+  let value;
+  while (pos < len) {
+    length++;
+    value = str.charCodeAt(pos++);
+    if (value >= 55296 && value <= 56319 && pos < len) {
+      value = str.charCodeAt(pos);
+      if ((value & 64512) === 56320)
+        pos++;
+    }
+  }
+  return length;
+}
+ucs2length$1.default = ucs2length;
+Object.defineProperty(limitLength, "__esModule", { value: true });
+const codegen_1$g = codegen;
+const ucs2length_1 = ucs2length$1;
+const error$e = {
+  message({ keyword: keyword2, schemaCode }) {
+    const comp = keyword2 === "maxLength" ? "more" : "fewer";
+    return codegen_1$g.str`should NOT have ${comp} than ${schemaCode} characters`;
+  },
+  params: ({ schemaCode }) => codegen_1$g._`{limit: ${schemaCode}}`
+};
+const def$l = {
+  keyword: ["maxLength", "minLength"],
+  type: "string",
+  schemaType: "number",
+  $data: true,
+  error: error$e,
+  code(cxt) {
+    const { keyword: keyword2, data, schemaCode, it } = cxt;
+    const op = keyword2 === "maxLength" ? codegen_1$g.operators.GT : codegen_1$g.operators.LT;
+    let len;
+    if (it.opts.unicode === false) {
+      len = codegen_1$g._`${data}.length`;
+    } else {
+      const u2l = cxt.gen.scopeValue("func", {
+        ref: ucs2length_1.default,
+        code: codegen_1$g._`require("ajv/dist/compile/ucs2length").default`
+      });
+      len = codegen_1$g._`${u2l}(${data})`;
+    }
+    cxt.fail$data(codegen_1$g._`${len} ${op} ${schemaCode}`);
+  }
+};
+limitLength.default = def$l;
+var pattern = {};
+Object.defineProperty(pattern, "__esModule", { value: true });
+const code_1$6 = requireCode();
+const codegen_1$f = codegen;
+const error$d = {
+  message: ({ schemaCode }) => codegen_1$f.str`should match pattern "${schemaCode}"`,
+  params: ({ schemaCode }) => codegen_1$f._`{pattern: ${schemaCode}}`
+};
+const def$k = {
+  keyword: "pattern",
+  type: "string",
+  schemaType: "string",
+  $data: true,
+  error: error$d,
+  code(cxt) {
+    const { gen, data, $data, schema, schemaCode } = cxt;
+    const regExp = $data ? codegen_1$f._`(new RegExp(${schemaCode}, "u"))` : code_1$6.usePattern(gen, schema);
+    cxt.fail$data(codegen_1$f._`!${regExp}.test(${data})`);
+  }
+};
+pattern.default = def$k;
+var limitProperties = {};
+Object.defineProperty(limitProperties, "__esModule", { value: true });
+const codegen_1$e = codegen;
+const error$c = {
+  message({ keyword: keyword2, schemaCode }) {
+    const comp = keyword2 === "maxProperties" ? "more" : "fewer";
+    return codegen_1$e.str`should NOT have ${comp} than ${schemaCode} items`;
+  },
+  params: ({ schemaCode }) => codegen_1$e._`{limit: ${schemaCode}}`
+};
+const def$j = {
+  keyword: ["maxProperties", "minProperties"],
+  type: "object",
+  schemaType: "number",
+  $data: true,
+  error: error$c,
+  code(cxt) {
+    const { keyword: keyword2, data, schemaCode } = cxt;
+    const op = keyword2 === "maxProperties" ? codegen_1$e.operators.GT : codegen_1$e.operators.LT;
+    cxt.fail$data(codegen_1$e._`Object.keys(${data}).length ${op} ${schemaCode}`);
+  }
+};
+limitProperties.default = def$j;
+var required = {};
+Object.defineProperty(required, "__esModule", { value: true });
+const code_1$5 = requireCode();
+const codegen_1$d = codegen;
+const validate_1$6 = requireValidate();
+const error$b = {
+  message: ({ params: { missingProperty } }) => codegen_1$d.str`should have required property '${missingProperty}'`,
+  params: ({ params: { missingProperty } }) => codegen_1$d._`{missingProperty: ${missingProperty}}`
+};
+const def$i = {
+  keyword: "required",
+  type: "object",
+  schemaType: "array",
+  $data: true,
+  error: error$b,
+  code(cxt) {
+    const { gen, schema, schemaCode, data, $data, it } = cxt;
+    const { opts } = it;
+    if (!$data && schema.length === 0)
+      return;
+    const useLoop = schema.length >= opts.loopRequired;
+    if (it.allErrors)
+      allErrorsMode();
+    else
+      exitOnErrorMode();
+    if (opts.strictRequired) {
+      const props = cxt.parentSchema.properties;
+      const { definedProperties } = cxt.it;
+      for (const requiredKey of schema) {
+        if ((props === null || props === void 0 ? void 0 : props[requiredKey]) === void 0 && !definedProperties.has(requiredKey)) {
+          const schemaPath = it.schemaEnv.baseId + it.errSchemaPath;
+          const msg = `required property "${requiredKey}" is not defined at "${schemaPath}" (strictRequired)`;
+          validate_1$6.checkStrictMode(it, msg, it.opts.strictRequired);
+        }
+      }
+    }
+    function allErrorsMode() {
+      if (useLoop || $data) {
+        cxt.block$data(codegen_1$d.nil, loopAllRequired);
+      } else {
+        for (const prop of schema) {
+          code_1$5.checkReportMissingProp(cxt, prop);
+        }
+      }
+    }
+    function exitOnErrorMode() {
+      const missing = gen.let("missing");
+      if (useLoop || $data) {
+        const valid2 = gen.let("valid", true);
+        cxt.block$data(valid2, () => loopUntilMissing(missing, valid2));
+        cxt.ok(valid2);
+      } else {
+        gen.if(code_1$5.checkMissingProp(cxt, schema, missing));
+        code_1$5.reportMissingProp(cxt, missing);
+        gen.else();
+      }
+    }
+    function loopAllRequired() {
+      gen.forOf("prop", schemaCode, (prop) => {
+        cxt.setParams({ missingProperty: prop });
+        gen.if(code_1$5.noPropertyInData(gen, data, prop, opts.ownProperties), () => cxt.error());
+      });
+    }
+    function loopUntilMissing(missing, valid2) {
+      cxt.setParams({ missingProperty: missing });
+      gen.forOf(missing, schemaCode, () => {
+        gen.assign(valid2, code_1$5.propertyInData(gen, data, missing, opts.ownProperties));
+        gen.if(codegen_1$d.not(valid2), () => {
+          cxt.error();
+          gen.break();
+        });
+      }, codegen_1$d.nil);
+    }
+  }
+};
+required.default = def$i;
+var limitItems = {};
+Object.defineProperty(limitItems, "__esModule", { value: true });
+const codegen_1$c = codegen;
+const error$a = {
+  message({ keyword: keyword2, schemaCode }) {
+    const comp = keyword2 === "maxItems" ? "more" : "fewer";
+    return codegen_1$c.str`should NOT have ${comp} than ${schemaCode} items`;
+  },
+  params: ({ schemaCode }) => codegen_1$c._`{limit: ${schemaCode}}`
+};
+const def$h = {
+  keyword: ["maxItems", "minItems"],
+  type: "array",
+  schemaType: "number",
+  $data: true,
+  error: error$a,
+  code(cxt) {
+    const { keyword: keyword2, data, schemaCode } = cxt;
+    const op = keyword2 === "maxItems" ? codegen_1$c.operators.GT : codegen_1$c.operators.LT;
+    cxt.fail$data(codegen_1$c._`${data}.length ${op} ${schemaCode}`);
+  }
+};
+limitItems.default = def$h;
+var uniqueItems = {};
+Object.defineProperty(uniqueItems, "__esModule", { value: true });
+const dataType_1 = requireDataType();
+const codegen_1$b = codegen;
+const equal$2 = fastDeepEqual;
+const error$9 = {
+  message: ({ params: { i, j } }) => codegen_1$b.str`should NOT have duplicate items (items ## ${j} and ${i} are identical)`,
+  params: ({ params: { i, j } }) => codegen_1$b._`{i: ${i}, j: ${j}}`
+};
+const def$g = {
+  keyword: "uniqueItems",
+  type: "array",
+  schemaType: "boolean",
+  $data: true,
+  error: error$9,
+  code(cxt) {
+    const { gen, data, $data, schema, parentSchema, schemaCode, it } = cxt;
+    if (!$data && !schema)
+      return;
+    const valid2 = gen.let("valid");
+    const itemTypes = parentSchema.items ? dataType_1.getSchemaTypes(parentSchema.items) : [];
+    cxt.block$data(valid2, validateUniqueItems, codegen_1$b._`${schemaCode} === false`);
+    cxt.ok(valid2);
+    function validateUniqueItems() {
+      const i = gen.let("i", codegen_1$b._`${data}.length`);
+      const j = gen.let("j");
+      cxt.setParams({ i, j });
+      gen.assign(valid2, true);
+      gen.if(codegen_1$b._`${i} > 1`, () => (canOptimize() ? loopN : loopN2)(i, j));
+    }
+    function canOptimize() {
+      return itemTypes.length > 0 && !itemTypes.some((t2) => t2 === "object" || t2 === "array");
+    }
+    function loopN(i, j) {
+      const item = gen.name("item");
+      const wrongType = dataType_1.checkDataTypes(itemTypes, item, it.opts.strict, dataType_1.DataType.Wrong);
+      const indices = gen.const("indices", codegen_1$b._`{}`);
+      gen.for(codegen_1$b._`;${i}--;`, () => {
+        gen.let(item, codegen_1$b._`${data}[${i}]`);
+        gen.if(wrongType, codegen_1$b._`continue`);
+        if (itemTypes.length > 1)
+          gen.if(codegen_1$b._`typeof ${item} == "string"`, codegen_1$b._`${item} += "_"`);
+        gen.if(codegen_1$b._`typeof ${indices}[${item}] == "number"`, () => {
+          gen.assign(j, codegen_1$b._`${indices}[${item}]`);
+          cxt.error();
+          gen.assign(valid2, false).break();
+        }).code(codegen_1$b._`${indices}[${item}] = ${i}`);
+      });
+    }
+    function loopN2(i, j) {
+      const eql = cxt.gen.scopeValue("func", {
+        ref: equal$2,
+        code: codegen_1$b._`require("ajv/dist/compile/equal")`
+      });
+      const outer = gen.name("outer");
+      gen.label(outer).for(codegen_1$b._`;${i}--;`, () => gen.for(codegen_1$b._`${j} = ${i}; ${j}--;`, () => gen.if(codegen_1$b._`${eql}(${data}[${i}], ${data}[${j}])`, () => {
+        cxt.error();
+        gen.assign(valid2, false).break(outer);
+      })));
+    }
+  }
+};
+uniqueItems.default = def$g;
+var _const = {};
+Object.defineProperty(_const, "__esModule", { value: true });
+const codegen_1$a = codegen;
+const equal$1 = fastDeepEqual;
+const error$8 = {
+  message: "should be equal to constant",
+  params: ({ schemaCode }) => codegen_1$a._`{allowedValue: ${schemaCode}}`
+};
+const def$f = {
+  keyword: "const",
+  $data: true,
+  error: error$8,
+  code(cxt) {
+    const eql = cxt.gen.scopeValue("func", {
+      ref: equal$1,
+      code: codegen_1$a._`require("ajv/dist/compile/equal")`
+    });
+    cxt.fail$data(codegen_1$a._`!${eql}(${cxt.data}, ${cxt.schemaCode})`);
+  }
+};
+_const.default = def$f;
+var _enum = {};
+Object.defineProperty(_enum, "__esModule", { value: true });
+const codegen_1$9 = codegen;
+const equal2 = fastDeepEqual;
+const error$7 = {
+  message: "should be equal to one of the allowed values",
+  params: ({ schemaCode }) => codegen_1$9._`{allowedValues: ${schemaCode}}`
+};
+const def$e = {
+  keyword: "enum",
+  schemaType: "array",
+  $data: true,
+  error: error$7,
+  code(cxt) {
+    const { gen, data, $data, schema, schemaCode, it } = cxt;
+    if (!$data && schema.length === 0)
+      throw new Error("enum must have non-empty array");
+    const useLoop = schema.length >= it.opts.loopEnum;
+    const eql = cxt.gen.scopeValue("func", {
+      ref: equal2,
+      code: codegen_1$9._`require("ajv/dist/compile/equal")`
+    });
+    let valid2;
+    if (useLoop || $data) {
+      valid2 = gen.let("valid");
+      cxt.block$data(valid2, loopEnum);
+    } else {
+      if (!Array.isArray(schema))
+        throw new Error("ajv implementation error");
+      const vSchema = gen.const("vSchema", schemaCode);
+      valid2 = codegen_1$9.or(...schema.map((_x, i) => equalCode(vSchema, i)));
+    }
+    cxt.pass(valid2);
+    function loopEnum() {
+      gen.assign(valid2, false);
+      gen.forOf("v", schemaCode, (v) => gen.if(codegen_1$9._`${eql}(${data}, ${v})`, () => gen.assign(valid2, true).break()));
+    }
+    function equalCode(vSchema, i) {
+      const sch = schema[i];
+      return sch && typeof sch === "object" ? codegen_1$9._`${eql}(${data}, ${vSchema}[${i}])` : codegen_1$9._`${data} === ${sch}`;
+    }
+  }
+};
+_enum.default = def$e;
+Object.defineProperty(validation$1, "__esModule", { value: true });
+const limitNumber_1 = limitNumber;
+const multipleOf_1 = multipleOf;
+const limitLength_1 = limitLength;
+const pattern_1 = pattern;
+const limitProperties_1 = limitProperties;
+const required_1 = required;
+const limitItems_1 = limitItems;
+const uniqueItems_1 = uniqueItems;
+const const_1 = _const;
+const enum_1 = _enum;
+const validation = [
+  // number
+  limitNumber_1.default,
+  multipleOf_1.default,
+  // string
+  limitLength_1.default,
+  pattern_1.default,
+  // object
+  limitProperties_1.default,
+  required_1.default,
+  // array
+  limitItems_1.default,
+  uniqueItems_1.default,
+  // any
+  { keyword: "type", schemaType: ["string", "array"] },
+  { keyword: "nullable", schemaType: "boolean" },
+  const_1.default,
+  enum_1.default
+];
+validation$1.default = validation;
+var applicator$1 = {};
+var additionalItems = {};
+Object.defineProperty(additionalItems, "__esModule", { value: true });
+const codegen_1$8 = codegen;
+const subschema_1$3 = requireSubschema();
+const util_1$a = requireUtil();
+const validate_1$5 = requireValidate();
+const error$6 = {
+  message: ({ params: { len } }) => codegen_1$8.str`should NOT have more than ${len} items`,
+  params: ({ params: { len } }) => codegen_1$8._`{limit: ${len}}`
+};
+const def$d = {
+  keyword: "additionalItems",
+  type: "array",
+  schemaType: ["boolean", "object"],
+  before: "uniqueItems",
+  error: error$6,
+  code(cxt) {
+    const { gen, schema, parentSchema, data, it } = cxt;
+    const { items: items2 } = parentSchema;
+    if (!Array.isArray(items2)) {
+      validate_1$5.checkStrictMode(it, '"additionalItems" is ignored when "items" is not an array of schemas');
+      return;
+    }
+    it.items = true;
+    const len = gen.const("len", codegen_1$8._`${data}.length`);
+    if (schema === false) {
+      cxt.setParams({ len: items2.length });
+      cxt.pass(codegen_1$8._`${len} <= ${items2.length}`);
+    } else if (typeof schema == "object" && !util_1$a.alwaysValidSchema(it, schema)) {
+      const valid2 = gen.var("valid", codegen_1$8._`${len} <= ${items2.length}`);
+      gen.if(codegen_1$8.not(valid2), () => validateItems(valid2));
+      cxt.ok(valid2);
+    }
+    function validateItems(valid2) {
+      gen.forRange("i", items2.length, len, (i) => {
+        cxt.subschema({ keyword: "additionalItems", dataProp: i, dataPropType: subschema_1$3.Type.Num }, valid2);
+        if (!it.allErrors)
+          gen.if(codegen_1$8.not(valid2), () => gen.break());
+      });
+    }
+  }
+};
+additionalItems.default = def$d;
+var items = {};
+Object.defineProperty(items, "__esModule", { value: true });
+const codegen_1$7 = codegen;
+const util_1$9 = requireUtil();
+const validate_1$4 = requireValidate();
+const code_1$4 = requireCode();
+const def$c = {
+  keyword: "items",
+  type: "array",
+  schemaType: ["object", "array", "boolean"],
+  before: "uniqueItems",
+  code(cxt) {
+    const { gen, schema, it } = cxt;
+    if (Array.isArray(schema)) {
+      if (it.opts.unevaluated && schema.length && it.items !== true) {
+        it.items = util_1$9.mergeEvaluated.items(gen, schema.length, it.items);
+      }
+      validateTuple(schema);
+    } else {
+      it.items = true;
+      if (util_1$9.alwaysValidSchema(it, schema))
+        return;
+      cxt.ok(code_1$4.validateArray(cxt));
+    }
+    function validateTuple(schArr) {
+      const { parentSchema, data } = cxt;
+      if (it.opts.strictTuples && !fullTupleSchema(schArr.length, parentSchema)) {
+        const msg = `"items" is ${schArr.length}-tuple, but minItems or maxItems/additionalItems are not specified or different`;
+        validate_1$4.checkStrictMode(it, msg, it.opts.strictTuples);
+      }
+      const valid2 = gen.name("valid");
+      const len = gen.const("len", codegen_1$7._`${data}.length`);
+      schArr.forEach((sch, i) => {
+        if (util_1$9.alwaysValidSchema(it, sch))
+          return;
+        gen.if(codegen_1$7._`${len} > ${i}`, () => cxt.subschema({
+          keyword: "items",
+          schemaProp: i,
+          dataProp: i
+        }, valid2));
+        cxt.ok(valid2);
+      });
+    }
+  }
+};
+function fullTupleSchema(len, sch) {
+  return len === sch.minItems && (len === sch.maxItems || sch.additionalItems === false);
+}
+items.default = def$c;
+var contains = {};
+Object.defineProperty(contains, "__esModule", { value: true });
+const codegen_1$6 = codegen;
+const subschema_1$2 = requireSubschema();
+const util_1$8 = requireUtil();
+const validate_1$3 = requireValidate();
+const error$5 = {
+  message: ({ params: { min, max } }) => max === void 0 ? codegen_1$6.str`should contain at least ${min} valid item(s)` : codegen_1$6.str`should contain at least ${min} and no more than ${max} valid item(s)`,
+  params: ({ params: { min, max } }) => max === void 0 ? codegen_1$6._`{minContains: ${min}}` : codegen_1$6._`{minContains: ${min}, maxContains: ${max}}`
+};
+const def$b = {
+  keyword: "contains",
+  type: "array",
+  schemaType: ["object", "boolean"],
+  before: "uniqueItems",
+  trackErrors: true,
+  error: error$5,
+  code(cxt) {
+    const { gen, schema, parentSchema, data, it } = cxt;
+    let min;
+    let max;
+    const { minContains, maxContains } = parentSchema;
+    if (it.opts.next) {
+      min = minContains === void 0 ? 1 : minContains;
+      max = maxContains;
+    } else {
+      min = 1;
+    }
+    const len = gen.const("len", codegen_1$6._`${data}.length`);
+    cxt.setParams({ min, max });
+    if (max === void 0 && min === 0) {
+      validate_1$3.checkStrictMode(it, `"minContains" == 0 without "maxContains": "contains" keyword ignored`);
+      return;
+    }
+    if (max !== void 0 && min > max) {
+      validate_1$3.checkStrictMode(it, `"minContains" > "maxContains" is always invalid`);
+      cxt.fail();
+      return;
+    }
+    if (util_1$8.alwaysValidSchema(it, schema)) {
+      let cond = codegen_1$6._`${len} >= ${min}`;
+      if (max !== void 0)
+        cond = codegen_1$6._`${cond} && ${len} <= ${max}`;
+      cxt.pass(cond);
+      return;
+    }
+    it.items = true;
+    const valid2 = gen.name("valid");
+    if (max === void 0 && min === 1) {
+      validateItems(valid2, () => gen.if(valid2, () => gen.break()));
+    } else {
+      gen.let(valid2, false);
+      const schValid = gen.name("_valid");
+      const count = gen.let("count", 0);
+      validateItems(schValid, () => gen.if(schValid, () => checkLimits(count)));
+    }
+    cxt.result(valid2, () => cxt.reset());
+    function validateItems(_valid, block) {
+      gen.forRange("i", 0, len, (i) => {
+        cxt.subschema({
+          keyword: "contains",
+          dataProp: i,
+          dataPropType: subschema_1$2.Type.Num,
+          compositeRule: true
+        }, _valid);
+        block();
+      });
+    }
+    function checkLimits(count) {
+      gen.code(codegen_1$6._`${count}++`);
+      if (max === void 0) {
+        gen.if(codegen_1$6._`${count} >= ${min}`, () => gen.assign(valid2, true).break());
+      } else {
+        gen.if(codegen_1$6._`${count} > ${max}`, () => gen.assign(valid2, false).break());
+        if (min === 1)
+          gen.assign(valid2, true);
+        else
+          gen.if(codegen_1$6._`${count} >= ${min}`, () => gen.assign(valid2, true));
+      }
+    }
+  }
+};
+contains.default = def$b;
+var dependencies = {};
+(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.validateSchemaDeps = exports.validatePropertyDeps = exports.error = void 0;
+  const codegen_12 = codegen;
+  const util_12 = requireUtil();
+  const code_12 = requireCode();
+  exports.error = {
+    message: ({ params: { property, depsCount, deps } }) => {
+      const property_ies = depsCount === 1 ? "property" : "properties";
+      return codegen_12.str`should have ${property_ies} ${deps} when property ${property} is present`;
+    },
+    params: ({ params: { property, depsCount, deps, missingProperty } }) => codegen_12._`{property: ${property},
+    missingProperty: ${missingProperty},
+    depsCount: ${depsCount},
+    deps: ${deps}}`
+    // TODO change to reference
+  };
+  const def2 = {
+    keyword: "dependencies",
+    type: "object",
+    schemaType: "object",
+    error: exports.error,
+    code(cxt) {
+      const [propDeps, schDeps] = splitDependencies(cxt);
+      validatePropertyDeps(cxt, propDeps);
+      validateSchemaDeps(cxt, schDeps);
+    }
+  };
+  function splitDependencies({ schema }) {
+    const propertyDeps = {};
+    const schemaDeps = {};
+    for (const key in schema) {
+      if (key === "__proto__")
+        continue;
+      const deps = Array.isArray(schema[key]) ? propertyDeps : schemaDeps;
+      deps[key] = schema[key];
+    }
+    return [propertyDeps, schemaDeps];
+  }
+  function validatePropertyDeps(cxt, propertyDeps = cxt.schema) {
+    const { gen, data, it } = cxt;
+    if (Object.keys(propertyDeps).length === 0)
+      return;
+    const missing = gen.let("missing");
+    for (const prop in propertyDeps) {
+      const deps = propertyDeps[prop];
+      if (deps.length === 0)
+        continue;
+      const hasProperty = code_12.propertyInData(gen, data, prop, it.opts.ownProperties);
+      cxt.setParams({
+        property: prop,
+        depsCount: deps.length,
+        deps: deps.join(", ")
+      });
+      if (it.allErrors) {
+        gen.if(hasProperty, () => {
+          for (const depProp of deps) {
+            code_12.checkReportMissingProp(cxt, depProp);
+          }
+        });
+      } else {
+        gen.if(codegen_12._`${hasProperty} && (${code_12.checkMissingProp(cxt, deps, missing)})`);
+        code_12.reportMissingProp(cxt, missing);
+        gen.else();
+      }
+    }
+  }
+  exports.validatePropertyDeps = validatePropertyDeps;
+  function validateSchemaDeps(cxt, schemaDeps = cxt.schema) {
+    const { gen, data, keyword: keyword2, it } = cxt;
+    const valid2 = gen.name("valid");
+    for (const prop in schemaDeps) {
+      if (util_12.alwaysValidSchema(it, schemaDeps[prop]))
+        continue;
+      gen.if(
+        code_12.propertyInData(gen, data, prop, it.opts.ownProperties),
+        () => {
+          const schCxt = cxt.subschema({ keyword: keyword2, schemaProp: prop }, valid2);
+          cxt.mergeValidEvaluated(schCxt, valid2);
+        },
+        () => gen.var(valid2, true)
+        // TODO var
+      );
+      cxt.ok(valid2);
+    }
+  }
+  exports.validateSchemaDeps = validateSchemaDeps;
+  exports.default = def2;
+})(dependencies);
+var propertyNames = {};
+Object.defineProperty(propertyNames, "__esModule", { value: true });
+const codegen_1$5 = codegen;
+const util_1$7 = requireUtil();
+const error$4 = {
+  message: ({ params }) => codegen_1$5.str`property name '${params.propertyName}' is invalid`,
+  params: ({ params }) => codegen_1$5._`{propertyName: ${params.propertyName}}`
+};
+const def$a = {
+  keyword: "propertyNames",
+  type: "object",
+  schemaType: ["object", "boolean"],
+  error: error$4,
+  code(cxt) {
+    const { gen, schema, data, it } = cxt;
+    if (util_1$7.alwaysValidSchema(it, schema))
+      return;
+    const valid2 = gen.name("valid");
+    gen.forIn("key", data, (key) => {
+      cxt.setParams({ propertyName: key });
+      cxt.subschema({
+        keyword: "propertyNames",
+        data: key,
+        dataTypes: ["string"],
+        propertyName: key,
+        compositeRule: true
+      }, valid2);
+      gen.if(codegen_1$5.not(valid2), () => {
+        cxt.error(true);
+        if (!it.allErrors)
+          gen.break();
+      });
+    });
+    cxt.ok(valid2);
+  }
+};
+propertyNames.default = def$a;
+var additionalProperties = {};
+Object.defineProperty(additionalProperties, "__esModule", { value: true });
+const code_1$3 = requireCode();
+const codegen_1$4 = codegen;
+const names_1 = names$1;
+const subschema_1$1 = requireSubschema();
+const util_1$6 = requireUtil();
+const error$3 = {
+  message: "should NOT have additional properties",
+  params: ({ params }) => codegen_1$4._`{additionalProperty: ${params.additionalProperty}}`
+};
+const def$9 = {
+  keyword: "additionalProperties",
+  type: ["object"],
+  schemaType: ["boolean", "object"],
+  allowUndefined: true,
+  trackErrors: true,
+  error: error$3,
+  code(cxt) {
+    const { gen, schema, parentSchema, data, errsCount, it } = cxt;
+    if (!errsCount)
+      throw new Error("ajv implementation error");
+    const { allErrors, opts } = it;
+    it.props = true;
+    if (opts.removeAdditional !== "all" && util_1$6.alwaysValidSchema(it, schema))
+      return;
+    const props = code_1$3.allSchemaProperties(parentSchema.properties);
+    const patProps = code_1$3.allSchemaProperties(parentSchema.patternProperties);
+    checkAdditionalProperties();
+    cxt.ok(codegen_1$4._`${errsCount} === ${names_1.default.errors}`);
+    function checkAdditionalProperties() {
+      gen.forIn("key", data, (key) => {
+        if (!props.length && !patProps.length)
+          additionalPropertyCode(key);
+        else
+          gen.if(isAdditional(key), () => additionalPropertyCode(key));
+      });
+    }
+    function isAdditional(key) {
+      let definedProp;
+      if (props.length > 8) {
+        const propsSchema = util_1$6.schemaRefOrVal(it, parentSchema.properties, "properties");
+        definedProp = code_1$3.isOwnProperty(gen, propsSchema, key);
+      } else if (props.length) {
+        definedProp = codegen_1$4.or(...props.map((p) => codegen_1$4._`${key} === ${p}`));
+      } else {
+        definedProp = codegen_1$4.nil;
+      }
+      if (patProps.length) {
+        definedProp = codegen_1$4.or(definedProp, ...patProps.map((p) => codegen_1$4._`${code_1$3.usePattern(gen, p)}.test(${key})`));
+      }
+      return codegen_1$4.not(definedProp);
+    }
+    function deleteAdditional(key) {
+      gen.code(codegen_1$4._`delete ${data}[${key}]`);
+    }
+    function additionalPropertyCode(key) {
+      if (opts.removeAdditional === "all" || opts.removeAdditional && schema === false) {
+        deleteAdditional(key);
+        return;
+      }
+      if (schema === false) {
+        cxt.setParams({ additionalProperty: key });
+        cxt.error();
+        if (!allErrors)
+          gen.break();
+        return;
+      }
+      if (typeof schema == "object" && !util_1$6.alwaysValidSchema(it, schema)) {
+        const valid2 = gen.name("valid");
+        if (opts.removeAdditional === "failing") {
+          applyAdditionalSchema(key, valid2, false);
+          gen.if(codegen_1$4.not(valid2), () => {
+            cxt.reset();
+            deleteAdditional(key);
+          });
+        } else {
+          applyAdditionalSchema(key, valid2);
+          if (!allErrors)
+            gen.if(codegen_1$4.not(valid2), () => gen.break());
+        }
+      }
+    }
+    function applyAdditionalSchema(key, valid2, errors2) {
+      const subschema2 = {
+        keyword: "additionalProperties",
+        dataProp: key,
+        dataPropType: subschema_1$1.Type.Str
+      };
+      if (errors2 === false) {
+        Object.assign(subschema2, {
+          compositeRule: true,
+          createErrors: false,
+          allErrors: false
+        });
+      }
+      cxt.subschema(subschema2, valid2);
+    }
+  }
+};
+additionalProperties.default = def$9;
+var properties$1 = {};
+Object.defineProperty(properties$1, "__esModule", { value: true });
+const context_1 = requireContext();
+const code_1$2 = requireCode();
+const util_1$5 = requireUtil();
+const additionalProperties_1$1 = additionalProperties;
+const def$8 = {
+  keyword: "properties",
+  type: "object",
+  schemaType: "object",
+  code(cxt) {
+    const { gen, schema, parentSchema, data, it } = cxt;
+    if (it.opts.removeAdditional === "all" && parentSchema.additionalProperties === void 0) {
+      additionalProperties_1$1.default.code(new context_1.default(it, additionalProperties_1$1.default, "additionalProperties"));
+    }
+    const allProps = code_1$2.allSchemaProperties(schema);
+    for (const prop of allProps) {
+      it.definedProperties.add(prop);
+    }
+    if (it.opts.unevaluated && allProps.length && it.props !== true) {
+      it.props = util_1$5.mergeEvaluated.props(gen, util_1$5.toHash(allProps), it.props);
+    }
+    const properties2 = allProps.filter((p) => !util_1$5.alwaysValidSchema(it, schema[p]));
+    if (properties2.length === 0)
+      return;
+    const valid2 = gen.name("valid");
+    for (const prop of properties2) {
+      if (hasDefault(prop)) {
+        applyPropertySchema(prop);
+      } else {
+        gen.if(code_1$2.propertyInData(gen, data, prop, it.opts.ownProperties));
+        applyPropertySchema(prop);
+        if (!it.allErrors)
+          gen.else().var(valid2, true);
+        gen.endIf();
+      }
+      cxt.it.definedProperties.add(prop);
+      cxt.ok(valid2);
+    }
+    function hasDefault(prop) {
+      return it.opts.useDefaults && !it.compositeRule && schema[prop].default !== void 0;
+    }
+    function applyPropertySchema(prop) {
+      cxt.subschema({
+        keyword: "properties",
+        schemaProp: prop,
+        dataProp: prop
+      }, valid2);
+    }
+  }
+};
+properties$1.default = def$8;
+var patternProperties = {};
+Object.defineProperty(patternProperties, "__esModule", { value: true });
+const code_1$1 = requireCode();
+const codegen_1$3 = codegen;
+const subschema_1 = requireSubschema();
+const validate_1$2 = requireValidate();
+const util_1$4 = requireUtil();
+const def$7 = {
+  keyword: "patternProperties",
+  type: "object",
+  schemaType: "object",
+  code(cxt) {
+    const { gen, schema, data, parentSchema, it } = cxt;
+    const { opts } = it;
+    const patterns = code_1$1.schemaProperties(it, schema);
+    if (patterns.length === 0)
+      return;
+    const checkProperties = opts.strict && !opts.allowMatchingProperties && parentSchema.properties;
+    const valid2 = gen.name("valid");
+    if (it.props !== true && !(it.props instanceof codegen_1$3.Name)) {
+      it.props = util_1$4.evaluatedPropsToName(gen, it.props);
+    }
+    const { props } = it;
+    validatePatternProperties();
+    function validatePatternProperties() {
+      for (const pat of patterns) {
+        if (checkProperties)
+          checkMatchingProperties(pat);
+        if (it.allErrors) {
+          validateProperties(pat);
+        } else {
+          gen.var(valid2, true);
+          validateProperties(pat);
+          gen.if(valid2);
+        }
+      }
+    }
+    function checkMatchingProperties(pat) {
+      for (const prop in checkProperties) {
+        if (new RegExp(pat).test(prop)) {
+          validate_1$2.checkStrictMode(it, `property ${prop} matches pattern ${pat} (use allowMatchingProperties)`);
+        }
+      }
+    }
+    function validateProperties(pat) {
+      gen.forIn("key", data, (key) => {
+        gen.if(codegen_1$3._`${code_1$1.usePattern(gen, pat)}.test(${key})`, () => {
+          cxt.subschema({
+            keyword: "patternProperties",
+            schemaProp: pat,
+            dataProp: key,
+            dataPropType: subschema_1.Type.Str
+          }, valid2);
+          if (it.opts.unevaluated && props !== true) {
+            gen.assign(codegen_1$3._`${props}[${key}]`, true);
+          } else if (!it.allErrors) {
+            gen.if(codegen_1$3.not(valid2), () => gen.break());
+          }
+        });
+      });
+    }
+  }
+};
+patternProperties.default = def$7;
+var not = {};
+Object.defineProperty(not, "__esModule", { value: true });
+const util_1$3 = requireUtil();
+const def$6 = {
+  keyword: "not",
+  schemaType: ["object", "boolean"],
+  trackErrors: true,
+  code(cxt) {
+    const { gen, schema, it } = cxt;
+    if (util_1$3.alwaysValidSchema(it, schema)) {
+      cxt.fail();
+      return;
+    }
+    const valid2 = gen.name("valid");
+    cxt.subschema({
+      keyword: "not",
+      compositeRule: true,
+      createErrors: false,
+      allErrors: false
+    }, valid2);
+    cxt.result(valid2, () => cxt.error(), () => cxt.reset());
+  },
+  error: {
+    message: "should NOT be valid"
+  }
+};
+not.default = def$6;
+var anyOf = {};
+Object.defineProperty(anyOf, "__esModule", { value: true });
+const code_1 = requireCode();
+const def$5 = {
+  keyword: "anyOf",
+  schemaType: "array",
+  trackErrors: true,
+  code: code_1.validateUnion,
+  error: {
+    message: "should match some schema in anyOf"
+  }
+};
+anyOf.default = def$5;
+var oneOf = {};
+Object.defineProperty(oneOf, "__esModule", { value: true });
+const codegen_1$2 = codegen;
+const util_1$2 = requireUtil();
+const error$2 = {
+  message: "should match exactly one schema in oneOf",
+  params: ({ params }) => codegen_1$2._`{passingSchemas: ${params.passing}}`
+};
+const def$4 = {
+  keyword: "oneOf",
+  schemaType: "array",
+  trackErrors: true,
+  error: error$2,
+  code(cxt) {
+    const { gen, schema, it } = cxt;
+    if (!Array.isArray(schema))
+      throw new Error("ajv implementation error");
+    const schArr = schema;
+    const valid2 = gen.let("valid", false);
+    const passing = gen.let("passing", null);
+    const schValid = gen.name("_valid");
+    cxt.setParams({ passing });
+    gen.block(validateOneOf);
+    cxt.result(valid2, () => cxt.reset(), () => cxt.error(true));
+    function validateOneOf() {
+      schArr.forEach((sch, i) => {
+        let schCxt;
+        if (util_1$2.alwaysValidSchema(it, sch)) {
+          gen.var(schValid, true);
+        } else {
+          schCxt = cxt.subschema({
+            keyword: "oneOf",
+            schemaProp: i,
+            compositeRule: true
+          }, schValid);
+        }
+        if (i > 0) {
+          gen.if(codegen_1$2._`${schValid} && ${valid2}`).assign(valid2, false).assign(passing, codegen_1$2._`[${passing}, ${i}]`).else();
+        }
+        gen.if(schValid, () => {
+          gen.assign(valid2, true);
+          gen.assign(passing, i);
+          if (schCxt)
+            cxt.mergeEvaluated(schCxt, codegen_1$2.Name);
+        });
+      });
+    }
+  }
+};
+oneOf.default = def$4;
+var allOf = {};
+Object.defineProperty(allOf, "__esModule", { value: true });
+const util_1$1 = requireUtil();
+const def$3 = {
+  keyword: "allOf",
+  schemaType: "array",
+  code(cxt) {
+    const { gen, schema, it } = cxt;
+    if (!Array.isArray(schema))
+      throw new Error("ajv implementation error");
+    const valid2 = gen.name("valid");
+    schema.forEach((sch, i) => {
+      if (util_1$1.alwaysValidSchema(it, sch))
+        return;
+      const schCxt = cxt.subschema({ keyword: "allOf", schemaProp: i }, valid2);
+      cxt.ok(valid2);
+      cxt.mergeEvaluated(schCxt);
+    });
+  }
+};
+allOf.default = def$3;
+var _if = {};
+Object.defineProperty(_if, "__esModule", { value: true });
+const codegen_1$1 = codegen;
+const util_1 = requireUtil();
+const validate_1$1 = requireValidate();
+const error$1 = {
+  message: ({ params }) => codegen_1$1.str`should match "${params.ifClause}" schema`,
+  params: ({ params }) => codegen_1$1._`{failingKeyword: ${params.ifClause}}`
+};
+const def$2 = {
+  keyword: "if",
+  schemaType: ["object", "boolean"],
+  trackErrors: true,
+  error: error$1,
+  code(cxt) {
+    const { gen, parentSchema, it } = cxt;
+    if (parentSchema.then === void 0 && parentSchema.else === void 0) {
+      validate_1$1.checkStrictMode(it, '"if" without "then" and "else" is ignored');
+    }
+    const hasThen = hasSchema(it, "then");
+    const hasElse = hasSchema(it, "else");
+    if (!hasThen && !hasElse)
+      return;
+    const valid2 = gen.let("valid", true);
+    const schValid = gen.name("_valid");
+    validateIf();
+    cxt.reset();
+    if (hasThen && hasElse) {
+      const ifClause = gen.let("ifClause");
+      cxt.setParams({ ifClause });
+      gen.if(schValid, validateClause("then", ifClause), validateClause("else", ifClause));
+    } else if (hasThen) {
+      gen.if(schValid, validateClause("then"));
+    } else {
+      gen.if(codegen_1$1.not(schValid), validateClause("else"));
+    }
+    cxt.pass(valid2, () => cxt.error(true));
+    function validateIf() {
+      const schCxt = cxt.subschema({
+        keyword: "if",
+        compositeRule: true,
+        createErrors: false,
+        allErrors: false
+      }, schValid);
+      cxt.mergeEvaluated(schCxt);
+    }
+    function validateClause(keyword2, ifClause) {
+      return () => {
+        const schCxt = cxt.subschema({ keyword: keyword2 }, schValid);
+        gen.assign(valid2, schValid);
+        cxt.mergeValidEvaluated(schCxt, valid2);
+        if (ifClause)
+          gen.assign(ifClause, codegen_1$1._`${keyword2}`);
+        else
+          cxt.setParams({ ifClause: keyword2 });
+      };
+    }
+  }
+};
+function hasSchema(it, keyword2) {
+  const schema = it.schema[keyword2];
+  return schema !== void 0 && !util_1.alwaysValidSchema(it, schema);
+}
+_if.default = def$2;
+var thenElse = {};
+Object.defineProperty(thenElse, "__esModule", { value: true });
+const validate_1 = requireValidate();
+const def$1 = {
+  keyword: ["then", "else"],
+  schemaType: ["object", "boolean"],
+  code({ keyword: keyword2, parentSchema, it }) {
+    if (parentSchema.if === void 0)
+      validate_1.checkStrictMode(it, `"${keyword2}" without "if" is ignored`);
+  }
+};
+thenElse.default = def$1;
+Object.defineProperty(applicator$1, "__esModule", { value: true });
+const additionalItems_1 = additionalItems;
+const items_1 = items;
+const contains_1 = contains;
+const dependencies_1 = dependencies;
+const propertyNames_1 = propertyNames;
+const additionalProperties_1 = additionalProperties;
+const properties_1 = properties$1;
+const patternProperties_1 = patternProperties;
+const not_1 = not;
+const anyOf_1 = anyOf;
+const oneOf_1 = oneOf;
+const allOf_1 = allOf;
+const if_1 = _if;
+const thenElse_1 = thenElse;
+const applicator = [
+  // any
+  not_1.default,
+  anyOf_1.default,
+  oneOf_1.default,
+  allOf_1.default,
+  if_1.default,
+  thenElse_1.default,
+  // array
+  additionalItems_1.default,
+  items_1.default,
+  contains_1.default,
+  // object
+  propertyNames_1.default,
+  additionalProperties_1.default,
+  dependencies_1.default,
+  properties_1.default,
+  patternProperties_1.default
+];
+applicator$1.default = applicator;
+var format$2 = {};
+var format$1 = {};
+Object.defineProperty(format$1, "__esModule", { value: true });
+const codegen_1 = codegen;
+const error = {
+  message: ({ schemaCode }) => codegen_1.str`should match format "${schemaCode}"`,
+  params: ({ schemaCode }) => codegen_1._`{format: ${schemaCode}}`
+};
+const def = {
+  keyword: "format",
+  type: ["number", "string"],
+  schemaType: "string",
+  $data: true,
+  error,
+  code(cxt, ruleType) {
+    const { gen, data, $data, schema, schemaCode, it } = cxt;
+    const { opts, errSchemaPath, schemaEnv, self: self2 } = it;
+    if (!opts.validateFormats)
+      return;
+    if ($data)
+      validate$DataFormat();
+    else
+      validateFormat();
+    function validate$DataFormat() {
+      const fmts = gen.scopeValue("formats", {
+        ref: self2.formats,
+        code: opts.code.formats
+      });
+      const fDef = gen.const("fDef", codegen_1._`${fmts}[${schemaCode}]`);
+      const fType = gen.let("fType");
+      const format2 = gen.let("format");
+      gen.if(codegen_1._`typeof ${fDef} == "object" && !(${fDef} instanceof RegExp)`, () => gen.assign(fType, codegen_1._`${fDef}.type || "string"`).assign(format2, codegen_1._`${fDef}.validate`), () => gen.assign(fType, codegen_1._`"string"`).assign(format2, fDef));
+      cxt.fail$data(codegen_1.or(unknownFmt(), invalidFmt()));
+      function unknownFmt() {
+        if (opts.strict === false)
+          return codegen_1.nil;
+        return codegen_1._`${schemaCode} && !${format2}`;
+      }
+      function invalidFmt() {
+        const callFormat = schemaEnv.$async ? codegen_1._`(${fDef}.async ? await ${format2}(${data}) : ${format2}(${data}))` : codegen_1._`${format2}(${data})`;
+        const validData = codegen_1._`(typeof ${format2} == "function" ? ${callFormat} : ${format2}.test(${data}))`;
+        return codegen_1._`${format2} && ${format2} !== true && ${fType} === ${ruleType} && !${validData}`;
+      }
+    }
+    function validateFormat() {
+      const formatDef = self2.formats[schema];
+      if (!formatDef) {
+        unknownFormat();
+        return;
+      }
+      if (formatDef === true)
+        return;
+      const [fmtType, format2, fmtRef] = getFormat(formatDef);
+      if (fmtType === ruleType)
+        cxt.pass(validCondition());
+      function unknownFormat() {
+        if (opts.strict === false) {
+          self2.logger.warn(unknownMsg());
+          return;
+        }
+        throw new Error(unknownMsg());
+        function unknownMsg() {
+          return `unknown format "${schema}" ignored in schema at path "${errSchemaPath}"`;
+        }
+      }
+      function getFormat(fmtDef) {
+        const fmt = gen.scopeValue("formats", {
+          key: schema,
+          ref: fmtDef,
+          code: opts.code.formats ? codegen_1._`${opts.code.formats}${codegen_1.getProperty(schema)}` : void 0
+        });
+        if (typeof fmtDef == "object" && !(fmtDef instanceof RegExp)) {
+          return [fmtDef.type || "string", fmtDef.validate, codegen_1._`${fmt}.validate`];
+        }
+        return ["string", fmtDef, fmt];
+      }
+      function validCondition() {
+        if (typeof formatDef == "object" && !(formatDef instanceof RegExp) && formatDef.async) {
+          if (!schemaEnv.$async)
+            throw new Error("async format in sync schema");
+          return codegen_1._`await ${fmtRef}(${data})`;
+        }
+        return typeof format2 == "function" ? codegen_1._`${fmtRef}(${data})` : codegen_1._`${fmtRef}.test(${data})`;
+      }
+    }
+  }
+};
+format$1.default = def;
+Object.defineProperty(format$2, "__esModule", { value: true });
+const format_1$1 = format$1;
+const format = [format_1$1.default];
+format$2.default = format;
+var metadata = {};
+Object.defineProperty(metadata, "__esModule", { value: true });
+metadata.contentVocabulary = metadata.metadataVocabulary = void 0;
+metadata.metadataVocabulary = [
+  "title",
+  "description",
+  "default",
+  "deprecated",
+  "readOnly",
+  "writeOnly",
+  "examples"
+];
+metadata.contentVocabulary = [
+  "contentMediaType",
+  "contentEncoding",
+  "contentSchema"
+];
+Object.defineProperty(draft7, "__esModule", { value: true });
+const core_1 = core$1;
+const validation_1 = validation$1;
+const applicator_1 = applicator$1;
+const format_1 = format$2;
+const metadata_1 = metadata;
+const draft7Vocabularies = [
+  core_1.default,
+  validation_1.default,
+  applicator_1.default,
+  format_1.default,
+  metadata_1.metadataVocabulary,
+  metadata_1.contentVocabulary
+];
+draft7.default = draft7Vocabularies;
+const $schema = "http://json-schema.org/draft-07/schema#";
+const $id = "http://json-schema.org/draft-07/schema#";
+const title = "Core schema meta-schema";
+const definitions = {
+  schemaArray: {
+    type: "array",
+    minItems: 1,
+    items: {
+      $ref: "#"
+    }
+  },
+  nonNegativeInteger: {
+    type: "integer",
+    minimum: 0
+  },
+  nonNegativeIntegerDefault0: {
+    allOf: [
+      {
+        $ref: "#/definitions/nonNegativeInteger"
+      },
+      {
+        "default": 0
+      }
+    ]
+  },
+  simpleTypes: {
+    "enum": [
+      "array",
+      "boolean",
+      "integer",
+      "null",
+      "number",
+      "object",
+      "string"
+    ]
+  },
+  stringArray: {
+    type: "array",
+    items: {
+      type: "string"
+    },
+    uniqueItems: true,
+    "default": []
+  }
+};
+const type = [
+  "object",
+  "boolean"
+];
+const properties = {
+  $id: {
+    type: "string",
+    format: "uri-reference"
+  },
+  $schema: {
+    type: "string",
+    format: "uri"
+  },
+  $ref: {
+    type: "string",
+    format: "uri-reference"
+  },
+  $comment: {
+    type: "string"
+  },
+  title: {
+    type: "string"
+  },
+  description: {
+    type: "string"
+  },
+  "default": true,
+  readOnly: {
+    type: "boolean",
+    "default": false
+  },
+  examples: {
+    type: "array",
+    items: true
+  },
+  multipleOf: {
+    type: "number",
+    exclusiveMinimum: 0
+  },
+  maximum: {
+    type: "number"
+  },
+  exclusiveMaximum: {
+    type: "number"
+  },
+  minimum: {
+    type: "number"
+  },
+  exclusiveMinimum: {
+    type: "number"
+  },
+  maxLength: {
+    $ref: "#/definitions/nonNegativeInteger"
+  },
+  minLength: {
+    $ref: "#/definitions/nonNegativeIntegerDefault0"
+  },
+  pattern: {
+    type: "string",
+    format: "regex"
+  },
+  additionalItems: {
+    $ref: "#"
+  },
+  items: {
+    anyOf: [
+      {
+        $ref: "#"
+      },
+      {
+        $ref: "#/definitions/schemaArray"
+      }
+    ],
+    "default": true
+  },
+  maxItems: {
+    $ref: "#/definitions/nonNegativeInteger"
+  },
+  minItems: {
+    $ref: "#/definitions/nonNegativeIntegerDefault0"
+  },
+  uniqueItems: {
+    type: "boolean",
+    "default": false
+  },
+  contains: {
+    $ref: "#"
+  },
+  maxProperties: {
+    $ref: "#/definitions/nonNegativeInteger"
+  },
+  minProperties: {
+    $ref: "#/definitions/nonNegativeIntegerDefault0"
+  },
+  required: {
+    $ref: "#/definitions/stringArray"
+  },
+  additionalProperties: {
+    $ref: "#"
+  },
+  definitions: {
+    type: "object",
+    additionalProperties: {
+      $ref: "#"
+    },
+    "default": {}
+  },
+  properties: {
+    type: "object",
+    additionalProperties: {
+      $ref: "#"
+    },
+    "default": {}
+  },
+  patternProperties: {
+    type: "object",
+    additionalProperties: {
+      $ref: "#"
+    },
+    propertyNames: {
+      format: "regex"
+    },
+    "default": {}
+  },
+  dependencies: {
+    type: "object",
+    additionalProperties: {
+      anyOf: [
+        {
+          $ref: "#"
+        },
+        {
+          $ref: "#/definitions/stringArray"
+        }
+      ]
+    }
+  },
+  propertyNames: {
+    $ref: "#"
+  },
+  "const": true,
+  "enum": {
+    type: "array",
+    items: true,
+    minItems: 1,
+    uniqueItems: true
+  },
+  type: {
+    anyOf: [
+      {
+        $ref: "#/definitions/simpleTypes"
+      },
+      {
+        type: "array",
+        items: {
+          $ref: "#/definitions/simpleTypes"
+        },
+        minItems: 1,
+        uniqueItems: true
+      }
+    ]
+  },
+  format: {
+    type: "string"
+  },
+  contentMediaType: {
+    type: "string"
+  },
+  contentEncoding: {
+    type: "string"
+  },
+  "if": {
+    $ref: "#"
+  },
+  then: {
+    $ref: "#"
+  },
+  "else": {
+    $ref: "#"
+  },
+  allOf: {
+    $ref: "#/definitions/schemaArray"
+  },
+  anyOf: {
+    $ref: "#/definitions/schemaArray"
+  },
+  oneOf: {
+    $ref: "#/definitions/schemaArray"
+  },
+  not: {
+    $ref: "#"
+  }
+};
+const require$$4 = {
+  $schema,
+  $id,
+  title,
+  definitions,
+  type,
+  properties,
+  "default": true
+};
+(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.CodeGen = exports.Name = exports.nil = exports.stringify = exports.str = exports._ = exports.KeywordCxt = void 0;
+  const context_12 = requireContext();
+  exports.KeywordCxt = context_12.default;
+  var codegen_12 = codegen;
+  Object.defineProperty(exports, "_", { enumerable: true, get: function() {
+    return codegen_12._;
+  } });
+  Object.defineProperty(exports, "str", { enumerable: true, get: function() {
+    return codegen_12.str;
+  } });
+  Object.defineProperty(exports, "stringify", { enumerable: true, get: function() {
+    return codegen_12.stringify;
+  } });
+  Object.defineProperty(exports, "nil", { enumerable: true, get: function() {
+    return codegen_12.nil;
+  } });
+  Object.defineProperty(exports, "Name", { enumerable: true, get: function() {
+    return codegen_12.Name;
+  } });
+  Object.defineProperty(exports, "CodeGen", { enumerable: true, get: function() {
+    return codegen_12.CodeGen;
+  } });
+  const core_12 = core$2;
+  const draft7_1 = draft7;
+  const draft7MetaSchema = require$$4;
+  const META_SUPPORT_DATA = ["/properties"];
+  const META_SCHEMA_ID = "http://json-schema.org/draft-07/schema";
+  class Ajv extends core_12.default {
+    _addVocabularies() {
+      super._addVocabularies();
+      draft7_1.default.forEach((v) => this.addVocabulary(v));
+    }
+    _addDefaultMetaSchema() {
+      super._addDefaultMetaSchema();
+      if (!this.opts.meta)
+        return;
+      const metaSchema = this.opts.$data ? this.$dataMetaSchema(draft7MetaSchema, META_SUPPORT_DATA) : draft7MetaSchema;
+      this.addMetaSchema(metaSchema, META_SCHEMA_ID, false);
+      this.refs["http://json-schema.org/schema"] = META_SCHEMA_ID;
+    }
+    defaultMeta() {
+      return this.opts.defaultMeta = super.defaultMeta() || (this.getSchema(META_SCHEMA_ID) ? META_SCHEMA_ID : void 0);
+    }
+  }
+  exports.default = Ajv;
+})(ajv);
+var dist = { exports: {} };
+var formats = {};
+(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.formatNames = exports.fastFormats = exports.fullFormats = void 0;
+  function fmtDef(validate2, compare2) {
+    return { validate: validate2, compare: compare2 };
+  }
+  exports.fullFormats = {
+    // date: http://tools.ietf.org/html/rfc3339#section-5.6
+    date: fmtDef(date, compareDate),
+    // date-time: http://tools.ietf.org/html/rfc3339#section-5.6
+    time: fmtDef(time, compareTime),
+    "date-time": fmtDef(date_time, compareDateTime),
+    // duration: https://tools.ietf.org/html/rfc3339#appendix-A
+    duration: /^P(?!$)((\d+Y)?(\d+M)?(\d+D)?(T(?=\d)(\d+H)?(\d+M)?(\d+S)?)?|(\d+W)?)$/,
+    uri,
+    "uri-reference": /^(?:[a-z][a-z0-9+\-.]*:)?(?:\/?\/(?:(?:[a-z0-9\-._~!$&'()*+,;=:]|%[0-9a-f]{2})*@)?(?:\[(?:(?:(?:(?:[0-9a-f]{1,4}:){6}|::(?:[0-9a-f]{1,4}:){5}|(?:[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){4}|(?:(?:[0-9a-f]{1,4}:){0,1}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){3}|(?:(?:[0-9a-f]{1,4}:){0,2}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){2}|(?:(?:[0-9a-f]{1,4}:){0,3}[0-9a-f]{1,4})?::[0-9a-f]{1,4}:|(?:(?:[0-9a-f]{1,4}:){0,4}[0-9a-f]{1,4})?::)(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?))|(?:(?:[0-9a-f]{1,4}:){0,5}[0-9a-f]{1,4})?::[0-9a-f]{1,4}|(?:(?:[0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4})?::)|[Vv][0-9a-f]+\.[a-z0-9\-._~!$&'()*+,;=:]+)\]|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)|(?:[a-z0-9\-._~!$&'"()*+,;=]|%[0-9a-f]{2})*)(?::\d*)?(?:\/(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})*)*|\/(?:(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})*)*)?|(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&'"()*+,;=:@]|%[0-9a-f]{2})*)*)?(?:\?(?:[a-z0-9\-._~!$&'"()*+,;=:@/?]|%[0-9a-f]{2})*)?(?:#(?:[a-z0-9\-._~!$&'"()*+,;=:@/?]|%[0-9a-f]{2})*)?$/i,
+    // uri-template: https://tools.ietf.org/html/rfc6570
+    "uri-template": /^(?:(?:[^\x00-\x20"'<>%\\^`{|}]|%[0-9a-f]{2})|\{[+#./;?&=,!@|]?(?:[a-z0-9_]|%[0-9a-f]{2})+(?::[1-9][0-9]{0,3}|\*)?(?:,(?:[a-z0-9_]|%[0-9a-f]{2})+(?::[1-9][0-9]{0,3}|\*)?)*\})*$/i,
+    // For the source: https://gist.github.com/dperini/729294
+    // For test cases: https://mathiasbynens.be/demo/url-regex
+    url: /^(?:https?|ftp):\/\/(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z0-9\u{00a1}-\u{ffff}]+-)*[a-z0-9\u{00a1}-\u{ffff}]+)(?:\.(?:[a-z0-9\u{00a1}-\u{ffff}]+-)*[a-z0-9\u{00a1}-\u{ffff}]+)*(?:\.(?:[a-z\u{00a1}-\u{ffff}]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/iu,
+    email: /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i,
+    hostname: /^(?=.{1,253}\.?$)[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[-0-9a-z]{0,61}[0-9a-z])?)*\.?$/i,
+    // optimized https://www.safaribooksonline.com/library/view/regular-expressions-cookbook/9780596802837/ch07s16.html
+    ipv4: /^(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)$/,
+    ipv6: /^((([0-9a-f]{1,4}:){7}([0-9a-f]{1,4}|:))|(([0-9a-f]{1,4}:){6}(:[0-9a-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9a-f]{1,4}:){5}(((:[0-9a-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9a-f]{1,4}:){4}(((:[0-9a-f]{1,4}){1,3})|((:[0-9a-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9a-f]{1,4}:){3}(((:[0-9a-f]{1,4}){1,4})|((:[0-9a-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9a-f]{1,4}:){2}(((:[0-9a-f]{1,4}){1,5})|((:[0-9a-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9a-f]{1,4}:){1}(((:[0-9a-f]{1,4}){1,6})|((:[0-9a-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9a-f]{1,4}){1,7})|((:[0-9a-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))$/i,
+    regex,
+    // uuid: http://tools.ietf.org/html/rfc4122
+    uuid: /^(?:urn:uuid:)?[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i,
+    // JSON-pointer: https://tools.ietf.org/html/rfc6901
+    // uri fragment: https://tools.ietf.org/html/rfc3986#appendix-A
+    "json-pointer": /^(?:\/(?:[^~/]|~0|~1)*)*$/,
+    "json-pointer-uri-fragment": /^#(?:\/(?:[a-z0-9_\-.!$&'()*+,;:=@]|%[0-9a-f]{2}|~0|~1)*)*$/i,
+    // relative JSON-pointer: http://tools.ietf.org/html/draft-luff-relative-json-pointer-00
+    "relative-json-pointer": /^(?:0|[1-9][0-9]*)(?:#|(?:\/(?:[^~/]|~0|~1)*)*)$/
+  };
+  exports.fastFormats = {
+    ...exports.fullFormats,
+    date: fmtDef(/^\d\d\d\d-[0-1]\d-[0-3]\d$/, compareDate),
+    time: fmtDef(/^(?:[0-2]\d:[0-5]\d:[0-5]\d|23:59:60)(?:\.\d+)?(?:z|[+-]\d\d(?::?\d\d)?)?$/i, compareTime),
+    "date-time": fmtDef(/^\d\d\d\d-[0-1]\d-[0-3]\d[t\s](?:[0-2]\d:[0-5]\d:[0-5]\d|23:59:60)(?:\.\d+)?(?:z|[+-]\d\d(?::?\d\d)?)$/i, compareDateTime),
+    // uri: https://github.com/mafintosh/is-my-json-valid/blob/master/formats.js
+    uri: /^(?:[a-z][a-z0-9+\-.]*:)(?:\/?\/)?[^\s]*$/i,
+    "uri-reference": /^(?:(?:[a-z][a-z0-9+\-.]*:)?\/?\/)?(?:[^\\\s#][^\s#]*)?(?:#[^\\\s]*)?$/i,
+    // email (sources from jsen validator):
+    // http://stackoverflow.com/questions/201323/using-a-regular-expression-to-validate-an-email-address#answer-8829363
+    // http://www.w3.org/TR/html5/forms.html#valid-e-mail-address (search for 'wilful violation')
+    email: /^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*$/i
+  };
+  exports.formatNames = Object.keys(exports.fullFormats);
+  function isLeapYear(year) {
+    return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  }
+  const DATE = /^(\d\d\d\d)-(\d\d)-(\d\d)$/;
+  const DAYS = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  function date(str) {
+    const matches = DATE.exec(str);
+    if (!matches)
+      return false;
+    const year = +matches[1];
+    const month = +matches[2];
+    const day = +matches[3];
+    return month >= 1 && month <= 12 && day >= 1 && day <= (month === 2 && isLeapYear(year) ? 29 : DAYS[month]);
+  }
+  function compareDate(d1, d2) {
+    if (!(d1 && d2))
+      return void 0;
+    if (d1 > d2)
+      return 1;
+    if (d1 < d2)
+      return -1;
+    return 0;
+  }
+  const TIME = /^(\d\d):(\d\d):(\d\d)(\.\d+)?(z|[+-]\d\d(?::?\d\d)?)?$/i;
+  function time(str, withTimeZone) {
+    const matches = TIME.exec(str);
+    if (!matches)
+      return false;
+    const hour = +matches[1];
+    const minute = +matches[2];
+    const second = +matches[3];
+    const timeZone = matches[5];
+    return (hour <= 23 && minute <= 59 && second <= 59 || hour === 23 && minute === 59 && second === 60) && (!withTimeZone || timeZone !== "");
+  }
+  function compareTime(t1, t2) {
+    if (!(t1 && t2))
+      return void 0;
+    const a1 = TIME.exec(t1);
+    const a2 = TIME.exec(t2);
+    if (!(a1 && a2))
+      return void 0;
+    t1 = a1[1] + a1[2] + a1[3] + (a1[4] || "");
+    t2 = a2[1] + a2[2] + a2[3] + (a2[4] || "");
+    if (t1 > t2)
+      return 1;
+    if (t1 < t2)
+      return -1;
+    return 0;
+  }
+  const DATE_TIME_SEPARATOR = /t|\s/i;
+  function date_time(str) {
+    const dateTime = str.split(DATE_TIME_SEPARATOR);
+    return dateTime.length === 2 && date(dateTime[0]) && time(dateTime[1], true);
+  }
+  function compareDateTime(dt1, dt2) {
+    if (!(dt1 && dt2))
+      return void 0;
+    const [d1, t1] = dt1.split(DATE_TIME_SEPARATOR);
+    const [d2, t2] = dt2.split(DATE_TIME_SEPARATOR);
+    const res = compareDate(d1, d2);
+    if (res === void 0)
+      return void 0;
+    return res || compareTime(t1, t2);
+  }
+  const NOT_URI_FRAGMENT = /\/|:/;
+  const URI2 = /^(?:[a-z][a-z0-9+\-.]*:)(?:\/?\/(?:(?:[a-z0-9\-._~!$&'()*+,;=:]|%[0-9a-f]{2})*@)?(?:\[(?:(?:(?:(?:[0-9a-f]{1,4}:){6}|::(?:[0-9a-f]{1,4}:){5}|(?:[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){4}|(?:(?:[0-9a-f]{1,4}:){0,1}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){3}|(?:(?:[0-9a-f]{1,4}:){0,2}[0-9a-f]{1,4})?::(?:[0-9a-f]{1,4}:){2}|(?:(?:[0-9a-f]{1,4}:){0,3}[0-9a-f]{1,4})?::[0-9a-f]{1,4}:|(?:(?:[0-9a-f]{1,4}:){0,4}[0-9a-f]{1,4})?::)(?:[0-9a-f]{1,4}:[0-9a-f]{1,4}|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?))|(?:(?:[0-9a-f]{1,4}:){0,5}[0-9a-f]{1,4})?::[0-9a-f]{1,4}|(?:(?:[0-9a-f]{1,4}:){0,6}[0-9a-f]{1,4})?::)|[Vv][0-9a-f]+\.[a-z0-9\-._~!$&'()*+,;=:]+)\]|(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)|(?:[a-z0-9\-._~!$&'()*+,;=]|%[0-9a-f]{2})*)(?::\d*)?(?:\/(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})*)*|\/(?:(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})*)*)?|(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})+(?:\/(?:[a-z0-9\-._~!$&'()*+,;=:@]|%[0-9a-f]{2})*)*)(?:\?(?:[a-z0-9\-._~!$&'()*+,;=:@/?]|%[0-9a-f]{2})*)?(?:#(?:[a-z0-9\-._~!$&'()*+,;=:@/?]|%[0-9a-f]{2})*)?$/i;
+  function uri(str) {
+    return NOT_URI_FRAGMENT.test(str) && URI2.test(str);
+  }
+  const Z_ANCHOR = /[^\\]\\Z/;
+  function regex(str) {
+    if (Z_ANCHOR.test(str))
+      return false;
+    try {
+      new RegExp(str);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+})(formats);
+var limit = {};
+(function(exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  exports.formatLimitDefinition = void 0;
+  const context_12 = requireContext();
+  const codegen_12 = codegen;
+  const ops2 = codegen_12.operators;
+  const KWDs2 = {
+    formatMaximum: { okStr: "<=", ok: ops2.LTE, fail: ops2.GT },
+    formatMinimum: { okStr: ">=", ok: ops2.GTE, fail: ops2.LT },
+    formatExclusiveMaximum: { okStr: "<", ok: ops2.LT, fail: ops2.GTE },
+    formatExclusiveMinimum: { okStr: ">", ok: ops2.GT, fail: ops2.LTE }
+  };
+  const error2 = {
+    message: ({ keyword: keyword2, schemaCode }) => codegen_12.str`should be ${KWDs2[keyword2].okStr} ${schemaCode}`,
+    params: ({ keyword: keyword2, schemaCode }) => codegen_12._`{comparison: ${KWDs2[keyword2].okStr}, limit: ${schemaCode}}`
+  };
+  exports.formatLimitDefinition = {
+    keyword: Object.keys(KWDs2),
+    type: "string",
+    schemaType: "string",
+    $data: true,
+    error: error2,
+    code(cxt) {
+      const { gen, data, schemaCode, keyword: keyword2, it } = cxt;
+      const { opts, self: self2 } = it;
+      if (!opts.validateFormats)
+        return;
+      const fCxt = new context_12.default(it, self2.RULES.all.format.definition, "format");
+      if (fCxt.$data)
+        validate$DataFormat();
+      else
+        validateFormat();
+      function validate$DataFormat() {
+        const fmts = gen.scopeValue("formats", {
+          ref: self2.formats,
+          code: opts.code.formats
+        });
+        const fmt = gen.const("fmt", codegen_12._`${fmts}[${fCxt.schemaCode}]`);
+        cxt.fail$data(codegen_12.or(codegen_12._`typeof ${fmt} != "object"`, codegen_12._`${fmt} instanceof RegExp`, codegen_12._`typeof ${fmt}.compare != "function"`, compareCode(fmt)));
+      }
+      function validateFormat() {
+        const format2 = fCxt.schema;
+        const fmtDef = self2.formats[format2];
+        if (!fmtDef || fmtDef === true)
+          return;
+        if (typeof fmtDef != "object" || fmtDef instanceof RegExp || typeof fmtDef.compare != "function") {
+          throw new Error(`"${keyword2}": format "${format2}" does not define "compare" function`);
+        }
+        const fmt = gen.scopeValue("formats", {
+          key: format2,
+          ref: fmtDef,
+          code: opts.code.formats ? codegen_12._`${opts.code.formats}${codegen_12.getProperty(format2)}` : void 0
+        });
+        cxt.fail$data(compareCode(fmt));
+      }
+      function compareCode(fmt) {
+        return codegen_12._`${fmt}.compare(${data}, ${schemaCode}) ${KWDs2[keyword2].fail} 0`;
+      }
+    },
+    dependencies: ["format"]
+  };
+  const formatLimitPlugin = (ajv2) => {
+    ajv2.addKeyword(exports.formatLimitDefinition);
+    return ajv2;
+  };
+  exports.default = formatLimitPlugin;
+})(limit);
+(function(module, exports) {
+  Object.defineProperty(exports, "__esModule", { value: true });
+  const formats_1 = formats;
+  const limit_1 = limit;
+  const codegen_12 = codegen;
+  const fullName = new codegen_12.Name("fullFormats");
+  const fastName = new codegen_12.Name("fastFormats");
+  const formatsPlugin = (ajv2, opts = { keywords: true }) => {
+    if (Array.isArray(opts)) {
+      addFormats(ajv2, opts, formats_1.fullFormats, fullName);
+      return ajv2;
+    }
+    const [formats2, exportName] = opts.mode === "fast" ? [formats_1.fastFormats, fastName] : [formats_1.fullFormats, fullName];
+    const list = opts.formats || formats_1.formatNames;
+    addFormats(ajv2, list, formats2, exportName);
+    if (opts.keywords)
+      limit_1.default(ajv2);
+    return ajv2;
+  };
+  formatsPlugin.get = (name, mode = "full") => {
+    const formats2 = mode === "fast" ? formats_1.fastFormats : formats_1.fullFormats;
+    const f = formats2[name];
+    if (!f)
+      throw new Error(`Unknown format "${name}"`);
+    return f;
+  };
+  function addFormats(ajv2, list, fs2, exportName) {
+    var _a;
+    var _b;
+    (_a = (_b = ajv2.opts.code).formats) !== null && _a !== void 0 ? _a : _b.formats = codegen_12._`require("ajv-formats/dist/formats").${exportName}`;
+    for (const f of list)
+      ajv2.addFormat(f, fs2[f]);
+  }
+  exports.default = formatsPlugin;
+  module.exports = formatsPlugin;
+  module.exports.default = formatsPlugin;
+})(dist, dist.exports);
+var distExports = dist.exports;
+const copyProperty = (to, from, property, ignoreNonConfigurable) => {
+  if (property === "length" || property === "prototype") {
+    return;
+  }
+  if (property === "arguments" || property === "caller") {
+    return;
+  }
+  const toDescriptor = Object.getOwnPropertyDescriptor(to, property);
+  const fromDescriptor = Object.getOwnPropertyDescriptor(from, property);
+  if (!canCopyProperty(toDescriptor, fromDescriptor) && ignoreNonConfigurable) {
+    return;
+  }
+  Object.defineProperty(to, property, fromDescriptor);
+};
+const canCopyProperty = function(toDescriptor, fromDescriptor) {
+  return toDescriptor === void 0 || toDescriptor.configurable || toDescriptor.writable === fromDescriptor.writable && toDescriptor.enumerable === fromDescriptor.enumerable && toDescriptor.configurable === fromDescriptor.configurable && (toDescriptor.writable || toDescriptor.value === fromDescriptor.value);
+};
+const changePrototype = (to, from) => {
+  const fromPrototype = Object.getPrototypeOf(from);
+  if (fromPrototype === Object.getPrototypeOf(to)) {
+    return;
+  }
+  Object.setPrototypeOf(to, fromPrototype);
+};
+const wrappedToString = (withName, fromBody) => `/* Wrapped ${withName}*/
+${fromBody}`;
+const toStringDescriptor = Object.getOwnPropertyDescriptor(Function.prototype, "toString");
+const toStringName = Object.getOwnPropertyDescriptor(Function.prototype.toString, "name");
+const changeToString = (to, from, name) => {
+  const withName = name === "" ? "" : `with ${name.trim()}() `;
+  const newToString = wrappedToString.bind(null, withName, from.toString());
+  Object.defineProperty(newToString, "name", toStringName);
+  Object.defineProperty(to, "toString", { ...toStringDescriptor, value: newToString });
+};
+const mimicFn$4 = (to, from, { ignoreNonConfigurable = false } = {}) => {
+  const { name } = to;
+  for (const property of Reflect.ownKeys(from)) {
+    copyProperty(to, from, property, ignoreNonConfigurable);
+  }
+  changePrototype(to, from);
+  changeToString(to, from, name);
+  return to;
+};
+var mimicFn_1 = mimicFn$4;
+const mimicFn$3 = mimicFn_1;
+var debounceFn = (inputFunction, options = {}) => {
+  if (typeof inputFunction !== "function") {
+    throw new TypeError(`Expected the first argument to be a function, got \`${typeof inputFunction}\``);
+  }
+  const {
+    wait = 0,
+    before = false,
+    after = true
+  } = options;
+  if (!before && !after) {
+    throw new Error("Both `before` and `after` are false, function wouldn't be called.");
+  }
+  let timeout;
+  let result;
+  const debouncedFunction = function(...arguments_) {
+    const context2 = this;
+    const later = () => {
+      timeout = void 0;
+      if (after) {
+        result = inputFunction.apply(context2, arguments_);
+      }
+    };
+    const shouldCallNow = before && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (shouldCallNow) {
+      result = inputFunction.apply(context2, arguments_);
+    }
+    return result;
+  };
+  mimicFn$3(debouncedFunction, inputFunction);
+  debouncedFunction.cancel = () => {
+    if (timeout) {
+      clearTimeout(timeout);
+      timeout = void 0;
+    }
+  };
+  return debouncedFunction;
+};
+var re$2 = { exports: {} };
+const SEMVER_SPEC_VERSION = "2.0.0";
+const MAX_LENGTH$1 = 256;
+const MAX_SAFE_INTEGER$1 = Number.MAX_SAFE_INTEGER || /* istanbul ignore next */
+9007199254740991;
+const MAX_SAFE_COMPONENT_LENGTH = 16;
+const MAX_SAFE_BUILD_LENGTH = MAX_LENGTH$1 - 6;
+const RELEASE_TYPES = [
+  "major",
+  "premajor",
+  "minor",
+  "preminor",
+  "patch",
+  "prepatch",
+  "prerelease"
+];
+var constants$2 = {
+  MAX_LENGTH: MAX_LENGTH$1,
+  MAX_SAFE_COMPONENT_LENGTH,
+  MAX_SAFE_BUILD_LENGTH,
+  MAX_SAFE_INTEGER: MAX_SAFE_INTEGER$1,
+  RELEASE_TYPES,
+  SEMVER_SPEC_VERSION,
+  FLAG_INCLUDE_PRERELEASE: 1,
+  FLAG_LOOSE: 2
+};
+const debug$1 = typeof process === "object" && process.env && process.env.NODE_DEBUG && /\bsemver\b/i.test(process.env.NODE_DEBUG) ? (...args) => console.error("SEMVER", ...args) : () => {
+};
+var debug_1 = debug$1;
+(function(module, exports) {
+  const {
+    MAX_SAFE_COMPONENT_LENGTH: MAX_SAFE_COMPONENT_LENGTH2,
+    MAX_SAFE_BUILD_LENGTH: MAX_SAFE_BUILD_LENGTH2,
+    MAX_LENGTH: MAX_LENGTH2
+  } = constants$2;
+  const debug2 = debug_1;
+  exports = module.exports = {};
+  const re2 = exports.re = [];
+  const safeRe = exports.safeRe = [];
+  const src = exports.src = [];
+  const safeSrc = exports.safeSrc = [];
+  const t2 = exports.t = {};
+  let R = 0;
+  const LETTERDASHNUMBER = "[a-zA-Z0-9-]";
+  const safeRegexReplacements = [
+    ["\\s", 1],
+    ["\\d", MAX_LENGTH2],
+    [LETTERDASHNUMBER, MAX_SAFE_BUILD_LENGTH2]
+  ];
+  const makeSafeRegex = (value) => {
+    for (const [token, max] of safeRegexReplacements) {
+      value = value.split(`${token}*`).join(`${token}{0,${max}}`).split(`${token}+`).join(`${token}{1,${max}}`);
+    }
+    return value;
+  };
+  const createToken = (name, value, isGlobal) => {
+    const safe = makeSafeRegex(value);
+    const index = R++;
+    debug2(name, index, value);
+    t2[name] = index;
+    src[index] = value;
+    safeSrc[index] = safe;
+    re2[index] = new RegExp(value, isGlobal ? "g" : void 0);
+    safeRe[index] = new RegExp(safe, isGlobal ? "g" : void 0);
+  };
+  createToken("NUMERICIDENTIFIER", "0|[1-9]\\d*");
+  createToken("NUMERICIDENTIFIERLOOSE", "\\d+");
+  createToken("NONNUMERICIDENTIFIER", `\\d*[a-zA-Z-]${LETTERDASHNUMBER}*`);
+  createToken("MAINVERSION", `(${src[t2.NUMERICIDENTIFIER]})\\.(${src[t2.NUMERICIDENTIFIER]})\\.(${src[t2.NUMERICIDENTIFIER]})`);
+  createToken("MAINVERSIONLOOSE", `(${src[t2.NUMERICIDENTIFIERLOOSE]})\\.(${src[t2.NUMERICIDENTIFIERLOOSE]})\\.(${src[t2.NUMERICIDENTIFIERLOOSE]})`);
+  createToken("PRERELEASEIDENTIFIER", `(?:${src[t2.NONNUMERICIDENTIFIER]}|${src[t2.NUMERICIDENTIFIER]})`);
+  createToken("PRERELEASEIDENTIFIERLOOSE", `(?:${src[t2.NONNUMERICIDENTIFIER]}|${src[t2.NUMERICIDENTIFIERLOOSE]})`);
+  createToken("PRERELEASE", `(?:-(${src[t2.PRERELEASEIDENTIFIER]}(?:\\.${src[t2.PRERELEASEIDENTIFIER]})*))`);
+  createToken("PRERELEASELOOSE", `(?:-?(${src[t2.PRERELEASEIDENTIFIERLOOSE]}(?:\\.${src[t2.PRERELEASEIDENTIFIERLOOSE]})*))`);
+  createToken("BUILDIDENTIFIER", `${LETTERDASHNUMBER}+`);
+  createToken("BUILD", `(?:\\+(${src[t2.BUILDIDENTIFIER]}(?:\\.${src[t2.BUILDIDENTIFIER]})*))`);
+  createToken("FULLPLAIN", `v?${src[t2.MAINVERSION]}${src[t2.PRERELEASE]}?${src[t2.BUILD]}?`);
+  createToken("FULL", `^${src[t2.FULLPLAIN]}$`);
+  createToken("LOOSEPLAIN", `[v=\\s]*${src[t2.MAINVERSIONLOOSE]}${src[t2.PRERELEASELOOSE]}?${src[t2.BUILD]}?`);
+  createToken("LOOSE", `^${src[t2.LOOSEPLAIN]}$`);
+  createToken("GTLT", "((?:<|>)?=?)");
+  createToken("XRANGEIDENTIFIERLOOSE", `${src[t2.NUMERICIDENTIFIERLOOSE]}|x|X|\\*`);
+  createToken("XRANGEIDENTIFIER", `${src[t2.NUMERICIDENTIFIER]}|x|X|\\*`);
+  createToken("XRANGEPLAIN", `[v=\\s]*(${src[t2.XRANGEIDENTIFIER]})(?:\\.(${src[t2.XRANGEIDENTIFIER]})(?:\\.(${src[t2.XRANGEIDENTIFIER]})(?:${src[t2.PRERELEASE]})?${src[t2.BUILD]}?)?)?`);
+  createToken("XRANGEPLAINLOOSE", `[v=\\s]*(${src[t2.XRANGEIDENTIFIERLOOSE]})(?:\\.(${src[t2.XRANGEIDENTIFIERLOOSE]})(?:\\.(${src[t2.XRANGEIDENTIFIERLOOSE]})(?:${src[t2.PRERELEASELOOSE]})?${src[t2.BUILD]}?)?)?`);
+  createToken("XRANGE", `^${src[t2.GTLT]}\\s*${src[t2.XRANGEPLAIN]}$`);
+  createToken("XRANGELOOSE", `^${src[t2.GTLT]}\\s*${src[t2.XRANGEPLAINLOOSE]}$`);
+  createToken("COERCEPLAIN", `${"(^|[^\\d])(\\d{1,"}${MAX_SAFE_COMPONENT_LENGTH2}})(?:\\.(\\d{1,${MAX_SAFE_COMPONENT_LENGTH2}}))?(?:\\.(\\d{1,${MAX_SAFE_COMPONENT_LENGTH2}}))?`);
+  createToken("COERCE", `${src[t2.COERCEPLAIN]}(?:$|[^\\d])`);
+  createToken("COERCEFULL", src[t2.COERCEPLAIN] + `(?:${src[t2.PRERELEASE]})?(?:${src[t2.BUILD]})?(?:$|[^\\d])`);
+  createToken("COERCERTL", src[t2.COERCE], true);
+  createToken("COERCERTLFULL", src[t2.COERCEFULL], true);
+  createToken("LONETILDE", "(?:~>?)");
+  createToken("TILDETRIM", `(\\s*)${src[t2.LONETILDE]}\\s+`, true);
+  exports.tildeTrimReplace = "$1~";
+  createToken("TILDE", `^${src[t2.LONETILDE]}${src[t2.XRANGEPLAIN]}$`);
+  createToken("TILDELOOSE", `^${src[t2.LONETILDE]}${src[t2.XRANGEPLAINLOOSE]}$`);
+  createToken("LONECARET", "(?:\\^)");
+  createToken("CARETTRIM", `(\\s*)${src[t2.LONECARET]}\\s+`, true);
+  exports.caretTrimReplace = "$1^";
+  createToken("CARET", `^${src[t2.LONECARET]}${src[t2.XRANGEPLAIN]}$`);
+  createToken("CARETLOOSE", `^${src[t2.LONECARET]}${src[t2.XRANGEPLAINLOOSE]}$`);
+  createToken("COMPARATORLOOSE", `^${src[t2.GTLT]}\\s*(${src[t2.LOOSEPLAIN]})$|^$`);
+  createToken("COMPARATOR", `^${src[t2.GTLT]}\\s*(${src[t2.FULLPLAIN]})$|^$`);
+  createToken("COMPARATORTRIM", `(\\s*)${src[t2.GTLT]}\\s*(${src[t2.LOOSEPLAIN]}|${src[t2.XRANGEPLAIN]})`, true);
+  exports.comparatorTrimReplace = "$1$2$3";
+  createToken("HYPHENRANGE", `^\\s*(${src[t2.XRANGEPLAIN]})\\s+-\\s+(${src[t2.XRANGEPLAIN]})\\s*$`);
+  createToken("HYPHENRANGELOOSE", `^\\s*(${src[t2.XRANGEPLAINLOOSE]})\\s+-\\s+(${src[t2.XRANGEPLAINLOOSE]})\\s*$`);
+  createToken("STAR", "(<|>)?=?\\s*\\*");
+  createToken("GTE0", "^\\s*>=\\s*0\\.0\\.0\\s*$");
+  createToken("GTE0PRE", "^\\s*>=\\s*0\\.0\\.0-0\\s*$");
+})(re$2, re$2.exports);
+var reExports = re$2.exports;
+const looseOption = Object.freeze({ loose: true });
+const emptyOpts = Object.freeze({});
+const parseOptions$1 = (options) => {
+  if (!options) {
+    return emptyOpts;
+  }
+  if (typeof options !== "object") {
+    return looseOption;
+  }
+  return options;
+};
+var parseOptions_1 = parseOptions$1;
+const numeric = /^[0-9]+$/;
+const compareIdentifiers$1 = (a, b) => {
+  if (typeof a === "number" && typeof b === "number") {
+    return a === b ? 0 : a < b ? -1 : 1;
+  }
+  const anum = numeric.test(a);
+  const bnum = numeric.test(b);
+  if (anum && bnum) {
+    a = +a;
+    b = +b;
+  }
+  return a === b ? 0 : anum && !bnum ? -1 : bnum && !anum ? 1 : a < b ? -1 : 1;
+};
+const rcompareIdentifiers = (a, b) => compareIdentifiers$1(b, a);
+var identifiers$1 = {
+  compareIdentifiers: compareIdentifiers$1,
+  rcompareIdentifiers
+};
+const debug = debug_1;
+const { MAX_LENGTH, MAX_SAFE_INTEGER } = constants$2;
+const { safeRe: re$1, t: t$1 } = reExports;
+const parseOptions = parseOptions_1;
+const { compareIdentifiers } = identifiers$1;
+const isPrereleaseIdentifier = (prerelease2, identifier) => {
+  const identifiers2 = identifier.split(".");
+  if (identifiers2.length > prerelease2.length) {
+    return false;
+  }
+  for (let i = 0; i < identifiers2.length; i++) {
+    if (compareIdentifiers(prerelease2[i], identifiers2[i]) !== 0) {
+      return false;
+    }
+  }
+  return true;
+};
+let SemVer$e = class SemVer {
+  constructor(version, options) {
+    options = parseOptions(options);
+    if (version instanceof SemVer) {
+      if (version.loose === !!options.loose && version.includePrerelease === !!options.includePrerelease) {
+        return version;
+      } else {
+        version = version.version;
+      }
+    } else if (typeof version !== "string") {
+      throw new TypeError(`Invalid version. Must be a string. Got type "${typeof version}".`);
+    }
+    if (version.length > MAX_LENGTH) {
+      throw new TypeError(
+        `version is longer than ${MAX_LENGTH} characters`
+      );
+    }
+    debug("SemVer", version, options);
+    this.options = options;
+    this.loose = !!options.loose;
+    this.includePrerelease = !!options.includePrerelease;
+    const m = version.trim().match(options.loose ? re$1[t$1.LOOSE] : re$1[t$1.FULL]);
+    if (!m) {
+      throw new TypeError(`Invalid Version: ${version}`);
+    }
+    this.raw = version;
+    this.major = +m[1];
+    this.minor = +m[2];
+    this.patch = +m[3];
+    if (this.major > MAX_SAFE_INTEGER || this.major < 0) {
+      throw new TypeError("Invalid major version");
+    }
+    if (this.minor > MAX_SAFE_INTEGER || this.minor < 0) {
+      throw new TypeError("Invalid minor version");
+    }
+    if (this.patch > MAX_SAFE_INTEGER || this.patch < 0) {
+      throw new TypeError("Invalid patch version");
+    }
+    if (!m[4]) {
+      this.prerelease = [];
+    } else {
+      this.prerelease = m[4].split(".").map((id2) => {
+        if (/^[0-9]+$/.test(id2)) {
+          const num = +id2;
+          if (num >= 0 && num < MAX_SAFE_INTEGER) {
+            return num;
+          }
+        }
+        return id2;
+      });
+    }
+    this.build = m[5] ? m[5].split(".") : [];
+    this.format();
+  }
+  format() {
+    this.version = `${this.major}.${this.minor}.${this.patch}`;
+    if (this.prerelease.length) {
+      this.version += `-${this.prerelease.join(".")}`;
+    }
+    return this.version;
+  }
+  toString() {
+    return this.version;
+  }
+  compare(other) {
+    debug("SemVer.compare", this.version, this.options, other);
+    if (!(other instanceof SemVer)) {
+      if (typeof other === "string" && other === this.version) {
+        return 0;
+      }
+      other = new SemVer(other, this.options);
+    }
+    if (other.version === this.version) {
+      return 0;
+    }
+    return this.compareMain(other) || this.comparePre(other);
+  }
+  compareMain(other) {
+    if (!(other instanceof SemVer)) {
+      other = new SemVer(other, this.options);
+    }
+    if (this.major < other.major) {
+      return -1;
+    }
+    if (this.major > other.major) {
+      return 1;
+    }
+    if (this.minor < other.minor) {
+      return -1;
+    }
+    if (this.minor > other.minor) {
+      return 1;
+    }
+    if (this.patch < other.patch) {
+      return -1;
+    }
+    if (this.patch > other.patch) {
+      return 1;
+    }
+    return 0;
+  }
+  comparePre(other) {
+    if (!(other instanceof SemVer)) {
+      other = new SemVer(other, this.options);
+    }
+    if (this.prerelease.length && !other.prerelease.length) {
+      return -1;
+    } else if (!this.prerelease.length && other.prerelease.length) {
+      return 1;
+    } else if (!this.prerelease.length && !other.prerelease.length) {
+      return 0;
+    }
+    let i = 0;
+    do {
+      const a = this.prerelease[i];
+      const b = other.prerelease[i];
+      debug("prerelease compare", i, a, b);
+      if (a === void 0 && b === void 0) {
+        return 0;
+      } else if (b === void 0) {
+        return 1;
+      } else if (a === void 0) {
+        return -1;
+      } else if (a === b) {
+        continue;
+      } else {
+        return compareIdentifiers(a, b);
+      }
+    } while (++i);
+  }
+  compareBuild(other) {
+    if (!(other instanceof SemVer)) {
+      other = new SemVer(other, this.options);
+    }
+    let i = 0;
+    do {
+      const a = this.build[i];
+      const b = other.build[i];
+      debug("build compare", i, a, b);
+      if (a === void 0 && b === void 0) {
+        return 0;
+      } else if (b === void 0) {
+        return 1;
+      } else if (a === void 0) {
+        return -1;
+      } else if (a === b) {
+        continue;
+      } else {
+        return compareIdentifiers(a, b);
+      }
+    } while (++i);
+  }
+  // preminor will bump the version up to the next minor release, and immediately
+  // down to pre-release. premajor and prepatch work the same way.
+  inc(release, identifier, identifierBase) {
+    if (release.startsWith("pre")) {
+      if (!identifier && identifierBase === false) {
+        throw new Error("invalid increment argument: identifier is empty");
+      }
+      if (identifier) {
+        const match = `-${identifier}`.match(this.options.loose ? re$1[t$1.PRERELEASELOOSE] : re$1[t$1.PRERELEASE]);
+        if (!match || match[1] !== identifier) {
+          throw new Error(`invalid identifier: ${identifier}`);
+        }
+      }
+    }
+    switch (release) {
+      case "premajor":
+        this.prerelease.length = 0;
+        this.patch = 0;
+        this.minor = 0;
+        this.major++;
+        this.inc("pre", identifier, identifierBase);
+        break;
+      case "preminor":
+        this.prerelease.length = 0;
+        this.patch = 0;
+        this.minor++;
+        this.inc("pre", identifier, identifierBase);
+        break;
+      case "prepatch":
+        this.prerelease.length = 0;
+        this.inc("patch", identifier, identifierBase);
+        this.inc("pre", identifier, identifierBase);
+        break;
+      case "prerelease":
+        if (this.prerelease.length === 0) {
+          this.inc("patch", identifier, identifierBase);
+        }
+        this.inc("pre", identifier, identifierBase);
+        break;
+      case "release":
+        if (this.prerelease.length === 0) {
+          throw new Error(`version ${this.raw} is not a prerelease`);
+        }
+        this.prerelease.length = 0;
+        break;
+      case "major":
+        if (this.minor !== 0 || this.patch !== 0 || this.prerelease.length === 0) {
+          this.major++;
+        }
+        this.minor = 0;
+        this.patch = 0;
+        this.prerelease = [];
+        break;
+      case "minor":
+        if (this.patch !== 0 || this.prerelease.length === 0) {
+          this.minor++;
+        }
+        this.patch = 0;
+        this.prerelease = [];
+        break;
+      case "patch":
+        if (this.prerelease.length === 0) {
+          this.patch++;
+        }
+        this.prerelease = [];
+        break;
+      case "pre": {
+        const base = Number(identifierBase) ? 1 : 0;
+        if (this.prerelease.length === 0) {
+          this.prerelease = [base];
+        } else {
+          let i = this.prerelease.length;
+          while (--i >= 0) {
+            if (typeof this.prerelease[i] === "number") {
+              this.prerelease[i]++;
+              i = -2;
+            }
+          }
+          if (i === -1) {
+            if (identifier === this.prerelease.join(".") && identifierBase === false) {
+              throw new Error("invalid increment argument: identifier already exists");
+            }
+            this.prerelease.push(base);
+          }
+        }
+        if (identifier) {
+          let prerelease2 = [identifier, base];
+          if (identifierBase === false) {
+            prerelease2 = [identifier];
+          }
+          if (isPrereleaseIdentifier(this.prerelease, identifier)) {
+            const prereleaseBase = this.prerelease[identifier.split(".").length];
+            if (isNaN(prereleaseBase)) {
+              this.prerelease = prerelease2;
+            }
+          } else {
+            this.prerelease = prerelease2;
+          }
+        }
+        break;
+      }
+      default:
+        throw new Error(`invalid increment argument: ${release}`);
+    }
+    this.raw = this.format();
+    if (this.build.length) {
+      this.raw += `+${this.build.join(".")}`;
+    }
+    return this;
+  }
+};
+var semver$1 = SemVer$e;
+const SemVer$d = semver$1;
+const parse$7 = (version, options, throwErrors = false) => {
+  if (version instanceof SemVer$d) {
+    return version;
+  }
+  try {
+    return new SemVer$d(version, options);
+  } catch (er) {
+    if (!throwErrors) {
+      return null;
+    }
+    throw er;
+  }
+};
+var parse_1 = parse$7;
+const parse$6 = parse_1;
+const valid$2 = (version, options) => {
+  const v = parse$6(version, options);
+  return v ? v.version : null;
+};
+var valid_1 = valid$2;
+const parse$5 = parse_1;
+const clean$1 = (version, options) => {
+  const s = parse$5(version.trim().replace(/^[=v]+/, ""), options);
+  return s ? s.version : null;
+};
+var clean_1 = clean$1;
+const SemVer$c = semver$1;
+const inc$1 = (version, release, options, identifier, identifierBase) => {
+  if (typeof options === "string") {
+    identifierBase = identifier;
+    identifier = options;
+    options = void 0;
+  }
+  try {
+    return new SemVer$c(
+      version instanceof SemVer$c ? version.version : version,
+      options
+    ).inc(release, identifier, identifierBase).version;
+  } catch (er) {
+    return null;
+  }
+};
+var inc_1 = inc$1;
+const parse$4 = parse_1;
+const diff$1 = (version1, version2) => {
+  const v1 = parse$4(version1, null, true);
+  const v2 = parse$4(version2, null, true);
+  const comparison = v1.compare(v2);
+  if (comparison === 0) {
+    return null;
+  }
+  const v1Higher = comparison > 0;
+  const highVersion = v1Higher ? v1 : v2;
+  const lowVersion = v1Higher ? v2 : v1;
+  const highHasPre = !!highVersion.prerelease.length;
+  const lowHasPre = !!lowVersion.prerelease.length;
+  if (lowHasPre && !highHasPre) {
+    if (!lowVersion.patch && !lowVersion.minor) {
+      return "major";
+    }
+    if (lowVersion.compareMain(highVersion) === 0) {
+      if (lowVersion.minor && !lowVersion.patch) {
+        return "minor";
+      }
+      return "patch";
+    }
+  }
+  const prefix = highHasPre ? "pre" : "";
+  if (v1.major !== v2.major) {
+    return prefix + "major";
+  }
+  if (v1.minor !== v2.minor) {
+    return prefix + "minor";
+  }
+  if (v1.patch !== v2.patch) {
+    return prefix + "patch";
+  }
+  return "prerelease";
+};
+var diff_1 = diff$1;
+const SemVer$b = semver$1;
+const major$1 = (a, loose) => new SemVer$b(a, loose).major;
+var major_1 = major$1;
+const SemVer$a = semver$1;
+const minor$1 = (a, loose) => new SemVer$a(a, loose).minor;
+var minor_1 = minor$1;
+const SemVer$9 = semver$1;
+const patch$1 = (a, loose) => new SemVer$9(a, loose).patch;
+var patch_1 = patch$1;
+const parse$3 = parse_1;
+const prerelease$1 = (version, options) => {
+  const parsed = parse$3(version, options);
+  return parsed && parsed.prerelease.length ? parsed.prerelease : null;
+};
+var prerelease_1 = prerelease$1;
+const SemVer$8 = semver$1;
+const compare$b = (a, b, loose) => new SemVer$8(a, loose).compare(new SemVer$8(b, loose));
+var compare_1 = compare$b;
+const compare$a = compare_1;
+const rcompare$1 = (a, b, loose) => compare$a(b, a, loose);
+var rcompare_1 = rcompare$1;
+const compare$9 = compare_1;
+const compareLoose$1 = (a, b) => compare$9(a, b, true);
+var compareLoose_1 = compareLoose$1;
+const SemVer$7 = semver$1;
+const compareBuild$3 = (a, b, loose) => {
+  const versionA = new SemVer$7(a, loose);
+  const versionB = new SemVer$7(b, loose);
+  return versionA.compare(versionB) || versionA.compareBuild(versionB);
+};
+var compareBuild_1 = compareBuild$3;
+const compareBuild$2 = compareBuild_1;
+const sort$1 = (list, loose) => list.sort((a, b) => compareBuild$2(a, b, loose));
+var sort_1 = sort$1;
+const compareBuild$1 = compareBuild_1;
+const rsort$1 = (list, loose) => list.sort((a, b) => compareBuild$1(b, a, loose));
+var rsort_1 = rsort$1;
+const compare$8 = compare_1;
+const gt$4 = (a, b, loose) => compare$8(a, b, loose) > 0;
+var gt_1 = gt$4;
+const compare$7 = compare_1;
+const lt$3 = (a, b, loose) => compare$7(a, b, loose) < 0;
+var lt_1 = lt$3;
+const compare$6 = compare_1;
+const eq$2 = (a, b, loose) => compare$6(a, b, loose) === 0;
+var eq_1 = eq$2;
+const compare$5 = compare_1;
+const neq$2 = (a, b, loose) => compare$5(a, b, loose) !== 0;
+var neq_1 = neq$2;
+const compare$4 = compare_1;
+const gte$3 = (a, b, loose) => compare$4(a, b, loose) >= 0;
+var gte_1 = gte$3;
+const compare$3 = compare_1;
+const lte$3 = (a, b, loose) => compare$3(a, b, loose) <= 0;
+var lte_1 = lte$3;
+const eq$1 = eq_1;
+const neq$1 = neq_1;
+const gt$3 = gt_1;
+const gte$2 = gte_1;
+const lt$2 = lt_1;
+const lte$2 = lte_1;
+const cmp$1 = (a, op, b, loose) => {
+  switch (op) {
+    case "===":
+      if (typeof a === "object") {
+        a = a.version;
+      }
+      if (typeof b === "object") {
+        b = b.version;
+      }
+      return a === b;
+    case "!==":
+      if (typeof a === "object") {
+        a = a.version;
+      }
+      if (typeof b === "object") {
+        b = b.version;
+      }
+      return a !== b;
+    case "":
+    case "=":
+    case "==":
+      return eq$1(a, b, loose);
+    case "!=":
+      return neq$1(a, b, loose);
+    case ">":
+      return gt$3(a, b, loose);
+    case ">=":
+      return gte$2(a, b, loose);
+    case "<":
+      return lt$2(a, b, loose);
+    case "<=":
+      return lte$2(a, b, loose);
+    default:
+      throw new TypeError(`Invalid operator: ${op}`);
+  }
+};
+var cmp_1 = cmp$1;
+const SemVer$6 = semver$1;
+const parse$2 = parse_1;
+const { safeRe: re, t } = reExports;
+const coerce$1 = (version, options) => {
+  if (version instanceof SemVer$6) {
+    return version;
+  }
+  if (typeof version === "number") {
+    version = String(version);
+  }
+  if (typeof version !== "string") {
+    return null;
+  }
+  options = options || {};
+  let match = null;
+  if (!options.rtl) {
+    match = version.match(options.includePrerelease ? re[t.COERCEFULL] : re[t.COERCE]);
+  } else {
+    const coerceRtlRegex = options.includePrerelease ? re[t.COERCERTLFULL] : re[t.COERCERTL];
+    let next;
+    while ((next = coerceRtlRegex.exec(version)) && (!match || match.index + match[0].length !== version.length)) {
+      if (!match || next.index + next[0].length !== match.index + match[0].length) {
+        match = next;
+      }
+      coerceRtlRegex.lastIndex = next.index + next[1].length + next[2].length;
+    }
+    coerceRtlRegex.lastIndex = -1;
+  }
+  if (match === null) {
+    return null;
+  }
+  const major2 = match[2];
+  const minor2 = match[3] || "0";
+  const patch2 = match[4] || "0";
+  const prerelease2 = options.includePrerelease && match[5] ? `-${match[5]}` : "";
+  const build = options.includePrerelease && match[6] ? `+${match[6]}` : "";
+  return parse$2(`${major2}.${minor2}.${patch2}${prerelease2}${build}`, options);
+};
+var coerce_1 = coerce$1;
+const parse$1 = parse_1;
+const constants$1 = constants$2;
+const SemVer$5 = semver$1;
+const truncate$1 = (version, truncation, options) => {
+  if (!constants$1.RELEASE_TYPES.includes(truncation)) {
+    return null;
+  }
+  const clonedVersion = cloneInputVersion(version, options);
+  return clonedVersion && doTruncation(clonedVersion, truncation);
+};
+const cloneInputVersion = (version, options) => {
+  const versionStringToParse = version instanceof SemVer$5 ? version.version : version;
+  return parse$1(versionStringToParse, options);
+};
+const doTruncation = (version, truncation) => {
+  if (isPrerelease(truncation)) {
+    return version.version;
+  }
+  version.prerelease = [];
+  switch (truncation) {
+    case "major":
+      version.minor = 0;
+      version.patch = 0;
+      break;
+    case "minor":
+      version.patch = 0;
+      break;
+  }
+  return version.format();
+};
+const isPrerelease = (type2) => {
+  return type2.startsWith("pre");
+};
+var truncate_1 = truncate$1;
+class LRUCache {
+  constructor() {
+    this.max = 1e3;
+    this.map = /* @__PURE__ */ new Map();
+  }
+  get(key) {
+    const value = this.map.get(key);
+    if (value === void 0) {
+      return void 0;
+    } else {
+      this.map.delete(key);
+      this.map.set(key, value);
+      return value;
+    }
+  }
+  delete(key) {
+    return this.map.delete(key);
+  }
+  set(key, value) {
+    const deleted = this.delete(key);
+    if (!deleted && value !== void 0) {
+      if (this.map.size >= this.max) {
+        const firstKey = this.map.keys().next().value;
+        this.delete(firstKey);
+      }
+      this.map.set(key, value);
+    }
+    return this;
+  }
+}
+var lrucache = LRUCache;
+var range;
+var hasRequiredRange;
+function requireRange() {
+  if (hasRequiredRange) return range;
+  hasRequiredRange = 1;
+  const SPACE_CHARACTERS = /\s+/g;
+  class Range2 {
+    constructor(range2, options) {
+      options = parseOptions2(options);
+      if (range2 instanceof Range2) {
+        if (range2.loose === !!options.loose && range2.includePrerelease === !!options.includePrerelease) {
+          return range2;
+        } else {
+          return new Range2(range2.raw, options);
+        }
+      }
+      if (range2 instanceof Comparator2) {
+        this.raw = range2.value;
+        this.set = [[range2]];
+        this.formatted = void 0;
+        return this;
+      }
+      this.options = options;
+      this.loose = !!options.loose;
+      this.includePrerelease = !!options.includePrerelease;
+      this.raw = range2.trim().replace(SPACE_CHARACTERS, " ");
+      this.set = this.raw.split("||").map((r) => this.parseRange(r.trim())).filter((c) => c.length);
+      if (!this.set.length) {
+        throw new TypeError(`Invalid SemVer Range: ${this.raw}`);
+      }
+      if (this.set.length > 1) {
+        const first = this.set[0];
+        this.set = this.set.filter((c) => !isNullSet(c[0]));
+        if (this.set.length === 0) {
+          this.set = [first];
+        } else if (this.set.length > 1) {
+          for (const c of this.set) {
+            if (c.length === 1 && isAny(c[0])) {
+              this.set = [c];
+              break;
+            }
+          }
+        }
+      }
+      this.formatted = void 0;
+    }
+    get range() {
+      if (this.formatted === void 0) {
+        this.formatted = "";
+        for (let i = 0; i < this.set.length; i++) {
+          if (i > 0) {
+            this.formatted += "||";
+          }
+          const comps = this.set[i];
+          for (let k = 0; k < comps.length; k++) {
+            if (k > 0) {
+              this.formatted += " ";
+            }
+            this.formatted += comps[k].toString().trim();
+          }
+        }
+      }
+      return this.formatted;
+    }
+    format() {
+      return this.range;
+    }
+    toString() {
+      return this.range;
+    }
+    parseRange(range2) {
+      range2 = range2.replace(BUILDSTRIPRE, "");
+      const memoOpts = (this.options.includePrerelease && FLAG_INCLUDE_PRERELEASE) | (this.options.loose && FLAG_LOOSE);
+      const memoKey = memoOpts + ":" + range2;
+      const cached = cache.get(memoKey);
+      if (cached) {
+        return cached;
+      }
+      const loose = this.options.loose;
+      const hr = loose ? re2[t2.HYPHENRANGELOOSE] : re2[t2.HYPHENRANGE];
+      range2 = range2.replace(hr, hyphenReplace(this.options.includePrerelease));
+      debug2("hyphen replace", range2);
+      range2 = range2.replace(re2[t2.COMPARATORTRIM], comparatorTrimReplace);
+      debug2("comparator trim", range2);
+      range2 = range2.replace(re2[t2.TILDETRIM], tildeTrimReplace);
+      debug2("tilde trim", range2);
+      range2 = range2.replace(re2[t2.CARETTRIM], caretTrimReplace);
+      debug2("caret trim", range2);
+      let rangeList = range2.split(" ").map((comp) => parseComparator(comp, this.options)).join(" ").split(/\s+/).map((comp) => replaceGTE0(comp, this.options));
+      if (loose) {
+        rangeList = rangeList.filter((comp) => {
+          debug2("loose invalid filter", comp, this.options);
+          return !!comp.match(re2[t2.COMPARATORLOOSE]);
+        });
+      }
+      debug2("range list", rangeList);
+      const rangeMap = /* @__PURE__ */ new Map();
+      const comparators = rangeList.map((comp) => new Comparator2(comp, this.options));
+      for (const comp of comparators) {
+        if (isNullSet(comp)) {
+          return [comp];
+        }
+        rangeMap.set(comp.value, comp);
+      }
+      if (rangeMap.size > 1 && rangeMap.has("")) {
+        rangeMap.delete("");
+      }
+      const result = [...rangeMap.values()];
+      cache.set(memoKey, result);
+      return result;
+    }
+    intersects(range2, options) {
+      if (!(range2 instanceof Range2)) {
+        throw new TypeError("a Range is required");
+      }
+      return this.set.some((thisComparators) => {
+        return isSatisfiable(thisComparators, options) && range2.set.some((rangeComparators) => {
+          return isSatisfiable(rangeComparators, options) && thisComparators.every((thisComparator) => {
+            return rangeComparators.every((rangeComparator) => {
+              return thisComparator.intersects(rangeComparator, options);
+            });
+          });
+        });
+      });
+    }
+    // if ANY of the sets match ALL of its comparators, then pass
+    test(version) {
+      if (!version) {
+        return false;
+      }
+      if (typeof version === "string") {
+        try {
+          version = new SemVer3(version, this.options);
+        } catch (er) {
+          return false;
+        }
+      }
+      for (let i = 0; i < this.set.length; i++) {
+        if (testSet(this.set[i], version, this.options)) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+  range = Range2;
+  const LRU = lrucache;
+  const cache = new LRU();
+  const parseOptions2 = parseOptions_1;
+  const Comparator2 = requireComparator();
+  const debug2 = debug_1;
+  const SemVer3 = semver$1;
+  const {
+    safeRe: re2,
+    src,
+    t: t2,
+    comparatorTrimReplace,
+    tildeTrimReplace,
+    caretTrimReplace
+  } = reExports;
+  const { FLAG_INCLUDE_PRERELEASE, FLAG_LOOSE } = constants$2;
+  const BUILDSTRIPRE = new RegExp(src[t2.BUILD], "g");
+  const isNullSet = (c) => c.value === "<0.0.0-0";
+  const isAny = (c) => c.value === "";
+  const isSatisfiable = (comparators, options) => {
+    let result = true;
+    const remainingComparators = comparators.slice();
+    let testComparator = remainingComparators.pop();
+    while (result && remainingComparators.length) {
+      result = remainingComparators.every((otherComparator) => {
+        return testComparator.intersects(otherComparator, options);
+      });
+      testComparator = remainingComparators.pop();
+    }
+    return result;
+  };
+  const parseComparator = (comp, options) => {
+    comp = comp.replace(re2[t2.BUILD], "");
+    debug2("comp", comp, options);
+    comp = replaceCarets(comp, options);
+    debug2("caret", comp);
+    comp = replaceTildes(comp, options);
+    debug2("tildes", comp);
+    comp = replaceXRanges(comp, options);
+    debug2("xrange", comp);
+    comp = replaceStars(comp, options);
+    debug2("stars", comp);
+    return comp;
+  };
+  const isX = (id2) => !id2 || id2.toLowerCase() === "x" || id2 === "*";
+  const invalidXRangeOrder = (M, m, p) => isX(M) && !isX(m) || isX(m) && p && !isX(p);
+  const replaceTildes = (comp, options) => {
+    return comp.trim().split(/\s+/).map((c) => replaceTilde(c, options)).join(" ");
+  };
+  const replaceTilde = (comp, options) => {
+    const r = options.loose ? re2[t2.TILDELOOSE] : re2[t2.TILDE];
+    return comp.replace(r, (_, M, m, p, pr) => {
+      debug2("tilde", comp, _, M, m, p, pr);
+      let ret;
+      if (isX(M)) {
+        ret = "";
+      } else if (isX(m)) {
+        ret = `>=${M}.0.0 <${+M + 1}.0.0-0`;
+      } else if (isX(p)) {
+        ret = `>=${M}.${m}.0 <${M}.${+m + 1}.0-0`;
+      } else if (pr) {
+        debug2("replaceTilde pr", pr);
+        ret = `>=${M}.${m}.${p}-${pr} <${M}.${+m + 1}.0-0`;
+      } else {
+        ret = `>=${M}.${m}.${p} <${M}.${+m + 1}.0-0`;
+      }
+      debug2("tilde return", ret);
+      return ret;
+    });
+  };
+  const replaceCarets = (comp, options) => {
+    return comp.trim().split(/\s+/).map((c) => replaceCaret(c, options)).join(" ");
+  };
+  const replaceCaret = (comp, options) => {
+    debug2("caret", comp, options);
+    const r = options.loose ? re2[t2.CARETLOOSE] : re2[t2.CARET];
+    const z = options.includePrerelease ? "-0" : "";
+    return comp.replace(r, (_, M, m, p, pr) => {
+      debug2("caret", comp, _, M, m, p, pr);
+      let ret;
+      if (isX(M)) {
+        ret = "";
+      } else if (isX(m)) {
+        ret = `>=${M}.0.0${z} <${+M + 1}.0.0-0`;
+      } else if (isX(p)) {
+        if (M === "0") {
+          ret = `>=${M}.${m}.0${z} <${M}.${+m + 1}.0-0`;
+        } else {
+          ret = `>=${M}.${m}.0${z} <${+M + 1}.0.0-0`;
+        }
+      } else if (pr) {
+        debug2("replaceCaret pr", pr);
+        if (M === "0") {
+          if (m === "0") {
+            ret = `>=${M}.${m}.${p}-${pr} <${M}.${m}.${+p + 1}-0`;
+          } else {
+            ret = `>=${M}.${m}.${p}-${pr} <${M}.${+m + 1}.0-0`;
+          }
+        } else {
+          ret = `>=${M}.${m}.${p}-${pr} <${+M + 1}.0.0-0`;
+        }
+      } else {
+        debug2("no pr");
+        if (M === "0") {
+          if (m === "0") {
+            ret = `>=${M}.${m}.${p} <${M}.${m}.${+p + 1}-0`;
+          } else {
+            ret = `>=${M}.${m}.${p} <${M}.${+m + 1}.0-0`;
+          }
+        } else {
+          ret = `>=${M}.${m}.${p} <${+M + 1}.0.0-0`;
+        }
+      }
+      debug2("caret return", ret);
+      return ret;
+    });
+  };
+  const replaceXRanges = (comp, options) => {
+    debug2("replaceXRanges", comp, options);
+    return comp.split(/\s+/).map((c) => replaceXRange(c, options)).join(" ");
+  };
+  const replaceXRange = (comp, options) => {
+    comp = comp.trim();
+    const r = options.loose ? re2[t2.XRANGELOOSE] : re2[t2.XRANGE];
+    return comp.replace(r, (ret, gtlt, M, m, p, pr) => {
+      debug2("xRange", comp, ret, gtlt, M, m, p, pr);
+      if (invalidXRangeOrder(M, m, p)) {
+        return comp;
+      }
+      const xM = isX(M);
+      const xm = xM || isX(m);
+      const xp = xm || isX(p);
+      const anyX = xp;
+      if (gtlt === "=" && anyX) {
+        gtlt = "";
+      }
+      pr = options.includePrerelease ? "-0" : "";
+      if (xM) {
+        if (gtlt === ">" || gtlt === "<") {
+          ret = "<0.0.0-0";
+        } else {
+          ret = "*";
+        }
+      } else if (gtlt && anyX) {
+        if (xm) {
+          m = 0;
+        }
+        p = 0;
+        if (gtlt === ">") {
+          gtlt = ">=";
+          if (xm) {
+            M = +M + 1;
+            m = 0;
+            p = 0;
+          } else {
+            m = +m + 1;
+            p = 0;
+          }
+        } else if (gtlt === "<=") {
+          gtlt = "<";
+          if (xm) {
+            M = +M + 1;
+          } else {
+            m = +m + 1;
+          }
+        }
+        if (gtlt === "<") {
+          pr = "-0";
+        }
+        ret = `${gtlt + M}.${m}.${p}${pr}`;
+      } else if (xm) {
+        ret = `>=${M}.0.0${pr} <${+M + 1}.0.0-0`;
+      } else if (xp) {
+        ret = `>=${M}.${m}.0${pr} <${M}.${+m + 1}.0-0`;
+      }
+      debug2("xRange return", ret);
+      return ret;
+    });
+  };
+  const replaceStars = (comp, options) => {
+    debug2("replaceStars", comp, options);
+    return comp.trim().replace(re2[t2.STAR], "");
+  };
+  const replaceGTE0 = (comp, options) => {
+    debug2("replaceGTE0", comp, options);
+    return comp.trim().replace(re2[options.includePrerelease ? t2.GTE0PRE : t2.GTE0], "");
+  };
+  const hyphenReplace = (incPr) => ($0, from, fM, fm, fp, fpr, fb, to, tM, tm, tp, tpr) => {
+    if (isX(fM)) {
+      from = "";
+    } else if (isX(fm)) {
+      from = `>=${fM}.0.0${incPr ? "-0" : ""}`;
+    } else if (isX(fp)) {
+      from = `>=${fM}.${fm}.0${incPr ? "-0" : ""}`;
+    } else if (fpr) {
+      from = `>=${from}`;
+    } else {
+      from = `>=${from}${incPr ? "-0" : ""}`;
+    }
+    if (isX(tM)) {
+      to = "";
+    } else if (isX(tm)) {
+      to = `<${+tM + 1}.0.0-0`;
+    } else if (isX(tp)) {
+      to = `<${tM}.${+tm + 1}.0-0`;
+    } else if (tpr) {
+      to = `<=${tM}.${tm}.${tp}-${tpr}`;
+    } else if (incPr) {
+      to = `<${tM}.${tm}.${+tp + 1}-0`;
+    } else {
+      to = `<=${to}`;
+    }
+    return `${from} ${to}`.trim();
+  };
+  const testSet = (set, version, options) => {
+    for (let i = 0; i < set.length; i++) {
+      if (!set[i].test(version)) {
+        return false;
+      }
+    }
+    if (version.prerelease.length && !options.includePrerelease) {
+      for (let i = 0; i < set.length; i++) {
+        debug2(set[i].semver);
+        if (set[i].semver === Comparator2.ANY) {
+          continue;
+        }
+        if (set[i].semver.prerelease.length > 0) {
+          const allowed = set[i].semver;
+          if (allowed.major === version.major && allowed.minor === version.minor && allowed.patch === version.patch) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+    return true;
+  };
+  return range;
+}
+var comparator;
+var hasRequiredComparator;
+function requireComparator() {
+  if (hasRequiredComparator) return comparator;
+  hasRequiredComparator = 1;
+  const ANY2 = Symbol("SemVer ANY");
+  class Comparator2 {
+    static get ANY() {
+      return ANY2;
+    }
+    constructor(comp, options) {
+      options = parseOptions2(options);
+      if (comp instanceof Comparator2) {
+        if (comp.loose === !!options.loose) {
+          return comp;
+        } else {
+          comp = comp.value;
+        }
+      }
+      comp = comp.trim().split(/\s+/).join(" ");
+      debug2("comparator", comp, options);
+      this.options = options;
+      this.loose = !!options.loose;
+      this.parse(comp);
+      if (this.semver === ANY2) {
+        this.value = "";
+      } else {
+        this.value = this.operator + this.semver.version;
+      }
+      debug2("comp", this);
+    }
+    parse(comp) {
+      const r = this.options.loose ? re2[t2.COMPARATORLOOSE] : re2[t2.COMPARATOR];
+      const m = comp.match(r);
+      if (!m) {
+        throw new TypeError(`Invalid comparator: ${comp}`);
+      }
+      this.operator = m[1] !== void 0 ? m[1] : "";
+      if (this.operator === "=") {
+        this.operator = "";
+      }
+      if (!m[2]) {
+        this.semver = ANY2;
+      } else {
+        this.semver = new SemVer3(m[2], this.options.loose);
+      }
+    }
+    toString() {
+      return this.value;
+    }
+    test(version) {
+      debug2("Comparator.test", version, this.options.loose);
+      if (this.semver === ANY2 || version === ANY2) {
+        return true;
+      }
+      if (typeof version === "string") {
+        try {
+          version = new SemVer3(version, this.options);
+        } catch (er) {
+          return false;
+        }
+      }
+      return cmp2(version, this.operator, this.semver, this.options);
+    }
+    intersects(comp, options) {
+      if (!(comp instanceof Comparator2)) {
+        throw new TypeError("a Comparator is required");
+      }
+      if (this.operator === "") {
+        if (this.value === "") {
+          return true;
+        }
+        return new Range2(comp.value, options).test(this.value);
+      } else if (comp.operator === "") {
+        if (comp.value === "") {
+          return true;
+        }
+        return new Range2(this.value, options).test(comp.semver);
+      }
+      options = parseOptions2(options);
+      if (options.includePrerelease && (this.value === "<0.0.0-0" || comp.value === "<0.0.0-0")) {
+        return false;
+      }
+      if (!options.includePrerelease && (this.value.startsWith("<0.0.0") || comp.value.startsWith("<0.0.0"))) {
+        return false;
+      }
+      if (this.operator.startsWith(">") && comp.operator.startsWith(">")) {
+        return true;
+      }
+      if (this.operator.startsWith("<") && comp.operator.startsWith("<")) {
+        return true;
+      }
+      if (this.semver.version === comp.semver.version && this.operator.includes("=") && comp.operator.includes("=")) {
+        return true;
+      }
+      if (cmp2(this.semver, "<", comp.semver, options) && this.operator.startsWith(">") && comp.operator.startsWith("<")) {
+        return true;
+      }
+      if (cmp2(this.semver, ">", comp.semver, options) && this.operator.startsWith("<") && comp.operator.startsWith(">")) {
+        return true;
+      }
+      return false;
+    }
+  }
+  comparator = Comparator2;
+  const parseOptions2 = parseOptions_1;
+  const { safeRe: re2, t: t2 } = reExports;
+  const cmp2 = cmp_1;
+  const debug2 = debug_1;
+  const SemVer3 = semver$1;
+  const Range2 = requireRange();
+  return comparator;
+}
+const Range$9 = requireRange();
+const satisfies$4 = (version, range2, options) => {
+  try {
+    range2 = new Range$9(range2, options);
+  } catch (er) {
+    return false;
+  }
+  return range2.test(version);
+};
+var satisfies_1 = satisfies$4;
+const Range$8 = requireRange();
+const toComparators$1 = (range2, options) => new Range$8(range2, options).set.map((comp) => comp.map((c) => c.value).join(" ").trim().split(" "));
+var toComparators_1 = toComparators$1;
+const SemVer$4 = semver$1;
+const Range$7 = requireRange();
+const maxSatisfying$1 = (versions, range2, options) => {
+  let max = null;
+  let maxSV = null;
+  let rangeObj = null;
+  try {
+    rangeObj = new Range$7(range2, options);
+  } catch (er) {
+    return null;
+  }
+  versions.forEach((v) => {
+    if (rangeObj.test(v)) {
+      if (!max || maxSV.compare(v) === -1) {
+        max = v;
+        maxSV = new SemVer$4(max, options);
+      }
+    }
+  });
+  return max;
+};
+var maxSatisfying_1 = maxSatisfying$1;
+const SemVer$3 = semver$1;
+const Range$6 = requireRange();
+const minSatisfying$1 = (versions, range2, options) => {
+  let min = null;
+  let minSV = null;
+  let rangeObj = null;
+  try {
+    rangeObj = new Range$6(range2, options);
+  } catch (er) {
+    return null;
+  }
+  versions.forEach((v) => {
+    if (rangeObj.test(v)) {
+      if (!min || minSV.compare(v) === 1) {
+        min = v;
+        minSV = new SemVer$3(min, options);
+      }
+    }
+  });
+  return min;
+};
+var minSatisfying_1 = minSatisfying$1;
+const SemVer$2 = semver$1;
+const Range$5 = requireRange();
+const gt$2 = gt_1;
+const minVersion$1 = (range2, loose) => {
+  range2 = new Range$5(range2, loose);
+  let minver = new SemVer$2("0.0.0");
+  if (range2.test(minver)) {
+    return minver;
+  }
+  minver = new SemVer$2("0.0.0-0");
+  if (range2.test(minver)) {
+    return minver;
+  }
+  minver = null;
+  for (let i = 0; i < range2.set.length; ++i) {
+    const comparators = range2.set[i];
+    let setMin = null;
+    comparators.forEach((comparator2) => {
+      const compver = new SemVer$2(comparator2.semver.version);
+      switch (comparator2.operator) {
+        case ">":
+          if (compver.prerelease.length === 0) {
+            compver.patch++;
+          } else {
+            compver.prerelease.push(0);
+          }
+          compver.raw = compver.format();
+        case "":
+        case ">=":
+          if (!setMin || gt$2(compver, setMin)) {
+            setMin = compver;
+          }
+          break;
+        case "<":
+        case "<=":
+          break;
+        default:
+          throw new Error(`Unexpected operation: ${comparator2.operator}`);
+      }
+    });
+    if (setMin && (!minver || gt$2(minver, setMin))) {
+      minver = setMin;
+    }
+  }
+  if (minver && range2.test(minver)) {
+    return minver;
+  }
+  return null;
+};
+var minVersion_1 = minVersion$1;
+const Range$4 = requireRange();
+const validRange$1 = (range2, options) => {
+  try {
+    return new Range$4(range2, options).range || "*";
+  } catch (er) {
+    return null;
+  }
+};
+var valid$1 = validRange$1;
+const SemVer$1 = semver$1;
+const Comparator$2 = requireComparator();
+const { ANY: ANY$1 } = Comparator$2;
+const Range$3 = requireRange();
+const satisfies$3 = satisfies_1;
+const gt$1 = gt_1;
+const lt$1 = lt_1;
+const lte$1 = lte_1;
+const gte$1 = gte_1;
+const outside$3 = (version, range2, hilo, options) => {
+  version = new SemVer$1(version, options);
+  range2 = new Range$3(range2, options);
+  let gtfn, ltefn, ltfn, comp, ecomp;
+  switch (hilo) {
+    case ">":
+      gtfn = gt$1;
+      ltefn = lte$1;
+      ltfn = lt$1;
+      comp = ">";
+      ecomp = ">=";
+      break;
+    case "<":
+      gtfn = lt$1;
+      ltefn = gte$1;
+      ltfn = gt$1;
+      comp = "<";
+      ecomp = "<=";
+      break;
+    default:
+      throw new TypeError('Must provide a hilo val of "<" or ">"');
+  }
+  if (satisfies$3(version, range2, options)) {
+    return false;
+  }
+  for (let i = 0; i < range2.set.length; ++i) {
+    const comparators = range2.set[i];
+    let high = null;
+    let low = null;
+    comparators.forEach((comparator2) => {
+      if (comparator2.semver === ANY$1) {
+        comparator2 = new Comparator$2(">=0.0.0");
+      }
+      high = high || comparator2;
+      low = low || comparator2;
+      if (gtfn(comparator2.semver, high.semver, options)) {
+        high = comparator2;
+      } else if (ltfn(comparator2.semver, low.semver, options)) {
+        low = comparator2;
+      }
+    });
+    if (high.operator === comp || high.operator === ecomp) {
+      return false;
+    }
+    if ((!low.operator || low.operator === comp) && ltefn(version, low.semver)) {
+      return false;
+    } else if (low.operator === ecomp && ltfn(version, low.semver)) {
+      return false;
+    }
+  }
+  return true;
+};
+var outside_1 = outside$3;
+const outside$2 = outside_1;
+const gtr$1 = (version, range2, options) => outside$2(version, range2, ">", options);
+var gtr_1 = gtr$1;
+const outside$1 = outside_1;
+const ltr$1 = (version, range2, options) => outside$1(version, range2, "<", options);
+var ltr_1 = ltr$1;
+const Range$2 = requireRange();
+const intersects$1 = (r1, r2, options) => {
+  r1 = new Range$2(r1, options);
+  r2 = new Range$2(r2, options);
+  return r1.intersects(r2, options);
+};
+var intersects_1 = intersects$1;
+const satisfies$2 = satisfies_1;
+const compare$2 = compare_1;
+var simplify = (versions, range2, options) => {
+  const set = [];
+  let first = null;
+  let prev = null;
+  const v = versions.sort((a, b) => compare$2(a, b, options));
+  for (const version of v) {
+    const included = satisfies$2(version, range2, options);
+    if (included) {
+      prev = version;
+      if (!first) {
+        first = version;
+      }
+    } else {
+      if (prev) {
+        set.push([first, prev]);
+      }
+      prev = null;
+      first = null;
+    }
+  }
+  if (first) {
+    set.push([first, null]);
+  }
+  const ranges = [];
+  for (const [min, max] of set) {
+    if (min === max) {
+      ranges.push(min);
+    } else if (!max && min === v[0]) {
+      ranges.push("*");
+    } else if (!max) {
+      ranges.push(`>=${min}`);
+    } else if (min === v[0]) {
+      ranges.push(`<=${max}`);
+    } else {
+      ranges.push(`${min} - ${max}`);
+    }
+  }
+  const simplified = ranges.join(" || ");
+  const original = typeof range2.raw === "string" ? range2.raw : String(range2);
+  return simplified.length < original.length ? simplified : range2;
+};
+const Range$1 = requireRange();
+const Comparator$1 = requireComparator();
+const { ANY } = Comparator$1;
+const satisfies$1 = satisfies_1;
+const compare$1 = compare_1;
+const subset$1 = (sub, dom, options = {}) => {
+  if (sub === dom) {
+    return true;
+  }
+  sub = new Range$1(sub, options);
+  dom = new Range$1(dom, options);
+  let sawNonNull = false;
+  OUTER: for (const simpleSub of sub.set) {
+    for (const simpleDom of dom.set) {
+      const isSub = simpleSubset(simpleSub, simpleDom, options);
+      sawNonNull = sawNonNull || isSub !== null;
+      if (isSub) {
+        continue OUTER;
+      }
+    }
+    if (sawNonNull) {
+      return false;
+    }
+  }
+  return true;
+};
+const minimumVersionWithPreRelease = [new Comparator$1(">=0.0.0-0")];
+const minimumVersion = [new Comparator$1(">=0.0.0")];
+const simpleSubset = (sub, dom, options) => {
+  if (sub === dom) {
+    return true;
+  }
+  if (sub.length === 1 && sub[0].semver === ANY) {
+    if (dom.length === 1 && dom[0].semver === ANY) {
+      return true;
+    } else if (options.includePrerelease) {
+      sub = minimumVersionWithPreRelease;
+    } else {
+      sub = minimumVersion;
+    }
+  }
+  if (dom.length === 1 && dom[0].semver === ANY) {
+    if (options.includePrerelease) {
+      return true;
+    } else {
+      dom = minimumVersion;
+    }
+  }
+  const eqSet = /* @__PURE__ */ new Set();
+  let gt2, lt2;
+  for (const c of sub) {
+    if (c.operator === ">" || c.operator === ">=") {
+      gt2 = higherGT(gt2, c, options);
+    } else if (c.operator === "<" || c.operator === "<=") {
+      lt2 = lowerLT(lt2, c, options);
+    } else {
+      eqSet.add(c.semver);
+    }
+  }
+  if (eqSet.size > 1) {
+    return null;
+  }
+  let gtltComp;
+  if (gt2 && lt2) {
+    gtltComp = compare$1(gt2.semver, lt2.semver, options);
+    if (gtltComp > 0) {
+      return null;
+    } else if (gtltComp === 0 && (gt2.operator !== ">=" || lt2.operator !== "<=")) {
+      return null;
+    }
+  }
+  for (const eq2 of eqSet) {
+    if (gt2 && !satisfies$1(eq2, String(gt2), options)) {
+      return null;
+    }
+    if (lt2 && !satisfies$1(eq2, String(lt2), options)) {
+      return null;
+    }
+    for (const c of dom) {
+      if (!satisfies$1(eq2, String(c), options)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  let higher, lower;
+  let hasDomLT, hasDomGT;
+  let needDomLTPre = lt2 && !options.includePrerelease && lt2.semver.prerelease.length ? lt2.semver : false;
+  let needDomGTPre = gt2 && !options.includePrerelease && gt2.semver.prerelease.length ? gt2.semver : false;
+  if (needDomLTPre && needDomLTPre.prerelease.length === 1 && lt2.operator === "<" && needDomLTPre.prerelease[0] === 0) {
+    needDomLTPre = false;
+  }
+  for (const c of dom) {
+    hasDomGT = hasDomGT || c.operator === ">" || c.operator === ">=";
+    hasDomLT = hasDomLT || c.operator === "<" || c.operator === "<=";
+    if (gt2) {
+      if (needDomGTPre) {
+        if (c.semver.prerelease && c.semver.prerelease.length && c.semver.major === needDomGTPre.major && c.semver.minor === needDomGTPre.minor && c.semver.patch === needDomGTPre.patch) {
+          needDomGTPre = false;
+        }
+      }
+      if (c.operator === ">" || c.operator === ">=") {
+        higher = higherGT(gt2, c, options);
+        if (higher === c && higher !== gt2) {
+          return false;
+        }
+      } else if (gt2.operator === ">=" && !c.test(gt2.semver)) {
+        return false;
+      }
+    }
+    if (lt2) {
+      if (needDomLTPre) {
+        if (c.semver.prerelease && c.semver.prerelease.length && c.semver.major === needDomLTPre.major && c.semver.minor === needDomLTPre.minor && c.semver.patch === needDomLTPre.patch) {
+          needDomLTPre = false;
+        }
+      }
+      if (c.operator === "<" || c.operator === "<=") {
+        lower = lowerLT(lt2, c, options);
+        if (lower === c && lower !== lt2) {
+          return false;
+        }
+      } else if (lt2.operator === "<=" && !c.test(lt2.semver)) {
+        return false;
+      }
+    }
+    if (!c.operator && (lt2 || gt2) && gtltComp !== 0) {
+      return false;
+    }
+  }
+  if (gt2 && hasDomLT && !lt2 && gtltComp !== 0) {
+    return false;
+  }
+  if (lt2 && hasDomGT && !gt2 && gtltComp !== 0) {
+    return false;
+  }
+  if (needDomGTPre || needDomLTPre) {
+    return false;
+  }
+  return true;
+};
+const higherGT = (a, b, options) => {
+  if (!a) {
+    return b;
+  }
+  const comp = compare$1(a.semver, b.semver, options);
+  return comp > 0 ? a : comp < 0 ? b : b.operator === ">" && a.operator === ">=" ? b : a;
+};
+const lowerLT = (a, b, options) => {
+  if (!a) {
+    return b;
+  }
+  const comp = compare$1(a.semver, b.semver, options);
+  return comp < 0 ? a : comp > 0 ? b : b.operator === "<" && a.operator === "<=" ? b : a;
+};
+var subset_1 = subset$1;
+const internalRe = reExports;
+const constants = constants$2;
+const SemVer2 = semver$1;
+const identifiers = identifiers$1;
+const parse = parse_1;
+const valid = valid_1;
+const clean = clean_1;
+const inc = inc_1;
+const diff = diff_1;
+const major = major_1;
+const minor = minor_1;
+const patch = patch_1;
+const prerelease = prerelease_1;
+const compare = compare_1;
+const rcompare = rcompare_1;
+const compareLoose = compareLoose_1;
+const compareBuild = compareBuild_1;
+const sort = sort_1;
+const rsort = rsort_1;
+const gt = gt_1;
+const lt = lt_1;
+const eq = eq_1;
+const neq = neq_1;
+const gte = gte_1;
+const lte = lte_1;
+const cmp = cmp_1;
+const coerce = coerce_1;
+const truncate = truncate_1;
+const Comparator = requireComparator();
+const Range = requireRange();
+const satisfies = satisfies_1;
+const toComparators = toComparators_1;
+const maxSatisfying = maxSatisfying_1;
+const minSatisfying = minSatisfying_1;
+const minVersion = minVersion_1;
+const validRange = valid$1;
+const outside = outside_1;
+const gtr = gtr_1;
+const ltr = ltr_1;
+const intersects = intersects_1;
+const simplifyRange = simplify;
+const subset = subset_1;
+var semver = {
+  parse,
+  valid,
+  clean,
+  inc,
+  diff,
+  major,
+  minor,
+  patch,
+  prerelease,
+  compare,
+  rcompare,
+  compareLoose,
+  compareBuild,
+  sort,
+  rsort,
+  gt,
+  lt,
+  eq,
+  neq,
+  gte,
+  lte,
+  cmp,
+  coerce,
+  truncate,
+  Comparator,
+  Range,
+  satisfies,
+  toComparators,
+  maxSatisfying,
+  minSatisfying,
+  minVersion,
+  validRange,
+  outside,
+  gtr,
+  ltr,
+  intersects,
+  simplifyRange,
+  subset,
+  SemVer: SemVer2,
+  re: internalRe.re,
+  src: internalRe.src,
+  tokens: internalRe.t,
+  SEMVER_SPEC_VERSION: constants.SEMVER_SPEC_VERSION,
+  RELEASE_TYPES: constants.RELEASE_TYPES,
+  compareIdentifiers: identifiers.compareIdentifiers,
+  rcompareIdentifiers: identifiers.rcompareIdentifiers
+};
+var onetime$1 = { exports: {} };
+var mimicFn$2 = { exports: {} };
+const mimicFn$1 = (to, from) => {
+  for (const prop of Reflect.ownKeys(from)) {
+    Object.defineProperty(to, prop, Object.getOwnPropertyDescriptor(from, prop));
+  }
+  return to;
+};
+mimicFn$2.exports = mimicFn$1;
+mimicFn$2.exports.default = mimicFn$1;
+var mimicFnExports = mimicFn$2.exports;
+const mimicFn = mimicFnExports;
+const calledFunctions = /* @__PURE__ */ new WeakMap();
+const onetime = (function_, options = {}) => {
+  if (typeof function_ !== "function") {
+    throw new TypeError("Expected a function");
+  }
+  let returnValue;
+  let callCount = 0;
+  const functionName = function_.displayName || function_.name || "<anonymous>";
+  const onetime2 = function(...arguments_) {
+    calledFunctions.set(onetime2, ++callCount);
+    if (callCount === 1) {
+      returnValue = function_.apply(this, arguments_);
+      function_ = null;
+    } else if (options.throw === true) {
+      throw new Error(`Function \`${functionName}\` can only be called once`);
+    }
+    return returnValue;
+  };
+  mimicFn(onetime2, function_);
+  calledFunctions.set(onetime2, callCount);
+  return onetime2;
+};
+onetime$1.exports = onetime;
+onetime$1.exports.default = onetime;
+onetime$1.exports.callCount = (function_) => {
+  if (!calledFunctions.has(function_)) {
+    throw new Error(`The given function \`${function_.name}\` is not wrapped by the \`onetime\` package`);
+  }
+  return calledFunctions.get(function_);
+};
+var onetimeExports = onetime$1.exports;
+(function(module, exports) {
+  var __classPrivateFieldSet = commonjsGlobal && commonjsGlobal.__classPrivateFieldSet || function(receiver, privateMap, value) {
+    if (!privateMap.has(receiver)) {
+      throw new TypeError("attempted to set private field on non-instance");
+    }
+    privateMap.set(receiver, value);
+    return value;
+  };
+  var __classPrivateFieldGet = commonjsGlobal && commonjsGlobal.__classPrivateFieldGet || function(receiver, privateMap) {
+    if (!privateMap.has(receiver)) {
+      throw new TypeError("attempted to get private field on non-instance");
+    }
+    return privateMap.get(receiver);
+  };
+  var _a, _b;
+  var _validator, _encryptionKey, _options, _defaultValues;
+  Object.defineProperty(exports, "__esModule", { value: true });
+  const fs2 = require$$0;
+  const path2 = require$$0$1;
+  const crypto = require$$2$1;
+  const assert = require$$3;
+  const events_1 = require$$4$1;
+  const dotProp$1 = dotProp;
+  const makeDir2 = makeDirExports;
+  const pkgUp2 = pkgUpExports;
+  const envPaths2 = envPathsExports;
+  const atomically = dist$1;
+  const ajv_1 = ajv;
+  const ajv_formats_1 = distExports;
+  const debounceFn$1 = debounceFn;
+  const semver$12 = semver;
+  const onetime2 = onetimeExports;
+  const encryptionAlgorithm = "aes-256-cbc";
+  const createPlainObject = () => {
+    return /* @__PURE__ */ Object.create(null);
+  };
+  const isExist = (data) => {
+    return data !== void 0 && data !== null;
+  };
+  delete require.cache[__filename];
+  const parentDir = path2.dirname((_b = (_a = module.parent) === null || _a === void 0 ? void 0 : _a.filename) !== null && _b !== void 0 ? _b : ".");
+  const checkValueType = (key, value) => {
+    const nonJsonTypes = /* @__PURE__ */ new Set([
+      "undefined",
+      "symbol",
+      "function"
+    ]);
+    const type2 = typeof value;
+    if (nonJsonTypes.has(type2)) {
+      throw new TypeError(`Setting a value of type \`${type2}\` for key \`${key}\` is not allowed as it's not supported by JSON`);
+    }
+  };
+  const INTERNAL_KEY = "__internal__";
+  const MIGRATION_KEY = `${INTERNAL_KEY}.migrations.version`;
+  class Conf2 {
+    constructor(partialOptions = {}) {
+      var _a2;
+      _validator.set(this, void 0);
+      _encryptionKey.set(this, void 0);
+      _options.set(this, void 0);
+      _defaultValues.set(this, {});
+      this._deserialize = (value) => JSON.parse(value);
+      this._serialize = (value) => JSON.stringify(value, null, "	");
+      const options = {
+        configName: "config",
+        fileExtension: "json",
+        projectSuffix: "nodejs",
+        clearInvalidConfig: false,
+        accessPropertiesByDotNotation: true,
+        ...partialOptions
+      };
+      const getPackageData = onetime2(() => {
+        const packagePath = pkgUp2.sync({ cwd: parentDir });
+        const packageData = packagePath && JSON.parse(fs2.readFileSync(packagePath, "utf8"));
+        return packageData !== null && packageData !== void 0 ? packageData : {};
+      });
+      if (!options.cwd) {
+        if (!options.projectName) {
+          options.projectName = getPackageData().name;
+        }
+        if (!options.projectName) {
+          throw new Error("Project name could not be inferred. Please specify the `projectName` option.");
+        }
+        options.cwd = envPaths2(options.projectName, { suffix: options.projectSuffix }).config;
+      }
+      __classPrivateFieldSet(this, _options, options);
+      if (options.schema) {
+        if (typeof options.schema !== "object") {
+          throw new TypeError("The `schema` option must be an object.");
+        }
+        const ajv2 = new ajv_1.default({
+          allErrors: true,
+          useDefaults: true
+        });
+        ajv_formats_1.default(ajv2);
+        const schema = {
+          type: "object",
+          properties: options.schema
+        };
+        __classPrivateFieldSet(this, _validator, ajv2.compile(schema));
+        for (const [key, value] of Object.entries(options.schema)) {
+          if (value === null || value === void 0 ? void 0 : value.default) {
+            __classPrivateFieldGet(this, _defaultValues)[key] = value.default;
+          }
+        }
+      }
+      if (options.defaults) {
+        __classPrivateFieldSet(this, _defaultValues, {
+          ...__classPrivateFieldGet(this, _defaultValues),
+          ...options.defaults
+        });
+      }
+      if (options.serialize) {
+        this._serialize = options.serialize;
+      }
+      if (options.deserialize) {
+        this._deserialize = options.deserialize;
+      }
+      this.events = new events_1.EventEmitter();
+      __classPrivateFieldSet(this, _encryptionKey, options.encryptionKey);
+      const fileExtension = options.fileExtension ? `.${options.fileExtension}` : "";
+      this.path = path2.resolve(options.cwd, `${(_a2 = options.configName) !== null && _a2 !== void 0 ? _a2 : "config"}${fileExtension}`);
+      const fileStore = this.store;
+      const store2 = Object.assign(createPlainObject(), options.defaults, fileStore);
+      this._validate(store2);
+      try {
+        assert.deepEqual(fileStore, store2);
+      } catch (_b2) {
+        this.store = store2;
+      }
+      if (options.watch) {
+        this._watch();
+      }
+      if (options.migrations) {
+        if (!options.projectVersion) {
+          options.projectVersion = getPackageData().version;
+        }
+        if (!options.projectVersion) {
+          throw new Error("Project version could not be inferred. Please specify the `projectVersion` option.");
+        }
+        this._migrate(options.migrations, options.projectVersion);
+      }
+    }
+    get(key, defaultValue) {
+      if (__classPrivateFieldGet(this, _options).accessPropertiesByDotNotation) {
+        return this._get(key, defaultValue);
+      }
+      return key in this.store ? this.store[key] : defaultValue;
+    }
+    set(key, value) {
+      if (typeof key !== "string" && typeof key !== "object") {
+        throw new TypeError(`Expected \`key\` to be of type \`string\` or \`object\`, got ${typeof key}`);
+      }
+      if (typeof key !== "object" && value === void 0) {
+        throw new TypeError("Use `delete()` to clear values");
+      }
+      if (this._containsReservedKey(key)) {
+        throw new TypeError(`Please don't use the ${INTERNAL_KEY} key, as it's used to manage this module internal operations.`);
+      }
+      const { store: store2 } = this;
+      const set = (key2, value2) => {
+        checkValueType(key2, value2);
+        if (__classPrivateFieldGet(this, _options).accessPropertiesByDotNotation) {
+          dotProp$1.set(store2, key2, value2);
+        } else {
+          store2[key2] = value2;
+        }
+      };
+      if (typeof key === "object") {
+        const object = key;
+        for (const [key2, value2] of Object.entries(object)) {
+          set(key2, value2);
+        }
+      } else {
+        set(key, value);
+      }
+      this.store = store2;
+    }
+    /**
+        Check if an item exists.
+    
+        @param key - The key of the item to check.
+        */
+    has(key) {
+      if (__classPrivateFieldGet(this, _options).accessPropertiesByDotNotation) {
+        return dotProp$1.has(this.store, key);
+      }
+      return key in this.store;
+    }
+    /**
+        Reset items to their default values, as defined by the `defaults` or `schema` option.
+    
+        @see `clear()` to reset all items.
+    
+        @param keys - The keys of the items to reset.
+        */
+    reset(...keys) {
+      for (const key of keys) {
+        if (isExist(__classPrivateFieldGet(this, _defaultValues)[key])) {
+          this.set(key, __classPrivateFieldGet(this, _defaultValues)[key]);
+        }
+      }
+    }
+    /**
+        Delete an item.
+    
+        @param key - The key of the item to delete.
+        */
+    delete(key) {
+      const { store: store2 } = this;
+      if (__classPrivateFieldGet(this, _options).accessPropertiesByDotNotation) {
+        dotProp$1.delete(store2, key);
+      } else {
+        delete store2[key];
+      }
+      this.store = store2;
+    }
+    /**
+        Delete all items.
+    
+        This resets known items to their default values, if defined by the `defaults` or `schema` option.
+        */
+    clear() {
+      this.store = createPlainObject();
+      for (const key of Object.keys(__classPrivateFieldGet(this, _defaultValues))) {
+        this.reset(key);
+      }
+    }
+    /**
+        Watches the given `key`, calling `callback` on any changes.
+    
+        @param key - The key wo watch.
+        @param callback - A callback function that is called on any changes. When a `key` is first set `oldValue` will be `undefined`, and when a key is deleted `newValue` will be `undefined`.
+        @returns A function, that when called, will unsubscribe.
+        */
+    onDidChange(key, callback) {
+      if (typeof key !== "string") {
+        throw new TypeError(`Expected \`key\` to be of type \`string\`, got ${typeof key}`);
+      }
+      if (typeof callback !== "function") {
+        throw new TypeError(`Expected \`callback\` to be of type \`function\`, got ${typeof callback}`);
+      }
+      return this._handleChange(() => this.get(key), callback);
+    }
+    /**
+        Watches the whole config object, calling `callback` on any changes.
+    
+        @param callback - A callback function that is called on any changes. When a `key` is first set `oldValue` will be `undefined`, and when a key is deleted `newValue` will be `undefined`.
+        @returns A function, that when called, will unsubscribe.
+        */
+    onDidAnyChange(callback) {
+      if (typeof callback !== "function") {
+        throw new TypeError(`Expected \`callback\` to be of type \`function\`, got ${typeof callback}`);
+      }
+      return this._handleChange(() => this.store, callback);
+    }
+    get size() {
+      return Object.keys(this.store).length;
+    }
+    get store() {
+      try {
+        const data = fs2.readFileSync(this.path, __classPrivateFieldGet(this, _encryptionKey) ? null : "utf8");
+        const dataString = this._encryptData(data);
+        const deserializedData = this._deserialize(dataString);
+        this._validate(deserializedData);
+        return Object.assign(createPlainObject(), deserializedData);
+      } catch (error2) {
+        if (error2.code === "ENOENT") {
+          this._ensureDirectory();
+          return createPlainObject();
+        }
+        if (__classPrivateFieldGet(this, _options).clearInvalidConfig && error2.name === "SyntaxError") {
+          return createPlainObject();
+        }
+        throw error2;
+      }
+    }
+    set store(value) {
+      this._ensureDirectory();
+      this._validate(value);
+      this._write(value);
+      this.events.emit("change");
+    }
+    *[(_validator = /* @__PURE__ */ new WeakMap(), _encryptionKey = /* @__PURE__ */ new WeakMap(), _options = /* @__PURE__ */ new WeakMap(), _defaultValues = /* @__PURE__ */ new WeakMap(), Symbol.iterator)]() {
+      for (const [key, value] of Object.entries(this.store)) {
+        yield [key, value];
+      }
+    }
+    _encryptData(data) {
+      if (!__classPrivateFieldGet(this, _encryptionKey)) {
+        return data.toString();
+      }
+      try {
+        if (__classPrivateFieldGet(this, _encryptionKey)) {
+          try {
+            if (data.slice(16, 17).toString() === ":") {
+              const initializationVector = data.slice(0, 16);
+              const password = crypto.pbkdf2Sync(__classPrivateFieldGet(this, _encryptionKey), initializationVector.toString(), 1e4, 32, "sha512");
+              const decipher = crypto.createDecipheriv(encryptionAlgorithm, password, initializationVector);
+              data = Buffer.concat([decipher.update(Buffer.from(data.slice(17))), decipher.final()]).toString("utf8");
+            } else {
+              const decipher = crypto.createDecipher(encryptionAlgorithm, __classPrivateFieldGet(this, _encryptionKey));
+              data = Buffer.concat([decipher.update(Buffer.from(data)), decipher.final()]).toString("utf8");
+            }
+          } catch (_a2) {
+          }
+        }
+      } catch (_b2) {
+      }
+      return data.toString();
+    }
+    _handleChange(getter, callback) {
+      let currentValue = getter();
+      const onChange = () => {
+        const oldValue = currentValue;
+        const newValue = getter();
+        try {
+          assert.deepEqual(newValue, oldValue);
+        } catch (_a2) {
+          currentValue = newValue;
+          callback.call(this, newValue, oldValue);
+        }
+      };
+      this.events.on("change", onChange);
+      return () => this.events.removeListener("change", onChange);
+    }
+    _validate(data) {
+      if (!__classPrivateFieldGet(this, _validator)) {
+        return;
+      }
+      const valid2 = __classPrivateFieldGet(this, _validator).call(this, data);
+      if (valid2 || !__classPrivateFieldGet(this, _validator).errors) {
+        return;
+      }
+      const errors2 = __classPrivateFieldGet(this, _validator).errors.map(({ dataPath, message = "" }) => `\`${dataPath.slice(1)}\` ${message}`);
+      throw new Error("Config schema violation: " + errors2.join("; "));
+    }
+    _ensureDirectory() {
+      makeDir2.sync(path2.dirname(this.path));
+    }
+    _write(value) {
+      let data = this._serialize(value);
+      if (__classPrivateFieldGet(this, _encryptionKey)) {
+        const initializationVector = crypto.randomBytes(16);
+        const password = crypto.pbkdf2Sync(__classPrivateFieldGet(this, _encryptionKey), initializationVector.toString(), 1e4, 32, "sha512");
+        const cipher = crypto.createCipheriv(encryptionAlgorithm, password, initializationVector);
+        data = Buffer.concat([initializationVector, Buffer.from(":"), cipher.update(Buffer.from(data)), cipher.final()]);
+      }
+      if (process.env.SNAP) {
+        fs2.writeFileSync(this.path, data);
+      } else {
+        try {
+          atomically.writeFileSync(this.path, data);
+        } catch (error2) {
+          if (error2.code === "EXDEV") {
+            fs2.writeFileSync(this.path, data);
+            return;
+          }
+          throw error2;
+        }
+      }
+    }
+    _watch() {
+      this._ensureDirectory();
+      if (!fs2.existsSync(this.path)) {
+        this._write(createPlainObject());
+      }
+      fs2.watch(this.path, { persistent: false }, debounceFn$1(() => {
+        this.events.emit("change");
+      }, { wait: 100 }));
+    }
+    _migrate(migrations, versionToMigrate) {
+      let previousMigratedVersion = this._get(MIGRATION_KEY, "0.0.0");
+      const newerVersions = Object.keys(migrations).filter((candidateVersion) => this._shouldPerformMigration(candidateVersion, previousMigratedVersion, versionToMigrate));
+      let storeBackup = { ...this.store };
+      for (const version of newerVersions) {
+        try {
+          const migration = migrations[version];
+          migration(this);
+          this._set(MIGRATION_KEY, version);
+          previousMigratedVersion = version;
+          storeBackup = { ...this.store };
+        } catch (error2) {
+          this.store = storeBackup;
+          throw new Error(`Something went wrong during the migration! Changes applied to the store until this failed migration will be restored. ${error2}`);
+        }
+      }
+      if (this._isVersionInRangeFormat(previousMigratedVersion) || !semver$12.eq(previousMigratedVersion, versionToMigrate)) {
+        this._set(MIGRATION_KEY, versionToMigrate);
+      }
+    }
+    _containsReservedKey(key) {
+      if (typeof key === "object") {
+        const firsKey = Object.keys(key)[0];
+        if (firsKey === INTERNAL_KEY) {
+          return true;
+        }
+      }
+      if (typeof key !== "string") {
+        return false;
+      }
+      if (__classPrivateFieldGet(this, _options).accessPropertiesByDotNotation) {
+        if (key.startsWith(`${INTERNAL_KEY}.`)) {
+          return true;
+        }
+        return false;
+      }
+      return false;
+    }
+    _isVersionInRangeFormat(version) {
+      return semver$12.clean(version) === null;
+    }
+    _shouldPerformMigration(candidateVersion, previousMigratedVersion, versionToMigrate) {
+      if (this._isVersionInRangeFormat(candidateVersion)) {
+        if (previousMigratedVersion !== "0.0.0" && semver$12.satisfies(previousMigratedVersion, candidateVersion)) {
+          return false;
+        }
+        return semver$12.satisfies(versionToMigrate, candidateVersion);
+      }
+      if (semver$12.lte(candidateVersion, previousMigratedVersion)) {
+        return false;
+      }
+      if (semver$12.gt(candidateVersion, versionToMigrate)) {
+        return false;
+      }
+      return true;
+    }
+    _get(key, defaultValue) {
+      return dotProp$1.get(this.store, key, defaultValue);
+    }
+    _set(key, value) {
+      const { store: store2 } = this;
+      dotProp$1.set(store2, key, value);
+      this.store = store2;
+    }
+  }
+  exports.default = Conf2;
+  module.exports = Conf2;
+  module.exports.default = Conf2;
+})(source, source.exports);
+var sourceExports = source.exports;
+const path = require$$0$1;
+const { app, ipcMain, ipcRenderer, shell } = require$$1$1;
+const Conf = sourceExports;
+let isInitialized = false;
+const initDataListener = () => {
+  if (!ipcMain || !app) {
+    throw new Error("Electron Store: You need to call `.initRenderer()` from the main process.");
+  }
+  const appData = {
+    defaultCwd: app.getPath("userData"),
+    appVersion: app.getVersion()
+  };
+  if (isInitialized) {
+    return appData;
+  }
+  ipcMain.on("electron-store-get-data", (event) => {
+    event.returnValue = appData;
+  });
+  isInitialized = true;
+  return appData;
+};
+class ElectronStore extends Conf {
+  constructor(options) {
+    let defaultCwd;
+    let appVersion;
+    if (ipcRenderer) {
+      const appData = ipcRenderer.sendSync("electron-store-get-data");
+      if (!appData) {
+        throw new Error("Electron Store: You need to call `.initRenderer()` from the main process.");
+      }
+      ({ defaultCwd, appVersion } = appData);
+    } else if (ipcMain && app) {
+      ({ defaultCwd, appVersion } = initDataListener());
+    }
+    options = {
+      name: "config",
+      ...options
+    };
+    if (!options.projectVersion) {
+      options.projectVersion = appVersion;
+    }
+    if (options.cwd) {
+      options.cwd = path.isAbsolute(options.cwd) ? options.cwd : path.join(defaultCwd, options.cwd);
+    } else {
+      options.cwd = defaultCwd;
+    }
+    options.configName = options.name;
+    delete options.name;
+    super(options);
+  }
+  static initRenderer() {
+    initDataListener();
+  }
+  openInEditor() {
+    shell.openPath(this.path);
+  }
+}
+var electronStore = ElectronStore;
+const Store = /* @__PURE__ */ getDefaultExportFromCjs(electronStore);
+const store = new Store({
+  name: "jianyue-reader"
+});
+const electronAPI = {
+  // ===== electron-store 键值存储（同步版本） =====
+  store: {
+    get: (key) => store.get(key),
+    set: (key, value) => store.set(key, value)
+  },
+  // ===== 文件系统操作 =====
+  fs: {
+    readFileAsBuffer: (filePath) => require$$1$1.ipcRenderer.invoke("fs:readFileAsBuffer", filePath),
+    readFileAsText: (filePath) => require$$1$1.ipcRenderer.invoke("fs:readFileAsText", filePath),
+    checkFileExists: (filePath) => require$$1$1.ipcRenderer.invoke("fs:checkFileExists", filePath),
+    getFileName: (filePath) => require$$1$1.ipcRenderer.invoke("fs:getFileName", filePath),
+    getFileSize: (filePath) => require$$1$1.ipcRenderer.invoke("fs:getFileSize", filePath),
+    writeTextFile: (text) => require$$1$1.ipcRenderer.invoke("fs:writeTextFile", text),
+    writeImageFile: (base64Url) => require$$1$1.ipcRenderer.invoke("fs:writeImageFile", base64Url),
+    scanFolder: (folderPath) => require$$1$1.ipcRenderer.invoke("fs:scanFolder", folderPath),
+    generateNextFileName: (dirPath, prefix) => require$$1$1.ipcRenderer.invoke("fs:generateNextFileName", dirPath, prefix),
+    writeToFile: (filePath, data) => require$$1$1.ipcRenderer.invoke("fs:writeToFile", filePath, data)
+  },
+  // ===== 文件对话框 =====
+  dialog: {
+    showFilePicker: () => require$$1$1.ipcRenderer.invoke("dialog:showFilePicker"),
+    showNoteFilePicker: () => require$$1$1.ipcRenderer.invoke("dialog:showNoteFilePicker"),
+    showImagePicker: () => require$$1$1.ipcRenderer.invoke("dialog:showImagePicker"),
+    showFontPicker: () => require$$1$1.ipcRenderer.invoke("dialog:showFontPicker"),
+    showFolderPicker: () => require$$1$1.ipcRenderer.invoke("dialog:showFolderPicker"),
+    saveFile: (defaultName, data) => require$$1$1.ipcRenderer.invoke("dialog:saveFile", defaultName, data),
+    showNoteSaveDialog: (data) => require$$1$1.ipcRenderer.invoke("dialog:showNoteSaveDialog", data)
+  },
+  // ===== 书籍缓存管理 =====
+  book: {
+    copyToCache: (bookId, srcPath) => require$$1$1.ipcRenderer.invoke("book:copyToCache", bookId, srcPath),
+    deleteCached: (filePath) => require$$1$1.ipcRenderer.invoke("book:deleteCached", filePath),
+    cachedExists: (filePath) => require$$1$1.ipcRenderer.invoke("book:cachedExists", filePath)
+  },
+  // ===== 封面管理 =====
+  cover: {
+    save: (bookId, base64DataUrl) => require$$1$1.ipcRenderer.invoke("cover:save", bookId, base64DataUrl),
+    delete: (filePath) => require$$1$1.ipcRenderer.invoke("cover:delete", filePath),
+    exists: (filePath) => require$$1$1.ipcRenderer.invoke("cover:exists", filePath),
+    findEpubCover: (bookId, filePath) => require$$1$1.ipcRenderer.invoke("cover:findEpubCover", bookId, filePath)
+  },
+  // ===== EPUB 操作 =====
+  epub: {
+    // 旧接口（兼容）
+    extractAll: (filePath) => require$$1$1.ipcRenderer.invoke("epub:extractAll", filePath),
+    // 新接口（按需加载）
+    listEntries: (filePath) => require$$1$1.ipcRenderer.invoke("epub:listEntries", filePath),
+    getEntry: (filePath, entryName) => require$$1$1.ipcRenderer.invoke("epub:getEntry", filePath, entryName),
+    getEntries: (filePath, entryNames) => require$$1$1.ipcRenderer.invoke("epub:getEntries", filePath, entryNames),
+    clearCache: (filePath) => require$$1$1.ipcRenderer.invoke("epub:clearCache", filePath)
+  },
+  // ===== 字体管理 =====
+  font: {
+    copyToCache: (srcPath) => require$$1$1.ipcRenderer.invoke("font:copyToCache", srcPath),
+    delete: (filePath) => require$$1$1.ipcRenderer.invoke("font:delete", filePath),
+    getFiles: () => require$$1$1.ipcRenderer.invoke("font:getFiles"),
+    getBase64: (filePath) => require$$1$1.ipcRenderer.invoke("font:getBase64", filePath)
+  },
+  // ===== AI 缓存管理 =====
+  ai: {
+    ensureCacheDir: () => require$$1$1.ipcRenderer.invoke("ai:ensureCacheDir"),
+    readCacheFile: (filePath) => require$$1$1.ipcRenderer.invoke("ai:readCacheFile", filePath),
+    writeCacheFile: (filePath, data) => require$$1$1.ipcRenderer.invoke("ai:writeCacheFile", filePath, data),
+    deleteCacheFile: (filePath) => require$$1$1.ipcRenderer.invoke("ai:deleteCacheFile", filePath),
+    listCacheFiles: () => require$$1$1.ipcRenderer.invoke("ai:listCacheFiles")
+  },
+  // ===== 剪贴板 =====
+  clipboard: {
+    writeText: (text) => require$$1$1.ipcRenderer.invoke("clipboard:writeText", text),
+    readText: () => require$$1$1.ipcRenderer.invoke("clipboard:readText")
+  },
+  // ===== 图片缓存 =====
+  image: {
+    saveToCache: (base64DataUrl) => require$$1$1.ipcRenderer.invoke("image:saveToCache", base64DataUrl)
+  },
+  // ===== 系统操作 =====
+  shell: {
+    showItemInFolder: (filePath) => require$$1$1.ipcRenderer.invoke("shell:showItemInFolder", filePath)
+  },
+  // ===== 开发者工具 =====
+  devTools: {
+    toggle: () => require$$1$1.ipcRenderer.invoke("window:toggleDevTools")
+  },
+  // ===== 浮动阅读窗口 =====
+  floatReader: {
+    create: (text, bookTitle, chapterTitle, opacity) => require$$1$1.ipcRenderer.invoke("floatReader:create", text, bookTitle, chapterTitle, opacity),
+    close: (returnToMain) => require$$1$1.ipcRenderer.invoke("floatReader:close", returnToMain !== false),
+    isOpen: () => require$$1$1.ipcRenderer.invoke("floatReader:isOpen"),
+    togglePin: () => require$$1$1.ipcRenderer.invoke("floatReader:togglePin")
+  },
+  // ===== 镜像笔记浮窗（可编辑）=====
+  floatNote: {
+    create: (text, fileName, opacity) => require$$1$1.ipcRenderer.invoke("floatNote:create", text, fileName, opacity),
+    close: (returnToMain) => require$$1$1.ipcRenderer.invoke("floatNote:close", returnToMain !== false),
+    isOpen: () => require$$1$1.ipcRenderer.invoke("floatNote:isOpen"),
+    syncContent: (content) => require$$1$1.ipcRenderer.invoke("floatNote:syncContent", content),
+    togglePin: () => require$$1$1.ipcRenderer.invoke("floatNote:togglePin"),
+    onContentUpdate: (callback) => {
+      const handler = (_event, content) => callback(content);
+      require$$1$1.ipcRenderer.on("floatNote:contentUpdate", handler);
+      return () => {
+        require$$1$1.ipcRenderer.removeListener("floatNote:contentUpdate", handler);
+      };
+    }
+  },
+  // ===== 窗口控制 =====
+  window: {
+    show: () => require$$1$1.ipcRenderer.invoke("window:show"),
+    hide: () => require$$1$1.ipcRenderer.invoke("window:hide"),
+    minimize: () => require$$1$1.ipcRenderer.invoke("window:minimize"),
+    maximize: () => require$$1$1.ipcRenderer.invoke("window:maximize"),
+    close: () => require$$1$1.ipcRenderer.invoke("window:close"),
+    isMaximized: () => require$$1$1.ipcRenderer.invoke("window:isMaximized"),
+    setupMaximizeListener: () => require$$1$1.ipcRenderer.invoke("window:setupMaximizeListener"),
+    onMaximizeChange: (callback) => {
+      require$$1$1.ipcRenderer.on("window:maximize-change", (_event, value) => callback(value));
+    }
+  },
+  // ===== 获取路径 =====
+  app: {
+    getPath: (name) => require$$1$1.ipcRenderer.invoke("app:getPath", name),
+    getVersion: () => require$$1$1.ipcRenderer.invoke("app:getVersion"),
+    openCacheFolder: () => require$$1$1.ipcRenderer.invoke("app:openCacheFolder"),
+    getPendingFilePath: () => require$$1$1.ipcRenderer.invoke("app:pendingFilePath")
+  },
+  // ===== 安全相关 =====
+  security: {
+    getAuthorizedDirs: () => require$$1$1.ipcRenderer.invoke("security:getAuthorizedDirs"),
+    addAuthorizedDir: (dirPath) => require$$1$1.ipcRenderer.invoke("security:addAuthorizedDir", dirPath),
+    removeAuthorizedDir: (dirPath) => require$$1$1.ipcRenderer.invoke("security:removeAuthorizedDir", dirPath),
+    isPathAllowed: (filePath) => require$$1$1.ipcRenderer.invoke("security:isPathAllowed", filePath),
+    isEncryptionAvailable: () => require$$1$1.ipcRenderer.invoke("security:isEncryptionAvailable"),
+    encryptData: (data) => require$$1$1.ipcRenderer.invoke("security:encryptData", data),
+    decryptData: (encryptedData) => require$$1$1.ipcRenderer.invoke("security:decryptData", encryptedData)
+  },
+  // ===== IPC 通信（通用） =====
+  send: (channel, ...args) => {
+    require$$1$1.ipcRenderer.send(channel, ...args);
+  },
+  on: (channel, callback) => {
+    const subscription = (_event, ...args) => callback(...args);
+    require$$1$1.ipcRenderer.on(channel, subscription);
+    return () => {
+      require$$1$1.ipcRenderer.removeListener(channel, subscription);
+    };
+  },
+  removeAllListeners: (channel) => {
+    require$$1$1.ipcRenderer.removeAllListeners(channel);
+  },
+  // ===== 外部文件打开 =====
+  onFileOpen: (callback) => {
+    const handler = (_event, filePath) => callback(filePath);
+    require$$1$1.ipcRenderer.on("file-open", handler);
+    return () => {
+      require$$1$1.ipcRenderer.removeListener("file-open", handler);
+    };
+  }
+};
+require$$1$1.contextBridge.exposeInMainWorld("electronAPI", electronAPI);
+require$$1$1.contextBridge.exposeInMainWorld("services", {
+  readFileAsBuffer: (filePath) => require$$1$1.ipcRenderer.invoke("fs:readFileAsBuffer", filePath),
+  readFileAsText: (filePath) => require$$1$1.ipcRenderer.invoke("fs:readFileAsText", filePath),
+  checkFileExists: (filePath) => require$$1$1.ipcRenderer.invoke("fs:checkFileExists", filePath),
+  showFilePicker: () => require$$1$1.ipcRenderer.invoke("dialog:showFilePicker"),
+  showNoteFilePicker: () => require$$1$1.ipcRenderer.invoke("dialog:showNoteFilePicker"),
+  showImagePicker: () => require$$1$1.ipcRenderer.invoke("dialog:showImagePicker"),
+  showFontPicker: () => require$$1$1.ipcRenderer.invoke("dialog:showFontPicker"),
+  showFolderPicker: () => require$$1$1.ipcRenderer.invoke("dialog:showFolderPicker"),
+  saveFile: (defaultName, data) => require$$1$1.ipcRenderer.invoke("dialog:saveFile", defaultName, data),
+  showNoteSaveDialog: (data) => require$$1$1.ipcRenderer.invoke("dialog:showNoteSaveDialog", data),
+  writeTextFile: (text) => require$$1$1.ipcRenderer.invoke("fs:writeTextFile", text),
+  writeImageFile: (base64Url) => require$$1$1.ipcRenderer.invoke("fs:writeImageFile", base64Url),
+  getFileName: (filePath) => require$$1$1.ipcRenderer.invoke("fs:getFileName", filePath),
+  getFileSize: (filePath) => require$$1$1.ipcRenderer.invoke("fs:getFileSize", filePath),
+  copyBookToCache: (bookId, srcPath) => require$$1$1.ipcRenderer.invoke("book:copyToCache", bookId, srcPath),
+  deleteCachedBook: (filePath) => require$$1$1.ipcRenderer.invoke("book:deleteCached", filePath),
+  cachedBookExists: (filePath) => require$$1$1.ipcRenderer.invoke("book:cachedExists", filePath),
+  saveCoverFile: (bookId, base64DataUrl) => require$$1$1.ipcRenderer.invoke("cover:save", bookId, base64DataUrl),
+  deleteCoverFile: (filePath) => require$$1$1.ipcRenderer.invoke("cover:delete", filePath),
+  coverFileExists: (filePath) => require$$1$1.ipcRenderer.invoke("cover:exists", filePath),
+  findEpubCover: (bookId, filePath) => require$$1$1.ipcRenderer.invoke("cover:findEpubCover", bookId, filePath),
+  extractEpubAll: (filePath) => require$$1$1.ipcRenderer.invoke("epub:extractAll", filePath),
+  copyFontToCache: (srcPath) => require$$1$1.ipcRenderer.invoke("font:copyToCache", srcPath),
+  deleteFontFile: (filePath) => require$$1$1.ipcRenderer.invoke("font:delete", filePath),
+  getFontFiles: () => require$$1$1.ipcRenderer.invoke("font:getFiles"),
+  showItemInFolder: (filePath) => require$$1$1.ipcRenderer.invoke("shell:showItemInFolder", filePath),
+  ensureAiCacheDir: () => require$$1$1.ipcRenderer.invoke("ai:ensureCacheDir"),
+  readAiCacheFile: (filePath) => require$$1$1.ipcRenderer.invoke("ai:readCacheFile", filePath),
+  writeAiCacheFile: (filePath, data) => require$$1$1.ipcRenderer.invoke("ai:writeCacheFile", filePath, data),
+  deleteAiCacheFile: (filePath) => require$$1$1.ipcRenderer.invoke("ai:deleteCacheFile", filePath),
+  listAiCacheFiles: () => require$$1$1.ipcRenderer.invoke("ai:listCacheFiles"),
+  generateNextFileName: (dirPath, prefix) => require$$1$1.ipcRenderer.invoke("fs:generateNextFileName", dirPath, prefix),
+  writeToFile: (filePath, data) => require$$1$1.ipcRenderer.invoke("fs:writeToFile", filePath, data),
+  saveImageToCache: (base64DataUrl) => require$$1$1.ipcRenderer.invoke("image:saveToCache", base64DataUrl),
+  createFloatReader: (text, bookTitle, chapterTitle, opacity) => require$$1$1.ipcRenderer.invoke("floatReader:create", text, bookTitle, chapterTitle, opacity),
+  closeFloatReader: () => require$$1$1.ipcRenderer.invoke("floatReader:close"),
+  isFloatReaderOpen: () => require$$1$1.ipcRenderer.invoke("floatReader:isOpen"),
+  createFloatNote: (text, fileName, opacity) => require$$1$1.ipcRenderer.invoke("floatNote:create", text, fileName, opacity),
+  closeFloatNote: (returnToMain) => require$$1$1.ipcRenderer.invoke("floatNote:close", returnToMain !== false),
+  isFloatNoteOpen: () => require$$1$1.ipcRenderer.invoke("floatNote:isOpen"),
+  syncFloatNoteContent: (content) => require$$1$1.ipcRenderer.invoke("floatNote:syncContent", content),
+  onFloatNoteContentUpdate: (callback) => {
+    const handler = (_event, content) => callback(content);
+    require$$1$1.ipcRenderer.on("floatNote:contentUpdate", handler);
+    return () => {
+      require$$1$1.ipcRenderer.removeListener("floatNote:contentUpdate", handler);
+    };
+  },
+  onFileOpen: (callback) => {
+    const handler = (_event, filePath) => callback(filePath);
+    require$$1$1.ipcRenderer.on("file-open", handler);
+    return () => {
+      require$$1$1.ipcRenderer.removeListener("file-open", handler);
+    };
+  }
+});

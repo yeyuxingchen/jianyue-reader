@@ -100,20 +100,20 @@ function backToMain() {
   try {
     if (window.electronAPI?.floatNote) {
       window.electronAPI.floatNote.syncContent(content)
-      window.electronAPI.floatNote.close()
+      // returnToMain = true: 关闭悬浮窗，返回主窗口
+      window.electronAPI.floatNote.close(true)
     }
   } catch {}
-  setTimeout(() => { try { window.close() } catch {} }, 100)
 }
 
 function closeWindow() {
   if (autoSyncTimer) clearTimeout(autoSyncTimer)
   try {
     if (window.electronAPI?.floatNote) {
+      // returnToMain = false: 关闭悬浮窗，同时退出应用
       window.electronAPI.floatNote.close(false)
     }
   } catch {}
-  setTimeout(() => { try { window.close() } catch {} }, 100)
 }
 
 function onOpacityInput(e: Event) {
@@ -163,7 +163,7 @@ const MilkdownEditor = defineComponent({
 
 // ===== 暴露给主进程注入数据 =====
 onMounted(() => {
-  // 暴露注入接口，主进程轮询调用
+  // 暴露注入接口，主进程通过 executeJavaScript 调用（兼容旧版）
   ;(window as any).setFloatNoteContent = (data: { text: string; fileName: string; opacity: number }) => {
     if (!data) return
     initialContent = data.text || ''
@@ -189,6 +189,37 @@ onMounted(() => {
 
   ;(window as any).getFloatNoteContent = () => {
     return sourceMode.value ? sourceContent.value : getMarkdownContent()
+  }
+
+  // 监听主进程通过 IPC 发送的数据
+  if (window.electronAPI?.on) {
+    window.electronAPI.on('float:note:data', (data: any) => {
+      if (!data) return
+      initialContent = data.text || ''
+      fileName.value = data.fileName || '未命名'
+      if (typeof data.opacity === 'number') opacity.value = data.opacity
+
+      // 编辑器就绪后写入内容
+      const applyContent = () => {
+        if (editorRef.value) {
+          replaceContent(initialContent)
+          updateCharCount()
+          return true
+        }
+        return false
+      }
+      if (!applyContent()) {
+        const t = setInterval(() => {
+          if (applyContent()) clearInterval(t)
+        }, 100)
+        setTimeout(() => clearInterval(t), 5000)
+      }
+    })
+  }
+
+  // 通知主进程渲染进程已就绪
+  if (window.electronAPI?.send) {
+    window.electronAPI.send('float:note:ready')
   }
 
   // Ctrl+S 返回主窗口

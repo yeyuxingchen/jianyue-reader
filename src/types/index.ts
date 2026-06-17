@@ -52,6 +52,7 @@ export interface ReaderSettings {
   theme: ThemeMode
   readerMode: ReaderMode
   fontBold: boolean
+  defaultSystemFont?: string
 }
 
 export interface CustomFont {
@@ -224,6 +225,15 @@ declare global {
         getVersion: () => Promise<string>
         openCacheFolder: () => Promise<void>
         getPendingFilePath: () => Promise<string | null>
+      }
+      security: {
+        getAuthorizedDirs: () => Promise<{ default: string[]; user: string[] }>
+        addAuthorizedDir: (dirPath: string) => Promise<boolean>
+        removeAuthorizedDir: (dirPath: string) => Promise<boolean>
+        isPathAllowed: (filePath: string) => Promise<boolean>
+        isEncryptionAvailable: () => Promise<boolean>
+        encryptData: (data: string) => Promise<string>
+        decryptData: (encryptedData: string) => Promise<string>
       }
       onFileOpen: (callback: (filePath: string) => void) => () => void
     }

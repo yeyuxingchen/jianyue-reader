@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
+release
 
 # Hidden directories and files (prevent pushing IDE configs, etc.)
 .*

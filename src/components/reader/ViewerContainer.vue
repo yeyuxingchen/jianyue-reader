@@ -85,7 +85,7 @@ onMounted(async () => {
     }
 
     applyThemeFilter(view, settings.settings.theme)
-    injectCustomFontFace(view, settings.customFonts, settings.settings.fontFamily)
+    await injectCustomFontFace(view, settings.customFonts, settings.settings.fontFamily)
     applyReaderStyles(view, settings.settings, settings.customFonts)
   } catch (err) {
     console.error('Failed to open book:', err)
@@ -387,11 +387,11 @@ function checkAnnotationAtPoint(e: MouseEvent) {
   }
 }
 
-function handleLoad(detail: any) {
+async function handleLoad(detail: any) {
   noteRangesMap.clear()
   const { doc } = detail
   if (doc) {
-    injectFontFaceToDoc(doc, settings.customFonts, settings.settings.fontFamily)
+    await injectFontFaceToDoc(doc, settings.customFonts, settings.settings.fontFamily)
     
     // 处理 mousedown 事件
     doc.addEventListener('mousedown', (e: MouseEvent) => {
@@ -759,9 +759,9 @@ function goPrevChapter() {
   viewInstance.prev?.()
 }
 
-watch(() => settings.settings.theme, (theme) => {
+watch(() => settings.settings.theme, async (theme) => {
   applyThemeFilter(viewInstance, theme)
-  injectCustomFontFace(viewInstance, settings.customFonts, settings.settings.fontFamily)
+  await injectCustomFontFace(viewInstance, settings.customFonts, settings.settings.fontFamily)
   applyReaderStyles(viewInstance, settings.settings, settings.customFonts)
 })
 
@@ -769,8 +769,8 @@ watch(() => settings.settings.readerMode, (mode) => {
   setFlowMode(viewInstance, mode)
 })
 
-watch(() => [settings.settings.fontSize, settings.settings.lineHeight, settings.settings.letterSpacing, settings.settings.fontFamily, settings.settings.fontBold], () => {
-  injectCustomFontFace(viewInstance, settings.customFonts, settings.settings.fontFamily)
+watch(() => [settings.settings.fontSize, settings.settings.lineHeight, settings.settings.letterSpacing, settings.settings.fontFamily, settings.settings.fontBold], async () => {
+  await injectCustomFontFace(viewInstance, settings.customFonts, settings.settings.fontFamily)
   applyReaderStyles(viewInstance, settings.settings, settings.customFonts)
 })
 

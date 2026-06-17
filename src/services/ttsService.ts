@@ -14,8 +14,8 @@ class TTSService {
   /**
    * 获取 TTS API 配置（复用 AI 设置的 api_key + base_url）
    */
-  private getConfig() {
-    const aiSettings = aiService.getSettings()
+  private async getConfig() {
+    const aiSettings = await aiService.getSettingsAsync()
     const ttsModel = aiService.getTTSModel()
 
     if (!aiSettings.api_key || !aiSettings.base_url || !ttsModel) {
@@ -37,7 +37,7 @@ class TTSService {
     voice: TTSVoice = '冰糖',
     stylePrompt: string = '',
   ): Promise<AudioBuffer> {
-    const config = this.getConfig()
+    const config = await this.getConfig()
 
     const messages: Array<{ role: 'user' | 'assistant'; content: string }> = []
 
