@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted, onBeforeUnmount, nextTick, defineComponent, h } from 'vue'
 import { Milkdown as MilkdownComponent, MilkdownProvider, useEditor } from '@milkdown/vue'
-import { Editor, rootCtx, defaultValueCtx, editorViewOptionsCtx } from '@milkdown/kit/core'
+import { Editor, rootCtx, defaultValueCtx, editorViewOptionsCtx, parserCtx, editorViewCtx } from '@milkdown/kit/core'
 import { commonmark } from '@milkdown/kit/preset/commonmark'
 import { gfm } from '@milkdown/kit/preset/gfm'
 import { history } from '@milkdown/kit/plugin/history'
@@ -16,12 +16,81 @@ import { useToastStore } from '@/stores/toast'
 import { useNoteSidebarStore } from '@/stores/noteSidebar'
 import NoteSidebar from '@/components/note/NoteSidebar.vue'
 import UnsavedChangesDialog from '@/components/common/UnsavedChangesDialog.vue'
-import { Code, Monitor } from 'lucide-vue-next'
+import { Code, Monitor, RotateCcw } from 'lucide-vue-next'
 
 const noteStore = useNoteEditorStore()
 const settings = useSettingsStore()
 const toast = useToastStore()
 const sidebar = useNoteSidebarStore()
+
+/**
+ * 规范化 markdown 内容用于"是否修改"判定。
+ * 目的：消除 milkdown serializer 与磁盘原文之间的微差异，避免历史记录
+ * 切换时误判"已修改"。
+ * 注意：用户实际编辑（增删字符）通常不会被这种规范化抹平。
+ */
+function normalizeMarkdown(s: string): string {
+  if (!s) return ''
+  return s
+    // 统一换行符（\r\n → \n）
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
+    // 去除每行末尾的空白字符
+    .replace(/[ \t]+$/gm, '')
+    // 去除每行开头的多余空白（milkdown 解析 list/blockquote 时会重排缩进，
+    // 序列化时又可能还原，但通常不会改变实际语义）
+    // 这里不处理开头缩进，避免破坏 code block
+    // 把 3 个或更多连续换行符合并为 2 个（标准段落分隔）
+    .replace(/\n{3,}/g, '\n\n')
+    // 去除整个字符串的首尾空白
+    .trim()
+}
+
+/**
+ * 比较两个 markdown 字符串是否"内容上相等"（规范化后）
+ */
+function isMarkdownContentEqual(a: string, b: string): boolean {
+  if (a === b) return true
+  return normalizeMarkdown(a) === normalizeMarkdown(b)
+}
+
+// ===== 编辑器文字缩放（Ctrl + 滚轮）=====
+// 1.0 = 100%, 范围 [0.5, 2.0]，步进 0.1
+const NOTE_ZOOM_MIN = 0.5
+const NOTE_ZOOM_MAX = 2.0
+const NOTE_ZOOM_STEP = 0.1
+const noteZoom = ref(1.0)
+
+function clampZoom(z: number): number {
+  return Math.max(NOTE_ZOOM_MIN, Math.min(NOTE_ZOOM_MAX, z))
+}
+
+/**
+ * Ctrl + 鼠标滚轮调整编辑器/源码区文字大小。
+ * 仅在事件目标位于编辑器/源码区/侧边栏面板内时生效，避免与系统/其他区域缩放冲突。
+ */
+function handleWheelZoom(e: WheelEvent) {
+  if (!e.ctrlKey) return
+  // 事件目标必须位于当前组件的滚动容器内
+  const target = e.target as HTMLElement | null
+  if (!target) return
+  // 通过 class 判定是否在编辑器区域或源码 textarea 内
+  const inEditor = target.closest('.note-editor-container, .source-textarea, .side-panel, .note-status-bar')
+  if (!inEditor) return
+  e.preventDefault()
+  // 向上滚(deltaY<0)放大，向下滚(deltaY>0)缩小
+  const direction = e.deltaY < 0 ? 1 : -1
+  const next = clampZoom(Math.round((noteZoom.value + direction * NOTE_ZOOM_STEP) * 100) / 100)
+  if (next === noteZoom.value) return
+  noteZoom.value = next
+}
+
+/**
+ * 恢复缩放到 100%
+ */
+function resetNoteZoom() {
+  noteZoom.value = 1.0
+}
 
 const editorRef = ref<EditorType | null>(null)
 const sourceContent = ref('')
@@ -171,7 +240,11 @@ async function toggleSourceMode() {
 
 // 源码模式下内容变化时，标记已修改并更新大纲
 function onSourceInput() {
-  if (sourceContent.value !== noteStore.lastSavedContent) {
+  // 用规范化字符串比较，避免与 milkdown 序列化结果之间的微差异误判
+  if (noteStore.pendingBaselineSync) {
+    // 首次输入即同步基准（与 markdownUpdated 同样的机制）
+    noteStore.syncBaseline(sourceContent.value)
+  } else if (!isMarkdownContentEqual(sourceContent.value, noteStore.lastSavedContent)) {
     noteStore.markModified()
   } else {
     noteStore.markSaved()
@@ -202,7 +275,9 @@ async function syncFromFloatNote(content: string) {
   if (noteStore.sourceMode) {
     sourceContent.value = content
     sidebar.parseOutline(content)
-    if (content !== noteStore.lastSavedContent) {
+    if (noteStore.pendingBaselineSync) {
+      noteStore.syncBaseline(content)
+    } else if (!isMarkdownContentEqual(content, noteStore.lastSavedContent)) {
       noteStore.markModified()
     } else {
       noteStore.markSaved()
@@ -227,7 +302,13 @@ const MilkdownEditor = defineComponent({
           })
           ctx.get(listenerCtx)
             .markdownUpdated((_ctx, markdown) => {
-              if (markdown !== noteStore.lastSavedContent) {
+              if (noteStore.pendingBaselineSync) {
+                // openFile/newFile 后的首次 markdownUpdated：
+                // 把 lastSavedContent 同步为当前 markdown 字符串，
+                // 作为后续"是否修改"判定的基准（消除磁盘原文与 serializer 的微差异）。
+                // 不修改 isModified（保持 openFile 时设置的 false）。
+                noteStore.syncBaseline(markdown)
+              } else if (!isMarkdownContentEqual(markdown, noteStore.lastSavedContent)) {
                 noteStore.markModified()
               } else {
                 noteStore.markSaved()
@@ -281,6 +362,10 @@ function getMarkdownContent(): string {
 }
 
 // 替换编辑器内容
+// 关键：openFile/newFile 后会置 pendingBaselineSync=true，
+// markdownUpdated 首次触发时把 lastSavedContent 同步为当前 markdown 字符串，
+// 消除磁盘原文与 milkdown serializer 之间的微差异（末尾空白、连续空行等），
+// 避免历史记录切换时误判"已修改"。
 async function replaceContent(markdown: string) {
   const editor = editorRef.value
   if (!editor) return
@@ -379,9 +464,14 @@ async function handleSaveAsFile() {
     // 弹出保存对话框（文件名输入框，默认"简记-XX.md"）
     const result = await window.electronAPI?.dialog.showNoteSaveDialog(content)
     if (result) {
-      noteStore.openFile(result.filePath, result.fileName, content)
-      noteStore.markSaved()
+      // 注意：不要调 openFile（它会置 pendingBaselineSync=true，导致下次
+      // markdownUpdated 误用序列化结果覆盖刚保存的 lastSavedContent）。
+      // 直接设置状态即可。
+      noteStore.currentFilePath = result.filePath
+      noteStore.currentFileName = result.fileName
       noteStore.lastSavedContent = content
+      noteStore.markSaved()
+      noteStore.clearPendingBaselineSync()
       toast.show(`已保存: ${result.fileName}`)
       sidebar.addToHistory(result.filePath, result.fileName, content)
       sidebar.parseOutline(content)
@@ -629,8 +719,10 @@ onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
   window.addEventListener('paste', handlePaste)
   window.addEventListener('beforeunload', handleBeforeUnload)
+  // Ctrl+滚轮缩放监听：必须 passive:false 才能 preventDefault 阻止浏览器内置缩放
+  window.addEventListener('wheel', handleWheelZoom, { passive: false })
   // 加载历史记录
-  sidebar.loadHistory?.()
+  sidebar.loadHistory?.();
   // 暴露保存函数到全局，供 TitleBar 调用
   (window as any).__noteEditorSave = handleSaveFile
   ;(window as any).__noteEditorSaveAs = handleSaveAsFile
@@ -640,6 +732,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleKeydown)
   window.removeEventListener('paste', handlePaste)
   window.removeEventListener('beforeunload', handleBeforeUnload)
+  window.removeEventListener('wheel', handleWheelZoom)
   // 清除全局暴露的保存函数
   delete (window as any).__noteEditorSave
   delete (window as any).__noteEditorSaveAs
@@ -667,7 +760,7 @@ onBeforeUnmount(() => {
       @open-file="handleOpenFromHistory"
       @scroll-to-line="handleScrollToLine"
     />
-    <div class="note-main">
+    <div class="note-main" :style="{ '--note-zoom': noteZoom }">
       <!-- Milkdown 编辑器（源码模式时隐藏） -->
       <div v-show="!noteStore.sourceMode" class="note-editor-container custom-scrollbar">
         <MilkdownProvider>
@@ -709,6 +802,19 @@ onBeforeUnmount(() => {
         <span class="status-spacer"></span>
         <span class="status-item">Markdown</span>
         <span class="status-item">UTF-8</span>
+        <!-- 缩放状态：始终显示百分比；非 100% 时显示恢复按钮 -->
+        <span class="status-item status-zoom" :class="{ 'status-zoom-modified': noteZoom !== 1.0 }">
+          {{ Math.round(noteZoom * 100) }}%
+        </span>
+        <button
+          v-if="noteZoom !== 1.0"
+          class="status-zoom-reset"
+          @click="resetNoteZoom"
+          title="恢复 100% 缩放"
+        >
+          <RotateCcw :size="11" :stroke-width="2" />
+          <span>恢复</span>
+        </button>
       </div>
     </div>
 
@@ -729,7 +835,8 @@ onBeforeUnmount(() => {
 .milkdown-editor-body {
   outline: none;
   min-height: calc(100vh - 32px - 24px);
-  padding: 32px 48px;
+  // 用 em 让 padding 跟随 Ctrl+滚轮缩放（保持视觉比例）
+  padding: 2em 3em;
 }
 
 .milkdown {
@@ -877,7 +984,8 @@ onBeforeUnmount(() => {
 .note-editor-container {
   flex: 1;
   overflow-y: auto;
-  font-size: 16px;
+  // 基础 16px × 缩放系数（由 note-main 上的 --note-zoom 控制，Ctrl+滚轮调节）
+  font-size: calc(16px * var(--note-zoom, 1));
   line-height: 1.75;
   font-family: system-ui, -apple-system, sans-serif;
 }
@@ -888,11 +996,12 @@ onBeforeUnmount(() => {
   border: none;
   outline: none;
   resize: none;
-  padding: 32px 48px;
+  // 用 em 让 padding 跟随 Ctrl+滚轮缩放
+  padding: 2em 3em;
   background: var(--bg-primary);
   color: var(--text-primary);
-  font-size: 14px;
-  line-height: 1.7;
+  // 基础 14px × 缩放系数（与编辑器共用同一个 CSS 变量）
+  font-size: calc(14px * var(--note-zoom, 1));
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   tab-size: 2;
 }
@@ -946,5 +1055,37 @@ onBeforeUnmount(() => {
 .status-modified {
   color: var(--accent-color);
   font-weight: 500;
+}
+
+// 缩放百分比：非 100% 时用强调色提示用户当前处于非默认缩放
+.status-zoom {
+  font-variant-numeric: tabular-nums;
+  transition: color 0.15s;
+}
+.status-zoom-modified {
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+// 恢复默认缩放按钮（纯文字，无边框/方框）
+.status-zoom-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--accent-color);
+  font-size: 11px;
+  cursor: pointer;
+  transition: opacity 0.12s;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+
+  &:hover {
+    opacity: 0.7;
+    text-decoration: underline;
+  }
 }
 </style>

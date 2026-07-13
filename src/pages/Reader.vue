@@ -278,7 +278,7 @@ function isFontActive(opt: { value: string; isDefault: boolean }): boolean {
     // 默认字体选项：当 fontFamily 是 'system-ui' 或等于 defaultSystemFont 时都算选中
     const defaultFont = settings.settings.defaultSystemFont
     return settings.settings.fontFamily === 'system-ui' || 
-           (defaultFont && settings.settings.fontFamily === defaultFont)
+           Boolean(defaultFont && settings.settings.fontFamily === defaultFont)
   }
   return settings.settings.fontFamily === opt.value
 }

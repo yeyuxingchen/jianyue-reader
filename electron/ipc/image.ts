@@ -37,7 +37,7 @@ export function registerImageHandlers(): void {
       const relativePath = path.relative(BASE_DIR, filePath).replace(/\\/g, '/')
       return { filePath, relativePath }
     } catch (err) {
-      console.error('保存图片到缓存失败:', err)
+      console.error('Failed to save image to cache:', err)
       return null
     }
   }, 'image:saveToCache'))

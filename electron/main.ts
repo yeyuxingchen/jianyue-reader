@@ -4,8 +4,21 @@
 
 import { app, BrowserWindow, protocol, net } from 'electron'
 import { join } from 'path'
+import { tmpdir } from 'os'
 import Store from 'electron-store'
-import { initSecurity } from './security'
+
+// ===== 修复 Windows 下 Chromium 缓存目录访问被拒绝（0x5）的问题 =====
+// userData 位于 AppData\Roaming 时（常被 OneDrive 同步或受限），
+// Chromium 创建/移动 GPU 与磁盘缓存会报 Access Denied。
+// 将缓存改到可写的临时目录并禁用 GPU 缓存，消除该噪声。
+try {
+  const cacheDir = join(tmpdir(), 'jianyue-reader-cache')
+  app.commandLine.appendSwitch('disk-cache-dir', cacheDir)
+  app.commandLine.appendSwitch('disable-gpu-cache')
+} catch {
+  // 忽略：开关设置失败时退回默认行为，仅为去噪，不影响功能
+}
+import { initSecurity, addAuthorizedDir } from './security'
 import { setupErrorHandler } from './errorHandler'
 import { initDirs, BASE_DIR } from './config'
 import { registerAllIpcHandlers } from './ipc'
@@ -13,6 +26,7 @@ import { setMainWindow as setDialogMainWindow } from './ipc/dialog'
 import { setMainWindow as setWindowMainWindow } from './ipc/window'
 import { setMainWindowForFloat } from './ipc/float'
 import { setPendingFilePath } from './ipc/shell'
+import { createTray, destroyTray, bindCloseToTray, setQuitting, isAppQuitting } from './tray'
 
 // ===== 外部文件打开支持 =====
 let pendingFilePath: string | null = null
@@ -30,6 +44,23 @@ function parseFilePathFromArgs(argv: string[]): string | null {
     }
   }
   return null
+}
+
+/**
+ * 外部文件打开时自动授权文件父目录。
+ * 用户通过资源管理器/Finder/"打开方式"用本应用打开文件是明确的授权意图，
+ * 无需再弹窗询问即可访问该目录（与系统文件对话框的语义一致）。
+ */
+function authorizeExternalFile(filePath: string): void {
+  try {
+    const dir = require('path').dirname(filePath)
+    const fs = require('fs')
+    if (fs.existsSync(dir) && fs.statSync(dir).isDirectory()) {
+      addAuthorizedDir(dir)
+    }
+  } catch (err) {
+    console.error('[main] Failed to authorize external file dir:', err)
+  }
 }
 
 /** 将待处理文件路径发送给渲染进程 */
@@ -77,6 +108,9 @@ function createMainWindow() {
     processPendingFile(mainWindow!)
   })
 
+  // 拦截关闭事件，默认最小化到托盘（不退出应用）
+  bindCloseToTray(mainWindow)
+
   mainWindow.on('closed', () => {
     mainWindow = null
     setDialogMainWindow(null)
@@ -102,6 +136,8 @@ if (!gotTheLock) {
     if (filePath && mainWindow && !mainWindow.isDestroyed()) {
       if (mainWindow.isMinimized()) mainWindow.restore()
       mainWindow.focus()
+      // 用户在资源管理器中双击文件触发本应用时，自动授权文件父目录
+      authorizeExternalFile(filePath)
       mainWindow.webContents.send('file-open', filePath)
     }
   })
@@ -114,6 +150,9 @@ app.on('open-file', (event, filePath) => {
   const ext = path.extname(filePath).toLowerCase()
   const supportedExts = new Set(['.md', '.epub', '.txt', '.mobi', '.azw3', '.cbz', '.cbr'])
   if (!supportedExts.has(ext)) return
+
+  // macOS 用户在 Finder 双击文件触发本应用时，自动授权文件父目录
+  authorizeExternalFile(filePath)
 
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send('file-open', filePath)
@@ -144,6 +183,9 @@ app.whenReady().then(() => {
     const filePath = parseFilePathFromArgs(process.argv)
     if (filePath) pendingFilePath = filePath
   }
+  // 首次启动时若通过命令行打开了文件（Windows: 资源管理器"打开方式"），
+  // 也自动授权文件父目录
+  if (pendingFilePath) authorizeExternalFile(pendingFilePath)
   setPendingFilePath(pendingFilePath)
 
   // 注册 cacheimg:// 协议，映射到缓存目录下的图片文件
@@ -180,15 +222,34 @@ app.whenReady().then(() => {
 
   createMainWindow()
 
+  // 创建系统托盘（主窗口已就绪）
+  createTray(mainWindow!)
+
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createMainWindow()
+      createTray(mainWindow!)
+    } else if (mainWindow && !mainWindow.isDestroyed()) {
+      // macOS: dock 图标点击时显示主窗口
+      if (!mainWindow.isVisible()) mainWindow.show()
+      mainWindow.focus()
     }
   })
 })
 
+// 标记真正退出（通过托盘菜单的"退出"调用）
+app.on('before-quit', () => {
+  setQuitting(true)
+})
+
+app.on('will-quit', () => {
+  destroyTray()
+})
+
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
+  // 当所有窗口关闭时，不再自动退出（保留托盘，由用户通过托盘菜单退出）
+  // 但 macOS 默认行为是保留应用
+  if (process.platform !== 'darwin' && isAppQuitting()) {
     app.quit()
   }
 })

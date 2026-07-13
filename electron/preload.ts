@@ -181,6 +181,16 @@ const electronAPI = {
     ipcRenderer.on('file-open', handler)
     return () => { ipcRenderer.removeListener('file-open', handler) }
   },
+
+  // ===== 托盘相关 =====
+  tray: {
+    // 监听主窗口被隐藏到托盘事件
+    onHiddenToTray: (callback: () => void) => {
+      const handler = () => callback()
+      ipcRenderer.on('window:hidden-to-tray', handler)
+      return () => { ipcRenderer.removeListener('window:hidden-to-tray', handler) }
+    },
+  },
 }
 
 contextBridge.exposeInMainWorld('electronAPI', electronAPI)

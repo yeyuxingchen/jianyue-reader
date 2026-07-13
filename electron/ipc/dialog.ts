@@ -8,11 +8,30 @@ import path from 'path'
 import { wrapHandler } from '../errorHandler'
 import { logError } from '../errorHandler'
 import { ensureDir } from '../config'
+import { addAuthorizedDir } from '../security'
 
 let mainWindow: BrowserWindow | null = null
 
 export function setMainWindow(win: BrowserWindow | null): void {
   mainWindow = win
+}
+
+/**
+ * 自动授权一组路径所在目录（用户已在系统对话框中明确选择，是明确授权意图）
+ * 对不存在的路径静默跳过，避免噪声
+ */
+function authorizeDirsOfPaths(paths: Array<string | undefined>): void {
+  for (const p of paths) {
+    if (!p) continue
+    try {
+      const dir = path.dirname(p)
+      if (fs.existsSync(dir) && fs.statSync(dir).isDirectory()) {
+        addAuthorizedDir(dir)
+      }
+    } catch {
+      // 静默忽略单个目录授权失败，不影响主流程
+    }
+  }
 }
 
 export function registerDialogHandlers(): void {
@@ -26,7 +45,10 @@ export function registerDialogHandlers(): void {
       ],
       properties: ['openFile', 'multiSelections'],
     })
-    return result.canceled ? undefined : result.filePaths
+    if (result.canceled) return undefined
+    // 用户在系统对话框中主动选择的文件，自动授权其父目录
+    authorizeDirsOfPaths(result.filePaths)
+    return result.filePaths
   }, 'dialog:showFilePicker'))
 
   ipcMain.handle('dialog:showNoteFilePicker', wrapHandler(async () => {
@@ -40,7 +62,9 @@ export function registerDialogHandlers(): void {
       ],
       properties: ['openFile'],
     })
-    return result.canceled ? undefined : result.filePaths
+    if (result.canceled) return undefined
+    authorizeDirsOfPaths(result.filePaths)
+    return result.filePaths
   }, 'dialog:showNoteFilePicker'))
 
   ipcMain.handle('dialog:showImagePicker', wrapHandler(async () => {
@@ -53,7 +77,9 @@ export function registerDialogHandlers(): void {
       ],
       properties: ['openFile'],
     })
-    return result.canceled ? undefined : result.filePaths
+    if (result.canceled) return undefined
+    authorizeDirsOfPaths(result.filePaths)
+    return result.filePaths
   }, 'dialog:showImagePicker'))
 
   ipcMain.handle('dialog:showFontPicker', wrapHandler(async () => {
@@ -66,7 +92,9 @@ export function registerDialogHandlers(): void {
       ],
       properties: ['openFile', 'multiSelections'],
     })
-    return result.canceled ? undefined : result.filePaths
+    if (result.canceled) return undefined
+    authorizeDirsOfPaths(result.filePaths)
+    return result.filePaths
   }, 'dialog:showFontPicker'))
 
   ipcMain.handle('dialog:showFolderPicker', wrapHandler(async () => {
@@ -75,7 +103,10 @@ export function registerDialogHandlers(): void {
       title: '选择文件夹',
       properties: ['openDirectory'],
     })
-    return result.canceled ? undefined : result.filePaths[0]
+    if (result.canceled || result.filePaths.length === 0) return undefined
+    // 用户选中的文件夹本身需要被授权（用于扫描等后续操作）
+    authorizeDirsOfPaths(result.filePaths)
+    return result.filePaths[0]
   }, 'dialog:showFolderPicker'))
 
   ipcMain.handle('dialog:saveFile', wrapHandler(async (_event, defaultName: string, data: string | Buffer) => {
@@ -85,6 +116,7 @@ export function registerDialogHandlers(): void {
       properties: ['openDirectory'],
     })
     if (result.canceled || result.filePaths.length === 0) return null
+    authorizeDirsOfPaths(result.filePaths)
     const savePath = path.join(result.filePaths[0], defaultName)
     fs.writeFileSync(savePath, data, typeof data === 'string' ? { encoding: 'utf-8' } : undefined)
     return savePath
@@ -135,6 +167,9 @@ export function registerDialogHandlers(): void {
       finalFileName = `${prefix}-${String(num).padStart(2, '0')}.md`
       finalPath = path.join(dir, finalFileName)
     }
+
+    // 用户在保存对话框中选择的目录需要被授权（以便后续打开/重保存）
+    authorizeDirsOfPaths([finalPath])
 
     fs.writeFileSync(finalPath, data, { encoding: 'utf-8' })
     return { filePath: finalPath, fileName: finalFileName }

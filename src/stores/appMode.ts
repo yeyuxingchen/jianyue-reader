@@ -75,6 +75,10 @@ export const useNoteEditorStore = defineStore('noteEditor', () => {
   // 源码模式
   const sourceMode = ref(false)
 
+  // 待同步标志：openFile/newFile 后置 true，markdownUpdated 首次触发时
+  // 把 lastSavedContent 同步为当前 markdown 字符串后置 false
+  const pendingBaselineSync = ref(false)
+
   const hasFile = computed(() => !!currentFilePath.value)
 
   function setEditorInstance(instance: any) {
@@ -87,6 +91,7 @@ export const useNoteEditorStore = defineStore('noteEditor', () => {
     isModified.value = false
     lastSavedContent.value = ''
     sourceMode.value = false
+    pendingBaselineSync.value = true
   }
 
   function openFile(filePath: string, fileName: string, content: string) {
@@ -95,6 +100,9 @@ export const useNoteEditorStore = defineStore('noteEditor', () => {
     lastSavedContent.value = content
     isModified.value = false
     sourceMode.value = false
+    // 标记：等待 markdownUpdated 首次触发时，把 lastSavedContent
+    // 同步为序列化后的 markdown 字符串（消除磁盘原文与 serializer 之间的微差异）
+    pendingBaselineSync.value = true
   }
 
   function markModified() {
@@ -105,12 +113,29 @@ export const useNoteEditorStore = defineStore('noteEditor', () => {
     isModified.value = false
   }
 
+  /**
+   * 同步"内容基准"为当前 markdown 字符串。
+   * 用于在 openFile/replaceContent 后，markdownUpdated 首次触发时调用：
+   * 把 lastSavedContent 更新为序列化后的内容，作为后续"是否修改"判定的基准。
+   * 这样既不丢失"用户编辑会被识别为已修改"的能力，又能消除磁盘原文的微差异。
+   */
+  function syncBaseline(markdown: string) {
+    lastSavedContent.value = markdown
+    pendingBaselineSync.value = false
+  }
+
+  /** 取消待同步标志（例如用户主动保存时，lastSavedContent 已经是正确的 markdown） */
+  function clearPendingBaselineSync() {
+    pendingBaselineSync.value = false
+  }
+
   function reset() {
     currentFilePath.value = null
     currentFileName.value = '未命名'
     isModified.value = false
     lastSavedContent.value = ''
     editorInstance.value = null
+    pendingBaselineSync.value = false
   }
 
   // ===== 草稿持久化 =====
@@ -170,6 +195,7 @@ export const useNoteEditorStore = defineStore('noteEditor', () => {
     currentFileName,
     isModified,
     lastSavedContent,
+    pendingBaselineSync,
     editorInstance,
     hasFile,
     sourceMode,
@@ -178,6 +204,8 @@ export const useNoteEditorStore = defineStore('noteEditor', () => {
     openFile,
     markModified,
     markSaved,
+    syncBaseline,
+    clearPendingBaselineSync,
     reset,
     saveDraft,
     loadDraft,

@@ -235,6 +235,9 @@ declare global {
         encryptData: (data: string) => Promise<string>
         decryptData: (encryptedData: string) => Promise<string>
       }
+      on: (channel: string, callback: (...args: any[]) => void) => (() => void)
+      send: (channel: string, ...args: any[]) => void
+      removeAllListeners: (channel: string) => void
       onFileOpen: (callback: (filePath: string) => void) => () => void
     }
   }

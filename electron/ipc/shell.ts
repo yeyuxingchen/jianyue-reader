@@ -39,7 +39,7 @@ export function registerShellHandlers(): void {
       ensureDir(BASE_DIR)
       shell.openPath(BASE_DIR)
     } catch (err) {
-      console.error('打开缓存目录失败:', err)
+      console.error('Failed to open cache folder:', err)
     }
   }, 'app:openCacheFolder'))
 
