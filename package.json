@@ -25,12 +25,15 @@
   "dependencies": {
     "@milkdown/crepe": "^7.21.2",
     "@milkdown/kit": "^7.21.2",
+    "@milkdown/plugin-prism": "7.21.2",
     "@milkdown/vue": "^7.21.2",
     "adm-zip": "^0.5.17",
     "electron-store": "^7.0.0",
     "lucide-vue-next": "^0.263.0",
     "marked": "^9.0.0",
     "pinia": "^2.1.0",
+    "prismjs": "^1.30.0",
+    "refractor": "5.0.0",
     "sass": "^1.62.0",
     "vue": "^3.3.0",
     "vue-router": "^4.3.0"
@@ -71,15 +74,21 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "nsis",
-          "arch": ["ia32"]
+          "arch": [
+            "ia32"
+          ]
         },
         {
           "target": "nsis",
-          "arch": ["arm64"]
+          "arch": [
+            "arm64"
+          ]
         }
       ],
       "icon": "public/logo.png"

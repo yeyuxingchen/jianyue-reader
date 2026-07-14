@@ -8,13 +8,18 @@ import { history } from '@milkdown/kit/plugin/history'
 import { clipboard } from '@milkdown/kit/plugin/clipboard'
 import { listener, listenerCtx } from '@milkdown/kit/plugin/listener'
 import { trailing } from '@milkdown/kit/plugin/trailing'
+import { prism, prismConfig } from '@milkdown/plugin-prism'
 import { getMarkdown } from '@milkdown/kit/utils'
+// 注册代码块语法高亮语言（副作用导入）
+import '@/editor/codeHighlight'
+import { CODE_LANGS } from '@/editor/codeLanguages'
 import type { Editor as EditorType } from '@milkdown/kit/core'
 import { useNoteEditorStore } from '@/stores/appMode'
 import { useSettingsStore } from '@/stores/settings'
 import { useToastStore } from '@/stores/toast'
 import { useNoteSidebarStore } from '@/stores/noteSidebar'
 import NoteSidebar from '@/components/note/NoteSidebar.vue'
+import NoteToolbar from '@/components/note/NoteToolbar.vue'
 import UnsavedChangesDialog from '@/components/common/UnsavedChangesDialog.vue'
 import { Code, Monitor, RotateCcw } from 'lucide-vue-next'
 
@@ -95,7 +100,99 @@ function resetNoteZoom() {
 const editorRef = ref<EditorType | null>(null)
 const sourceContent = ref('')
 const sourceTextareaRef = ref<HTMLTextAreaElement | null>(null)
+const noteMainRef = ref<HTMLElement | null>(null)
+const editorContainerRef = ref<HTMLElement | null>(null)
 let isSaving = false
+
+// ===== 代码块语言切换器（定位在光标所在代码块右下角）=====
+const codeSelector = reactive({ visible: false, pos: -1, language: 'plaintext' })
+const codeSelectorPos = reactive({ top: 0, left: 0 })
+
+function getEditorView(): any | null {
+  const editor = editorRef.value
+  if (!editor || typeof editor.action !== 'function') return null
+  try {
+    return editor.action((ctx: any) => ctx.get(editorViewCtx))
+  } catch {
+    return null
+  }
+}
+
+function updateCodeBlockSelector() {
+  if (noteStore.sourceMode) {
+    codeSelector.visible = false
+    return
+  }
+  const view = getEditorView()
+  const main = noteMainRef.value
+  const container = editorContainerRef.value
+  if (!view || !main) {
+    codeSelector.visible = false
+    return
+  }
+  const { state } = view
+  const { $from } = state.selection
+  // 查找光标所在的代码块节点位置
+  let pos = -1
+  for (let d = $from.depth; d > 0; d--) {
+    if ($from.node(d).type.name === 'code_block') {
+      pos = $from.before(d)
+      break
+    }
+  }
+  if (pos < 0) {
+    codeSelector.visible = false
+    return
+  }
+  const dom = view.nodeDOM(pos) as HTMLElement | null
+  if (!dom) {
+    codeSelector.visible = false
+    return
+  }
+  const dr = dom.getBoundingClientRect()
+  const mr = main.getBoundingClientRect()
+  // 代码块已滚动出编辑器可视区域时隐藏
+  if (container) {
+    const cr = container.getBoundingClientRect()
+    if (dr.bottom < cr.top || dr.top > cr.bottom) {
+      codeSelector.visible = false
+      return
+    }
+  }
+  codeSelector.pos = pos
+  codeSelector.language = $from.parent.attrs.language || 'plaintext'
+  // 定位到代码块右下角（相对 .note-main）
+  codeSelectorPos.top = dr.bottom - mr.top - 28
+  codeSelectorPos.left = dr.right - mr.left - 104
+  codeSelector.visible = true
+}
+
+// selectionchange 触发时，ProseMirror 尚未提交最新 state，直接读取会得到旧选区。
+// 延迟到下一帧，待 PM 同步完 state 后再计算，避免"进代码块不显示 / 出代码块仍显示"。
+let codeSelRaf = 0
+function scheduleCodeBlockSelector() {
+  if (codeSelRaf) cancelAnimationFrame(codeSelRaf)
+  codeSelRaf = requestAnimationFrame(() => {
+    codeSelRaf = 0
+    updateCodeBlockSelector()
+  })
+}
+
+function onCodeLangSelectorChange(e: Event) {
+  const lang = (e.target as HTMLSelectElement).value
+  codeSelector.language = lang
+  const view = getEditorView()
+  if (!view || codeSelector.pos < 0) return
+  try {
+    // 直接通过 ProseMirror 事务设置代码块 language 属性
+    // （等价于 updateCodeBlockLanguageCommand：state.tr.setNodeAttribute(pos, 'language', language)）
+    const tr = view.state.tr.setNodeAttribute(codeSelector.pos, 'language', lang === 'plaintext' ? '' : lang)
+    view.dispatch(tr)
+    scheduleCodeBlockSelector()
+  } catch (err) {
+    console.error('切换代码语言失败:', err)
+  }
+}
 
 // ===== 启动时恢复草稿 =====
 // 必须在 MilkdownEditor 组件挂载前执行，因为 defaultValueCtx 在 setup 时读取
@@ -318,11 +415,16 @@ const MilkdownEditor = defineComponent({
               // 触发草稿自动保存
               scheduleSaveDraft()
             })
+          // 语法高亮：语言已在 @/editor/codeHighlight 注册到共享 refractor 单例
+          ctx.set(prismConfig.key, {
+            configureRefractor: (r) => r,
+          })
         })
         .use(commonmark)
         .use(gfm)
         .use(history)
         .use(clipboard)
+        .use(prism)
         .use(listener)
         .use(trailing)
     )
@@ -721,6 +823,9 @@ onMounted(() => {
   window.addEventListener('beforeunload', handleBeforeUnload)
   // Ctrl+滚轮缩放监听：必须 passive:false 才能 preventDefault 阻止浏览器内置缩放
   window.addEventListener('wheel', handleWheelZoom, { passive: false })
+  // 光标在代码块内时显示语言切换器，并在编辑器滚动时重新定位
+  document.addEventListener('selectionchange', scheduleCodeBlockSelector)
+  editorContainerRef.value?.addEventListener('scroll', scheduleCodeBlockSelector)
   // 加载历史记录
   sidebar.loadHistory?.();
   // 暴露保存函数到全局，供 TitleBar 调用
@@ -733,6 +838,8 @@ onBeforeUnmount(() => {
   window.removeEventListener('paste', handlePaste)
   window.removeEventListener('beforeunload', handleBeforeUnload)
   window.removeEventListener('wheel', handleWheelZoom)
+  document.removeEventListener('selectionchange', scheduleCodeBlockSelector)
+  editorContainerRef.value?.removeEventListener('scroll', scheduleCodeBlockSelector)
   // 清除全局暴露的保存函数
   delete (window as any).__noteEditorSave
   delete (window as any).__noteEditorSaveAs
@@ -760,9 +867,12 @@ onBeforeUnmount(() => {
       @open-file="handleOpenFromHistory"
       @scroll-to-line="handleScrollToLine"
     />
-    <div class="note-main" :style="{ '--note-zoom': noteZoom }">
+    <div class="note-main" ref="noteMainRef" :style="{ '--note-zoom': noteZoom }">
+      <!-- 顶部格式化工具栏（类似 Word 的"开始"栏；源码模式下隐藏） -->
+      <NoteToolbar v-show="!noteStore.sourceMode" />
+
       <!-- Milkdown 编辑器（源码模式时隐藏） -->
-      <div v-show="!noteStore.sourceMode" class="note-editor-container custom-scrollbar">
+      <div v-show="!noteStore.sourceMode" ref="editorContainerRef" class="note-editor-container custom-scrollbar">
         <MilkdownProvider>
           <MilkdownEditor />
         </MilkdownProvider>
@@ -816,6 +926,20 @@ onBeforeUnmount(() => {
           <span>恢复</span>
         </button>
       </div>
+
+      <!-- 代码块语言切换器（定位在光标所在代码块右下角） -->
+      <select
+        v-if="codeSelector.visible"
+        class="code-lang-selector"
+        :style="{ top: codeSelectorPos.top + 'px', left: codeSelectorPos.left + 'px' }"
+        :value="codeSelector.language"
+        title="切换代码语言"
+        @change="onCodeLangSelectorChange"
+        @mousedown.stop
+        @blur="codeSelector.visible = false"
+      >
+        <option v-for="lang in CODE_LANGS" :key="lang" :value="lang">{{ lang }}</option>
+      </select>
     </div>
 
     <!-- 未保存更改对话框 -->
@@ -947,6 +1071,52 @@ onBeforeUnmount(() => {
   color: var(--text-secondary);
 }
 
+/* 代码块语法高亮（refractor / Prism token 类名） */
+.milkdown .token.comment,
+.milkdown .token.prolog,
+.milkdown .token.doctype,
+.milkdown .token.cdata {
+  color: #8b949e;
+}
+.milkdown .token.punctuation {
+  color: var(--text-secondary);
+}
+.milkdown .token.keyword,
+.milkdown .token.boolean,
+.milkdown .token.selector,
+.milkdown .token.important {
+  color: #e06c75;
+}
+.milkdown .token.string,
+.milkdown .token.attr-value,
+.milkdown .token.char,
+.milkdown .token.inserted {
+  color: #98c379;
+}
+.milkdown .token.number,
+.milkdown .token.property,
+.milkdown .token.constant,
+.milkdown .token.symbol,
+.milkdown .token.variable {
+  color: #d19a66;
+}
+.milkdown .token.function,
+.milkdown .token.class-name {
+  color: #61afef;
+}
+.milkdown .token.tag,
+.milkdown .token.operator {
+  color: #56b6c2;
+}
+.milkdown .token.attr-name,
+.milkdown .token.builtin,
+.milkdown .token.deleted {
+  color: #e5c07b;
+}
+.milkdown .token.regex {
+  color: #d19a66;
+}
+
 /* 选区高亮 */
 .milkdown .ProseMirror-selectednode {
   outline: 2px solid var(--accent-color);
@@ -979,6 +1149,32 @@ onBeforeUnmount(() => {
   flex-direction: column;
   min-width: 0;
   overflow: hidden;
+  position: relative;
+}
+
+/* 代码块右下角的语言切换下拉框 */
+.code-lang-selector {
+  position: absolute;
+  z-index: 40;
+  height: 24px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border-radius: 4px;
+  padding: 0 4px;
+  font-size: 11px;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+  &:hover {
+    border-color: var(--accent-color);
+    color: var(--text-primary);
+  }
+
+  &:focus {
+    border-color: var(--accent-color);
+  }
 }
 
 .note-editor-container {
