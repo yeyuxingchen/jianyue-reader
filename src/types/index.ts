@@ -38,7 +38,7 @@ export interface Annotation {
   createdAt: number
 }
 
-export type ThemeMode = 'parchment' | 'bamboo' | 'sand' | 'sky' | 'nightgreen' | 'inkgold' | 'deepsea' | 'candle' | 'softwhite' | 'lavender' | 'charcoal' | 'eyeguard'
+export type ThemeMode = 'parchment' | 'bamboo' | 'sand' | 'sky' | 'nightgreen' | 'inkgold' | 'deepsea' | 'candle' | 'softwhite' | 'purewhite' | 'lavender' | 'charcoal' | 'eyeguard'
 export type ReaderMode = 'scroll' | 'single' | 'double'
 export type AppMode = 'reader' | 'note'
 export type SortBy = 'lastRead' | 'title' | 'progress' | 'addedAt' | 'custom'

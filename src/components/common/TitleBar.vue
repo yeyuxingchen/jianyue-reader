@@ -23,7 +23,7 @@ const unsavedDialog = reactive({
 
 const themeList: ThemeMode[] = [
   'parchment', 'bamboo', 'sand', 'sky', 'nightgreen', 'inkgold',
-  'deepsea', 'candle', 'softwhite', 'lavender', 'charcoal', 'eyeguard'
+  'deepsea', 'candle', 'softwhite', 'purewhite', 'lavender', 'charcoal', 'eyeguard'
 ]
 
 const themeNames: Record<ThemeMode, string> = {
@@ -36,6 +36,7 @@ const themeNames: Record<ThemeMode, string> = {
   deepsea: '深海',
   candle: '烛光',
   softwhite: '柔白',
+  purewhite: '纯白',
   lavender: '薰衣草',
   charcoal: '炭黑',
   eyeguard: '护眼',
@@ -584,8 +585,11 @@ async function handleSaveAsFile() {
   display: flex;
   align-items: center;
   height: 32px;
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-color);
+  // 使用主题专属的 chrome 色阶（--bg-chrome），保留主题色相、干净不灰，
+  // 与下方编辑区（bg-secondary，最浅）及面板（bg-primary，中间）形成清晰层次
+  background: var(--bg-chrome);
+  // 去掉底边框，改用底部投影与页面内容区分层次
+  box-shadow: 0 1px 5px -1px rgba(0, 0, 0, 0.14);
   user-select: none;
   flex-shrink: 0;
   position: relative;
@@ -610,12 +614,12 @@ async function handleSaveAsFile() {
   transition: background 0.15s, transform 0.1s;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.06);
+    background: color-mix(in srgb, #fff 14%, transparent);
   }
 
   &:active {
     transform: scale(0.88);
-    background: rgba(0, 0, 0, 0.1);
+    background: color-mix(in srgb, #fff 22%, transparent);
   }
 }
 
@@ -644,12 +648,12 @@ async function handleSaveAsFile() {
   transition: background 0.1s, color 0.1s;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.06);
+    background: color-mix(in srgb, #fff 14%, transparent);
     color: var(--text-primary);
   }
 
   &.active {
-    background: rgba(0, 0, 0, 0.08);
+    background: color-mix(in srgb, #fff 20%, transparent);
     color: var(--text-primary);
   }
 }
@@ -809,7 +813,7 @@ async function handleSaveAsFile() {
   transition: background 0.1s, color 0.1s;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.08);
+    background: color-mix(in srgb, #fff 14%, transparent);
     color: var(--text-primary);
   }
 

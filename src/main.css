@@ -5,6 +5,7 @@
   --bg-primary: #f8f9fa;
   --bg-secondary: #ffffff;
   --bg-tertiary: #f1f3f5;
+  --bg-chrome: #e9edf2;
 
   --text-primary: #1a1a2e;
   --text-secondary: #6b7280;
@@ -21,6 +22,7 @@
   --bg-primary: #f8f4ec;
   --bg-secondary: #F5F0E8;
   --bg-tertiary: #EDE8DF;
+  --bg-chrome: #E0D8C8;
 
   --text-primary: #3A2E1E;
   --text-secondary: #6B5740;
@@ -37,6 +39,7 @@
   --bg-primary: #eef5e6;
   --bg-secondary: #E8F5E0;
   --bg-tertiary: #D8EDD0;
+  --bg-chrome: #C9E0BC;
 
   --text-primary: #1B3A1A;
   --text-secondary: #2A5228;
@@ -53,6 +56,7 @@
   --bg-primary: #faf6ea;
   --bg-secondary: #FAF3E0;
   --bg-tertiary: #F0E6C8;
+  --bg-chrome: #E8D9A8;
 
   --text-primary: #3D2F00;
   --text-secondary: #6B4E00;
@@ -69,6 +73,7 @@
   --bg-primary: #ecf3f8;
   --bg-secondary: #E6F0F5;
   --bg-tertiary: #D5E6EF;
+  --bg-chrome: #C2DAE6;
 
   --text-primary: #1A2E3A;
   --text-secondary: #1A3A4A;
@@ -85,6 +90,7 @@
   --bg-primary: #1a261a;
   --bg-secondary: #1E2A1E;
   --bg-tertiary: #253225;
+  --bg-chrome: #2E3C2E;
 
   --text-primary: #C8DEB0;
   --text-secondary: #A8C890;
@@ -101,6 +107,7 @@
   --bg-primary: #181610;
   --bg-secondary: #1C1A14;
   --bg-tertiary: #262318;
+  --bg-chrome: #2E2818;
 
   --text-primary: #D4C89A;
   --text-secondary: #B0A070;
@@ -117,6 +124,7 @@
   --bg-primary: #161a26;
   --bg-secondary: #1A1E2A;
   --bg-tertiary: #222836;
+  --bg-chrome: #283043;
 
   --text-primary: #B0C4DE;
   --text-secondary: #8AACCC;
@@ -133,6 +141,7 @@
   --bg-primary: #221a14;
   --bg-secondary: #2A1F1A;
   --bg-tertiary: #352820;
+  --bg-chrome: #3D2E22;
 
   --text-primary: #D4B896;
   --text-secondary: #B09070;
@@ -149,6 +158,7 @@
   --bg-primary: #f0eeee;
   --bg-secondary: #F2F0F0;
   --bg-tertiary: #E8E6E6;
+  --bg-chrome: #DCD9D9;
 
   --text-primary: #2C2C2C;
   --text-secondary: #505050;
@@ -158,6 +168,23 @@
   --reader-text: #2C2C2C;
 }
 
+.theme-purewhite {
+  --accent-color: #378ADD;
+  --border-color: #e6e8eb;
+
+  --bg-primary: #f6f7f9;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #eef0f3;
+  --bg-chrome: #e9ebef;
+
+  --text-primary: #1a1a1a;
+  --text-secondary: #5f6368;
+  --text-tertiary: #9aa0a6;
+
+  --reader-bg: #ffffff;
+  --reader-text: #1a1a1a;
+}
+
 .theme-lavender {
   --accent-color: #378ADD;
   --border-color: #d0c4e0;
@@ -165,6 +192,7 @@
   --bg-primary: #f0ebf4;
   --bg-secondary: #F0EBF4;
   --bg-tertiary: #E4DCF0;
+  --bg-chrome: #D8CCEC;
 
   --text-primary: #2E1A3A;
   --text-secondary: #5A3A6A;
@@ -181,6 +209,7 @@
   --bg-primary: #323232;
   --bg-secondary: #3A3A3A;
   --bg-tertiary: #484848;
+  --bg-chrome: #404040;
 
   --text-primary: #E0E0E0;
   --text-secondary: #C8C8C8;
@@ -197,6 +226,7 @@
   --bg-primary: #faf8e0;
   --bg-secondary: #FFFDE8;
   --bg-tertiary: #F5F0C0;
+  --bg-chrome: #EFE7A8;
 
   --text-primary: #333300;
   --text-secondary: #5A5000;

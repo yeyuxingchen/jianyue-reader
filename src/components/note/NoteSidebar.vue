@@ -337,11 +337,16 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 4px;
-  gap: 2px;
-  background: var(--bg-tertiary);
+  padding-top: 6px;
+  gap: 6px;
+  // 使用主题专属的 chrome 色阶（--bg-chrome），保留主题色相、干净不灰，
+  // 使图标栏与编辑区拉开层次（所有主题通用）
+  background: var(--bg-chrome);
   border-right: 1px solid var(--border-color);
+  // 向右投出极轻的阴影，让图标栏像一条独立的功能轨道浮在编辑区之上
+  box-shadow: 1px 0 4px -2px rgba(0, 0, 0, 0.08);
   position: relative;
+  z-index: 2;
 }
 
 // 面板关闭时 activity bar 右侧的展开拖拽区域
@@ -366,23 +371,29 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border: none;
   background: transparent;
-  color: var(--text-tertiary);
-  border-radius: 6px;
+  color: color-mix(in srgb, var(--text-tertiary) 80%, #fff 20%);
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: color 0.15s ease, background 0.15s ease, transform 0.12s ease;
   position: relative;
 
   &:hover {
     color: var(--text-primary);
-    background: rgba(0, 0, 0, 0.06);
+    // 悬停时以主题强调色做淡色填充，柔和且统一
+    background: color-mix(in srgb, var(--accent-color) 14%, transparent);
+  }
+
+  &:active {
+    transform: scale(0.92);
   }
 
   &.active {
     color: var(--accent-color);
+    background: color-mix(in srgb, var(--accent-color) 18%, transparent);
 
     &::before {
       content: '';
@@ -402,17 +413,19 @@ onMounted(() => {
 .side-panel {
   display: flex;
   flex-direction: column;
-  background: var(--bg-secondary);
-  border-right: 1px solid var(--border-color);
+  // 面板为中间一档（bg-primary），比编辑区（bg-secondary）深、比图标栏浅
+  background: var(--bg-primary);
   overflow: hidden;
   position: relative;
   flex-shrink: 0;
+  // 去掉右边框，仅用右侧阴影与编辑区区分层次（阴影略加强以补偿无边框）
+  box-shadow: 4px 0 12px -6px rgba(0, 0, 0, 0.14);
   // 展开/收起宽度过渡；拖拽时由 .is-dragging 强制关闭过渡
-  transition: width 0.26s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.26s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.26s ease;
 
   &.collapsed {
-    // 完全收起时不显示右侧边框与拖拽手柄
-    border-right-color: transparent;
+    // 完全收起时不显示阴影与拖拽手柄
+    box-shadow: none;
 
     .resize-handle {
       display: none;
@@ -454,10 +467,12 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 4px 12px;
   flex-shrink: 0;
-  height: 34px;
+  // 与 NoteToolbar 一致：去掉底边框，改用底部投影与面板内容区分
+  box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.10);
+  // 与 NoteToolbar 高度（min-height: 36px）保持一致，底部对齐
+  min-height: 36px;
 }
 
 .panel-title {

@@ -125,6 +125,7 @@ const themeList: { id: ThemeMode; name: string; previewBg: string; lineColor: st
   { id: 'deepsea', name: '深海蓝', previewBg: '#1A1E2A', lineColor: '#B0C4DE', lineOpacity1: 0.8, lineOpacity2: 0.45, labelBg: '#222836', labelColor: '#8AACCC' },
   { id: 'candle', name: '烛火', previewBg: '#2A1F1A', lineColor: '#D4B896', lineOpacity1: 0.8, lineOpacity2: 0.45, labelBg: '#352820', labelColor: '#B09070' },
   { id: 'softwhite', name: '冷白', previewBg: '#F2F0F0', lineColor: '#2C2C2C', lineOpacity1: 0.7, lineOpacity2: 0.4, labelBg: '#E8E6E6', labelColor: '#505050' },
+  { id: 'purewhite', name: '纯白', previewBg: '#ffffff', lineColor: '#1a1a1a', lineOpacity1: 0.7, lineOpacity2: 0.4, labelBg: '#eef0f3', labelColor: '#5f6368' },
   { id: 'lavender', name: '薰衣草', previewBg: '#F0EBF4', lineColor: '#2E1A3A', lineOpacity1: 0.7, lineOpacity2: 0.4, labelBg: '#E4DCF0', labelColor: '#5A3A6A' },
   { id: 'charcoal', name: '深灰', previewBg: '#3A3A3A', lineColor: '#E0E0E0', lineOpacity1: 0.8, lineOpacity2: 0.45, labelBg: '#484848', labelColor: '#C8C8C8' },
   { id: 'eyeguard', name: '护目黄', previewBg: '#FFFDE8', lineColor: '#333300', lineOpacity1: 0.7, lineOpacity2: 0.4, labelBg: '#F5F0C0', labelColor: '#5A5000' },

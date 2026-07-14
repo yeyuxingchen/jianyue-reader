@@ -239,7 +239,7 @@ export async function searchInBook(view: any, query: string): Promise<any[]> {
 const ALL_THEME_CLASSES = [
   'theme-parchment', 'theme-bamboo', 'theme-sand', 'theme-sky',
   'theme-nightgreen', 'theme-inkgold', 'theme-deepsea', 'theme-candle',
-  'theme-softwhite', 'theme-lavender', 'theme-charcoal', 'theme-eyeguard',
+  'theme-softwhite', 'theme-purewhite', 'theme-lavender', 'theme-charcoal', 'theme-eyeguard',
 ]
 
 export function applyThemeFilter(view: any, theme: string) {
@@ -276,6 +276,7 @@ const THEME_READER_COLORS: Record<string, { bg: string; text: string }> = {
   deepsea: { bg: '#1A1E2A', text: '#B0C4DE' },
   candle: { bg: '#2A1F1A', text: '#D4B896' },
   softwhite: { bg: '#F2F0F0', text: '#2C2C2C' },
+  purewhite: { bg: '#ffffff', text: '#1a1a1a' },
   lavender: { bg: '#F0EBF4', text: '#2E1A3A' },
   charcoal: { bg: '#3A3A3A', text: '#E0E0E0' },
   eyeguard: { bg: '#FFFDE8', text: '#333300' },

@@ -409,8 +409,9 @@ onBeforeUnmount(() => {
   flex-wrap: wrap;
   gap: 4px;
   padding: 4px 10px;
-  border-bottom: 1px solid var(--border-color);
   background: var(--bg-secondary);
+  // 去掉底边框，改用底部投影与编辑区区分层次
+  box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.10);
   flex-shrink: 0;
   min-height: 36px;
 }

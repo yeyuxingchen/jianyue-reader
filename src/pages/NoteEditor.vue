@@ -1243,6 +1243,8 @@ onBeforeUnmount(() => {
 .note-editor-container {
   flex: 1;
   overflow-y: auto;
+  // 编辑区为最浅一档（bg-secondary），与面板、图标栏形成由浅入深的层次
+  background: var(--bg-secondary);
   // 基础 16px × 缩放系数（由 note-main 上的 --note-zoom 控制，Ctrl+滚轮调节）
   font-size: calc(16px * var(--note-zoom, 1));
   line-height: 1.75;
@@ -1257,7 +1259,7 @@ onBeforeUnmount(() => {
   resize: none;
   // 用 em 让 padding 跟随 Ctrl+滚轮缩放
   padding: 2em 3em;
-  background: var(--bg-primary);
+  background: var(--bg-secondary);
   color: var(--text-primary);
   // 基础 14px × 缩放系数（与编辑器共用同一个 CSS 变量）
   font-size: calc(14px * var(--note-zoom, 1));
