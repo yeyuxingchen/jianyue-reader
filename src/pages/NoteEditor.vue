@@ -718,6 +718,11 @@ async function handleOpenFromHistory(filePath: string) {
 // 滚动到指定行（文档大纲跳转）
 function handleScrollToLine(line: number) {
   try {
+    // 源码模式：在 textarea 中滚动到对应行
+    if (noteStore.sourceMode && sourceTextareaRef.value) {
+      scrollSourceToLine(line)
+      return
+    }
     const editorEl = document.querySelector('.milkdown-editor-body')
     if (!editorEl) return
     const headings = editorEl.querySelectorAll('h1, h2, h3, h4, h5, h6')
@@ -734,6 +739,64 @@ function handleScrollToLine(line: number) {
   } catch (err) {
     console.error('滚动到行失败:', err)
   }
+}
+
+// 源码模式下将 textarea 平滑滚动到指定行（兼容软换行）
+function scrollSourceToLine(line: number) {
+  const ta = sourceTextareaRef.value
+  if (!ta) return
+  const text = sourceContent.value
+  const lines = text.split('\n')
+  // 目标行的字符偏移
+  let offset = 0
+  for (let i = 0; i < line && i < lines.length; i++) {
+    offset += lines[i].length + 1
+  }
+  // 聚焦到该行，便于后续编辑
+  ta.focus()
+  ta.setSelectionRange(offset, offset)
+
+  // 用镜像 div 复刻 textarea 的字体/内边距/换行，测量目标行像素位置
+  const cs = getComputedStyle(ta)
+  const mirror = document.createElement('div')
+  const copyProps = [
+    'boxSizing', 'width', 'paddingTop', 'paddingBottom', 'paddingLeft', 'paddingRight',
+    'borderTopWidth', 'borderBottomWidth', 'borderLeftWidth', 'borderRightWidth',
+    'fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'letterSpacing',
+    'lineHeight', 'textTransform', 'wordSpacing', 'tabSize',
+  ] as const
+  copyProps.forEach((prop) => {
+    // 复制计算后的样式，确保换行方式一致
+    // @ts-ignore - 动态拷贝样式
+    mirror.style[prop] = cs[prop]
+  })
+  mirror.style.position = 'absolute'
+  mirror.style.visibility = 'hidden'
+  mirror.style.whiteSpace = 'pre-wrap'
+  mirror.style.wordWrap = 'break-word'
+  mirror.style.overflow = 'hidden'
+  mirror.textContent = text.substring(0, offset)
+  document.body.appendChild(mirror)
+  // offsetHeight 包含上内边距，约等于目标行起始位置
+  const targetY = Math.max(0, mirror.offsetHeight - ta.clientHeight / 2)
+  document.body.removeChild(mirror)
+
+  // 平滑滚动
+  const startY = ta.scrollTop
+  const dist = targetY - startY
+  if (Math.abs(dist) < 2) {
+    ta.scrollTop = targetY
+    return
+  }
+  const dur = 260
+  const t0 = performance.now()
+  const step = (now: number) => {
+    const p = Math.min(1, (now - t0) / dur)
+    const eased = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2
+    ta.scrollTop = startY + dist * eased
+    if (p < 1) requestAnimationFrame(step)
+  }
+  requestAnimationFrame(step)
 }
 
 // 监听快捷键

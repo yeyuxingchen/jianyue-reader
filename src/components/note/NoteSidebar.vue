@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
+import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useNoteSidebarStore } from '@/stores/noteSidebar'
-import type { OutlineItem, NoteHistoryItem } from '@/stores/noteSidebar'
+import type { OutlineItem, NoteHistoryItem, SidebarPanel } from '@/stores/noteSidebar'
 import {
   Clock,
   ListTree,
@@ -27,6 +27,22 @@ const panelTitle = computed(() => {
   if (sidebar.activePanel === 'outline') return '文档结构'
   return ''
 })
+
+// 面板实际渲染的内容：关闭时延迟清空，等待收缩动画结束，避免内容瞬间消失
+const displayPanel = ref<SidebarPanel>(null)
+watch(
+  () => sidebar.activePanel,
+  (val) => {
+    if (val) {
+      displayPanel.value = val
+    } else {
+      window.setTimeout(() => {
+        if (sidebar.activePanel === null) displayPanel.value = null
+      }, 260)
+    }
+  },
+  { immediate: true }
+)
 
 // ===== 拖拽调整宽度 =====
 type DragMode = 'none' | 'resize' | 'expand'
@@ -142,7 +158,12 @@ function cleanupDrag() {
 const isDragging = computed(() => dragMode.value !== 'none')
 
 const panelStyle = computed(() => {
-  const w = isDragging.value ? currentWidth.value : sidebar.panelWidth
+  if (isDragging.value) {
+    // 拖拽中实时跟随鼠标，且由 .is-dragging 关闭过渡动画
+    return { width: `${currentWidth.value}px` }
+  }
+  // 展开时为目标宽度，收起时收缩为 0，配合 CSS transition 形成展开/收起动效
+  const w = sidebar.activePanel ? sidebar.panelWidth : 0
   return { width: `${w}px` }
 })
 
@@ -207,14 +228,18 @@ onMounted(() => {
 
       <!-- 面板关闭时，activity bar 右侧边缘可向右拖拽展开 -->
       <div
-        v-if="!isOpen"
+        v-if="displayPanel === null"
         class="expand-handle"
         @mousedown="onExpandStart"
       ></div>
     </div>
 
     <!-- Content Panel (展开面板) -->
-    <div v-if="isOpen" class="side-panel" :style="panelStyle">
+    <div
+      class="side-panel"
+      :class="{ collapsed: sidebar.activePanel === null }"
+      :style="panelStyle"
+    >
       <!-- 右侧拖拽手柄 -->
       <div class="resize-handle" @mousedown="onResizeStart"></div>
 
@@ -227,7 +252,7 @@ onMounted(() => {
       </div>
 
       <!-- 历史记录面板 -->
-      <div v-if="sidebar.activePanel === 'history'" class="panel-body custom-scrollbar-compact">
+      <div v-if="displayPanel === 'history'" class="panel-body custom-scrollbar-compact">
         <div v-if="sidebar.history.length === 0" class="panel-empty">
           <FileText :size="32" :stroke-width="1.2" class="empty-icon" />
           <p>暂无历史记录</p>
@@ -265,7 +290,7 @@ onMounted(() => {
       </div>
 
       <!-- 文档结构面板 -->
-      <div v-if="sidebar.activePanel === 'outline'" class="panel-body custom-scrollbar-compact">
+      <div v-if="displayPanel === 'outline'" class="panel-body custom-scrollbar-compact">
         <div v-if="sidebar.outline.length === 0" class="panel-empty">
           <ListTree :size="32" :stroke-width="1.2" class="empty-icon" />
           <p>暂无标题结构</p>
@@ -382,6 +407,28 @@ onMounted(() => {
   overflow: hidden;
   position: relative;
   flex-shrink: 0;
+  // 展开/收起宽度过渡；拖拽时由 .is-dragging 强制关闭过渡
+  transition: width 0.26s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.collapsed {
+    // 完全收起时不显示右侧边框与拖拽手柄
+    border-right-color: transparent;
+
+    .resize-handle {
+      display: none;
+    }
+
+    // 内容随收起淡出，过渡更自然
+    .panel-header,
+    .panel-body {
+      opacity: 0;
+    }
+  }
+
+  .panel-header,
+  .panel-body {
+    transition: opacity 0.2s ease;
+  }
 }
 
 // ===== 拖拽手柄 =====
