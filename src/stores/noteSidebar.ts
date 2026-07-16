@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, toRaw } from 'vue'
+import { ref, toRaw, isRef } from 'vue'
 import { electronStore } from '@/services/electronStore'
 
 const HISTORY_STORAGE_KEY = 'note:file-history'
@@ -86,7 +86,9 @@ export const useNoteSidebarStore = defineStore('noteSidebar', () => {
   }
 
   function saveHistory() {
-    electronStore.setItem(HISTORY_STORAGE_KEY, toRaw(history.value))
+    // 深拷贝以完全去除响应式属性，确保可以序列化
+    const data = JSON.parse(JSON.stringify(toRaw(history.value)))
+    electronStore.setItem(HISTORY_STORAGE_KEY, data)
   }
 
   function addToHistory(filePath: string, fileName: string, content?: string) {

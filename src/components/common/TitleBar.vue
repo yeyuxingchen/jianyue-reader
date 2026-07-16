@@ -14,7 +14,7 @@ const library = useLibraryStore()
 const toast = useToastStore()
 const appModeStore = useAppModeStore()
 const noteStore = useNoteEditorStore()
-const noteSidebar = useNoteSidebarStore()
+const sidebar = useNoteSidebarStore()
 
 // 未保存更改对话框状态
 const unsavedDialog = reactive({
@@ -48,6 +48,9 @@ const isMaximized = ref(false)
 
 // ===== 图标点击切换模式 =====
 async function toggleMode() {
+  // 如果 NoteEditor 的未保存对话框已经在显示，不重复弹出，直接返回
+  if ((window as any).__unsavedDialogVisible) return
+
   // 如果当前是简记模式，切换到简阅模式前检查未保存的更改
   if (appModeStore.isNoteMode) {
     const hasUnsavedChanges = noteStore.isModified || !noteStore.currentFilePath
@@ -95,6 +98,12 @@ function showUnsavedDialog(): Promise<string> {
   })
 }
 
+function onTitleBarUnsavedResolve(result: string) {
+  unsavedDialog.visible = false
+  unsavedDialog._resolve?.(result)
+  unsavedDialog._resolve = null
+}
+
 // ===== 菜单定义 =====
 interface SubmenuItem {
   label: string
@@ -108,7 +117,7 @@ interface MenuItem {
   divider?: boolean
   disabled?: boolean
   submenu?: SubmenuItem[]
-  submenuType?: 'theme' | 'imageFormat'
+  submenuType?: 'theme' | 'imageFormat' | 'recentFiles'
 }
 
 interface MenuGroup {
@@ -141,6 +150,12 @@ const menus = computed<MenuGroup[]>(() => {
         items: [
           { label: '新建文件', shortcut: 'Ctrl+N', action: handleNewFile },
           { label: '打开文件...', shortcut: 'Ctrl+O', action: handleOpenFile },
+          {
+            label: '最近的文件',
+            submenuType: 'recentFiles',
+            submenu: sidebar.history.slice(0, 10).map(h => ({ label: h.fileName, value: h.filePath })),
+            disabled: sidebar.history.length === 0,
+          },
           { divider: true, label: '' },
           { label: '创建epub目录', action: handleCreateEpubDirectory },
           { divider: true, label: '' },
@@ -279,6 +294,11 @@ function onMenuClick(item: MenuItem) {
 }
 
 function onSubmenuHover(index: number) {
+  const item = menus.value[activeMenuIndex.value]?.items[index]
+  if (item?.disabled) {
+    activeSubmenuIndex.value = -1
+    return
+  }
   activeSubmenuIndex.value = index
 }
 
@@ -291,6 +311,9 @@ function selectTheme(theme: ThemeMode) {
 function onSelectSubmenu(item: MenuItem, sub: SubmenuItem) {
   if (item.submenuType === 'imageFormat') {
     setImageFormat(sub.value)
+  } else if (item.submenuType === 'recentFiles') {
+    // 从历史记录打开文件
+    window.dispatchEvent(new CustomEvent('note-open-history', { detail: sub.value }))
   } else {
     selectTheme(sub.value as ThemeMode)
   }
@@ -299,6 +322,7 @@ function onSelectSubmenu(item: MenuItem, sub: SubmenuItem) {
 
 function isSubmenuActive(item: MenuItem, sub: SubmenuItem): boolean {
   if (item.submenuType === 'imageFormat') return imageFormat.value === sub.value
+  if (item.submenuType === 'recentFiles') return false
   return settings.settings.theme === sub.value
 }
 
@@ -517,10 +541,10 @@ async function handleCreateEpubDirectory() {
     await window.electronAPI?.security.addAuthorizedDir(result.path)
 
     // 5. 自动打开文件目录面板并把根目录切换到 epub 目录本身
-    noteSidebar.setFileTreeRoot(result.path)
-    noteSidebar.selectNode(result.path)
-    noteSidebar.togglePanel('files')
-    await noteSidebar.refreshFileTree()
+    sidebar.setFileTreeRoot(result.path)
+    sidebar.selectNode(result.path)
+    sidebar.togglePanel('files')
+    await sidebar.refreshFileTree()
     // 6. 通知编辑器清空内容（类似新建未保存文件的状态）
     window.dispatchEvent(new CustomEvent('note-reset-editor'))
   } catch (err: any) {
@@ -583,7 +607,7 @@ async function handleCreateEpubDirectory() {
                       :class="{ active: isSubmenuActive(item, sub) }"
                       @mousedown.stop.prevent="onSelectSubmenu(item, sub)"
                     >
-                      <span class="menu-submenu-check">{{ isSubmenuActive(item, sub) ? '✓' : '' }}</span>
+                      <span v-if="item.submenuType !== 'recentFiles'" class="menu-submenu-check">{{ isSubmenuActive(item, sub) ? '✓' : '' }}</span>
                       <span class="menu-submenu-label">{{ sub.label }}</span>
                     </div>
                   </div>
@@ -621,9 +645,9 @@ async function handleCreateEpubDirectory() {
   <UnsavedChangesDialog
     v-if="unsavedDialog.visible"
     :message="unsavedDialog.message"
-    @save="unsavedDialog._resolve?.('save')"
-    @discard="unsavedDialog._resolve?.('discard')"
-    @cancel="unsavedDialog._resolve?.('cancel')"
+    @save="onTitleBarUnsavedResolve('save')"
+    @discard="onTitleBarUnsavedResolve('discard')"
+    @cancel="onTitleBarUnsavedResolve('cancel')"
   />
 </template>
 
@@ -786,6 +810,8 @@ async function handleCreateEpubDirectory() {
   left: 100%;
   top: -4px;
   min-width: 140px;
+  max-height: 320px;
+  overflow-y: auto;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 6px;

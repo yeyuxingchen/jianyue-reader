@@ -10935,7 +10935,8 @@ const electronAPI = {
     setEpubCover: (dirPath) => require$$1$1.ipcRenderer.invoke("epub:setCover", dirPath),
     getEpubCover: (dirPath) => require$$1$1.ipcRenderer.invoke("epub:getCover", dirPath),
     saveChapterImage: (dirPath, base64DataUrl) => require$$1$1.ipcRenderer.invoke("epub:saveChapterImage", dirPath, base64DataUrl),
-    saveChapterImageFromFile: (dirPath, sourcePath) => require$$1$1.ipcRenderer.invoke("epub:saveChapterImageFromFile", dirPath, sourcePath)
+    saveChapterImageFromFile: (dirPath, sourcePath) => require$$1$1.ipcRenderer.invoke("epub:saveChapterImageFromFile", dirPath, sourcePath),
+    registerChapterDir: (dirPath) => require$$1$1.ipcRenderer.invoke("epub:registerChapterDir", dirPath)
   },
   // ===== 文件对话框 =====
   dialog: {
@@ -11135,6 +11136,7 @@ require$$1$1.contextBridge.exposeInMainWorld("services", {
   getEpubCover: (dirPath) => require$$1$1.ipcRenderer.invoke("epub:getCover", dirPath),
   saveChapterImage: (dirPath, base64DataUrl) => require$$1$1.ipcRenderer.invoke("epub:saveChapterImage", dirPath, base64DataUrl),
   saveChapterImageFromFile: (dirPath, sourcePath) => require$$1$1.ipcRenderer.invoke("epub:saveChapterImageFromFile", dirPath, sourcePath),
+  registerChapterDir: (dirPath) => require$$1$1.ipcRenderer.invoke("epub:registerChapterDir", dirPath),
   saveImageToCache: (base64DataUrl) => require$$1$1.ipcRenderer.invoke("image:saveToCache", base64DataUrl),
   createFloatReader: (text, bookTitle, chapterTitle, opacity) => require$$1$1.ipcRenderer.invoke("floatReader:create", text, bookTitle, chapterTitle, opacity),
   closeFloatReader: () => require$$1$1.ipcRenderer.invoke("floatReader:close"),

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, reactive, onMounted, onBeforeUnmount, nextTick, defineComponent, h, watch } from 'vue'
+import { ref, reactive, onMounted, onBeforeUnmount, nextTick, defineComponent, h, computed, watch } from 'vue'
 import { Milkdown as MilkdownComponent, MilkdownProvider, useEditor } from '@milkdown/vue'
 import { Editor, rootCtx, defaultValueCtx, editorViewOptionsCtx, parserCtx, editorViewCtx } from '@milkdown/kit/core'
 import { commonmark } from '@milkdown/kit/preset/commonmark'
@@ -18,6 +18,16 @@ import { useNoteEditorStore } from '@/stores/appMode'
 import { useSettingsStore } from '@/stores/settings'
 import { useToastStore } from '@/stores/toast'
 import { useNoteSidebarStore } from '@/stores/noteSidebar'
+import {
+  expandChapterImageSrcs,
+  collapseChapterImageSrcs,
+  rebuildChapterImageMap,
+  getChapterDir,
+  insertImageForCurrentFile,
+  clearChapterImages,
+  ensureChapterRegistered,
+  currentChapterId,
+} from '@/composables/useNoteImage'
 import NoteSidebar from '@/components/note/NoteSidebar.vue'
 import NoteToolbar from '@/components/note/NoteToolbar.vue'
 import UnsavedChangesDialog from '@/components/common/UnsavedChangesDialog.vue'
@@ -103,10 +113,21 @@ const sourceTextareaRef = ref<HTMLTextAreaElement | null>(null)
 const noteMainRef = ref<HTMLElement | null>(null)
 const editorContainerRef = ref<HTMLElement | null>(null)
 let isSaving = false
+let isClosingAfterDialog = false // 用户在未保存对话框中做出选择后，跳过 beforeunload 拦截
 
 // ===== 代码块语言切换器（定位在光标所在代码块右下角）=====
 const codeSelector = reactive({ visible: false, pos: -1, language: 'plaintext' })
 const codeSelectorPos = reactive({ top: 0, left: 0 })
+const codeLangDropdownOpen = ref(false)
+const codeLangFilter = ref('')
+const codeLangListRef = ref<HTMLElement | null>(null)
+const codeLangInputRef = ref<HTMLInputElement | null>(null)
+
+const filteredCodeLangs = computed(() => {
+  const q = codeLangFilter.value.toLowerCase()
+  if (!q) return [...CODE_LANGS]
+  return CODE_LANGS.filter(l => l.toLowerCase().includes(q))
+})
 
 function getEditorView(): any | null {
   const editor = editorRef.value
@@ -178,19 +199,58 @@ function scheduleCodeBlockSelector() {
   })
 }
 
-function onCodeLangSelectorChange(e: Event) {
-  const lang = (e.target as HTMLSelectElement).value
+function selectCodeLang(lang: string) {
   codeSelector.language = lang
+  codeLangDropdownOpen.value = false
+  codeLangFilter.value = ''
   const view = getEditorView()
   if (!view || codeSelector.pos < 0) return
   try {
-    // 直接通过 ProseMirror 事务设置代码块 language 属性
-    // （等价于 updateCodeBlockLanguageCommand：state.tr.setNodeAttribute(pos, 'language', language)）
     const tr = view.state.tr.setNodeAttribute(codeSelector.pos, 'language', lang === 'plaintext' ? '' : lang)
     view.dispatch(tr)
     scheduleCodeBlockSelector()
   } catch (err) {
     console.error('切换代码语言失败:', err)
+  }
+}
+
+function toggleCodeLangDropdown() {
+  codeLangDropdownOpen.value = !codeLangDropdownOpen.value
+  if (codeLangDropdownOpen.value) {
+    codeLangFilter.value = ''
+    nextTick(() => {
+      // 滚动到当前选中项
+      const list = codeLangListRef.value
+      if (list) {
+        const active = list.querySelector('.code-lang-item.active') as HTMLElement | null
+        active?.scrollIntoView({ block: 'nearest' })
+      }
+      codeLangInputRef.value?.focus()
+    })
+  }
+}
+
+function onCodeLangFilterInput(e: Event) {
+  codeLangFilter.value = (e.target as HTMLInputElement).value
+}
+
+function onCodeLangFilterKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape') {
+    codeLangDropdownOpen.value = false
+    codeLangFilter.value = ''
+  } else if (e.key === 'Enter') {
+    const first = filteredCodeLangs.value[0]
+    if (first) selectCodeLang(first)
+  }
+}
+
+// 点击外部关闭语言下拉
+function onCodeLangDocClick(e: MouseEvent) {
+  if (!codeLangDropdownOpen.value) return
+  const target = e.target as HTMLElement
+  if (!target.closest('.code-lang-selector-wrap')) {
+    codeLangDropdownOpen.value = false
+    codeLangFilter.value = ''
   }
 }
 
@@ -236,6 +296,12 @@ function saveCurrentDraft() {
 }
 
 function handleBeforeUnload(e: BeforeUnloadEvent) {
+  // 用户已在未保存对话框中做出选择，允许关闭
+  if (isClosingAfterDialog) {
+    saveCurrentDraft()
+    return
+  }
+
   // 检测是否有未保存的更改或临时文件
   const hasUnsavedChanges = noteStore.isModified
   const isTempFile = !noteStore.currentFilePath
@@ -252,7 +318,10 @@ function handleBeforeUnload(e: BeforeUnloadEvent) {
 
     unsavedDialog.message = message
     unsavedDialog.visible = true
+    ;(window as any).__unsavedDialogVisible = true
     unsavedDialog._resolve = async (result) => {
+      // 标记已做出选择，使下一次 beforeunload 不再拦截
+      isClosingAfterDialog = true
       if (result === 'save') {
         // 用户选择保存
         if (isTempFile) {
@@ -267,8 +336,10 @@ function handleBeforeUnload(e: BeforeUnloadEvent) {
         // 用户选择放弃修改
         noteStore.markSaved()
         window.close()
+      } else {
+        // cancel：撤销选择，恢复拦截
+        isClosingAfterDialog = false
       }
-      // 如果是 cancel，什么都不做，窗口保持打开
     }
 
     return false
@@ -283,36 +354,47 @@ function clearDraftAfterSave() {
 }
 
 // ===== 未保存更改对话框 =====
-const unsavedDialog = reactive({
+interface UnsavedDialogState {
+  visible: boolean
+  message: string
+  messagePrefix: string
+  _resolve: ((result: 'save' | 'discard' | 'cancel') => void) | null
+}
+
+const unsavedDialog = {
   visible: false,
   message: '',
   messagePrefix: '',
   _resolve: null as ((result: 'save' | 'discard' | 'cancel') => void) | null,
-})
+}
 
 function showUnsavedDialog(messagePrefix = ''): Promise<'save' | 'discard' | 'cancel'> {
   return new Promise((resolve) => {
     unsavedDialog.messagePrefix = messagePrefix
     unsavedDialog.message = messagePrefix ? `${messagePrefix}尚未保存，是否先保存？` : '当前修改尚未保存，是否先保存？'
     unsavedDialog.visible = true
+    ;(window as any).__unsavedDialogVisible = true
     unsavedDialog._resolve = resolve
   })
 }
 
 function onUnsavedSave() {
   unsavedDialog.visible = false
+  ;(window as any).__unsavedDialogVisible = false
   unsavedDialog._resolve?.('save')
   unsavedDialog._resolve = null
 }
 
 function onUnsavedDiscard() {
   unsavedDialog.visible = false
+  ;(window as any).__unsavedDialogVisible = false
   unsavedDialog._resolve?.('discard')
   unsavedDialog._resolve = null
 }
 
 function onUnsavedCancel() {
   unsavedDialog.visible = false
+  ;(window as any).__unsavedDialogVisible = false
   unsavedDialog._resolve?.('cancel')
   unsavedDialog._resolve = null
 }
@@ -395,7 +477,7 @@ const MilkdownEditor = defineComponent({
           ctx.set(rootCtx, root)
           ctx.set(defaultValueCtx, noteStore.lastSavedContent || '# 欢迎使用简记\n\n开始记录你的想法...\n')
           ctx.set(editorViewOptionsCtx, {
-            attributes: { class: 'milkdown-editor-body' },
+            attributes: { class: 'milkdown-editor-body', spellcheck: 'false' },
           })
           ctx.get(listenerCtx)
             .markdownUpdated((_ctx, markdown) => {
@@ -466,156 +548,7 @@ function getMarkdownContent(): string {
   }
 }
 
-// ===== 章节图片双向转换 =====
-// 章节 markdown 源使用相对引用：![alt](.image/<filename>)
-// 但浏览器/编辑器无法解析相对路径，所以渲染时替换为 chimg:// 协议 URL
-// （chimg 在主进程里映射到 file://，避开 webSecurity 限制）
-// 保存时再还原为相对路径。
-// imageSrcMap: 相对路径 -> chimg:// 协议 URL
-const imageSrcMap = new Map<string, string>()
-
-// 当前章节在主进程注册表里的 id（chimg://<id>/... 用），避免把路径塞进 URL 被改写
-const currentChapterId = ref<string | null>(null)
-
-/** 打开章节时把目录注册到主进程，拿到稳定 id；同一目录复用同一 id */
-async function ensureChapterRegistered(chapterDir: string) {
-  try {
-    const id = await window.services?.registerChapterDir?.(chapterDir)
-    currentChapterId.value = id || null
-  } catch {
-    currentChapterId.value = null
-  }
-}
-
-/** 将 markdown 中 .image/... 引用替换为 chimg:// URL，给编辑器用 */
-function expandChapterImageSrcs(md: string): string {
-  if (imageSrcMap.size === 0) return md
-  let result = md
-  for (const [rel, abs] of imageSrcMap) {
-    // 同时覆盖 ![alt](rel) 和 <img src="rel"> 两种形式
-    result = result.split(`(${rel})`).join(`(${abs})`)
-    result = result.split(`src="${rel}"`).join(`src="${abs}"`)
-  }
-  return result
-}
-
-/** 将 markdown 中 chimg:// 协议 URL 还原为 .image/... 相对引用，给磁盘用 */
-function collapseChapterImageSrcs(md: string): string {
-  if (imageSrcMap.size === 0) return md
-  let result = md
-  for (const [rel, abs] of imageSrcMap) {
-    result = result.split(`(${abs})`).join(`(${rel})`)
-    result = result.split(`src="${abs}"`).join(`src="${rel}"`)
-  }
-  return result
-}
-
-/** 当前文件是否位于某个 epub 目录下（章节文件） */
-function isChapterFile(): boolean {
-  const cur = noteStore.currentFilePath
-  const root = sidebar.fileTreeRootPath
-  if (!cur || !root) return false
-  // 路径前缀匹配（兼容 / 与 \）
-  const curNorm = cur.replace(/\\/g, '/')
-  const rootNorm = (root + '/').replace(/\\/g, '/')
-  return curNorm.startsWith(rootNorm)
-}
-
-/** 取得当前章节所在目录（epub 根目录），用于存图片 */
-function getChapterDir(): string | null {
-  const cur = noteStore.currentFilePath
-  const root = sidebar.fileTreeRootPath
-  if (!cur || !root) return null
-  const curNorm = cur.replace(/\\/g, '/')
-  const rootNorm = (root + '/').replace(/\\/g, '/')
-  if (!curNorm.startsWith(rootNorm)) return null
-  return root
-}
-
-/** 注册一张图片到映射表（重复注册会覆盖） */
-function registerChapterImage(rel: string, abs: string) {
-  imageSrcMap.set(rel, abs)
-}
-
-/** 清空映射表（切换文件时调用） */
-function clearChapterImages() {
-  imageSrcMap.clear()
-}
-
-/**
- * 扫描 markdown 中的 .image/<name> 引用，重建映射。
- * 仅在打开章节时调用，避免误把用户自己写的相对路径吞了。
- */
-function rebuildChapterImageMap(md: string) {
-  imageSrcMap.clear()
-  // 匹配 ![alt](.image/xxx.ext) 和 <img src=".image/xxx.ext">
-  const reMd = /!\[[^\]]*\]\(\.image\/([^)\s]+)\)/g
-  const reHtml = /<img[^>]+src="\.image\/([^"]+)"/g
-  let m: RegExpExecArray | null
-  while ((m = reMd.exec(md)) !== null) {
-    const rel = `.image/${m[1]}`
-    if (imageSrcMap.has(rel)) continue
-    const abs = fileUrlForChapter(m[1])
-    if (abs) imageSrcMap.set(rel, abs)
-  }
-  while ((m = reHtml.exec(md)) !== null) {
-    const rel = `.image/${m[1]}`
-    if (imageSrcMap.has(rel)) continue
-    const abs = fileUrlForChapter(m[1])
-    if (abs) imageSrcMap.set(rel, abs)
-  }
-}
-
-/** 把章节 .image/<name> 拼成 chimg://<id> 协议 URL（id 由主进程注册返回，映射到真实目录） */
-function fileUrlForChapter(name: string): string | null {
-  const id = currentChapterId.value
-  if (!id) return null
-  return `chimg://${id}/.image/${name}`
-}
-
-/**
- * 往当前章节插入一张图片。
- * - 自动检测是否在章节文件
- * - 非章节：走老的全局缓存流程
- * - 章节：存到 <chapterDir>/.image/，用相对引用，编辑器内展开为 file://
- * - 返回 { src, markdown }：src 是编辑器用的可渲染 URL，markdown 是要写进文档的语法
- */
-async function insertImageForCurrentFile(opts: {
-  /** 从 base64 dataURL 插入（粘贴/拖拽） */
-  base64DataUrl?: string
-  /** 从本地文件路径插入（工具栏选图） */
-  sourceFilePath?: string
-}): Promise<{ src: string; markdown: string } | null> {
-  const chapterDir = getChapterDir()
-  if (chapterDir) {
-    // 章节模式：存到 .image/，返回相对引用
-    let result: { filePath: string; relativePath: string } | null = null
-    if (opts.base64DataUrl) {
-      result = await window.services?.saveChapterImage?.(chapterDir, opts.base64DataUrl)
-    } else if (opts.sourceFilePath) {
-      result = await window.services?.saveChapterImageFromFile?.(chapterDir, opts.sourceFilePath)
-    }
-    if (!result) return null
-    // 确保目录已注册（拿到 chimg 用的 id），再拼可渲染 URL
-    await ensureChapterRegistered(chapterDir)
-    const absUrl = fileUrlForChapter(result.relativePath.slice('.image/'.length))
-    if (absUrl) registerChapterImage(result.relativePath, absUrl)
-    return {
-      src: absUrl || result.relativePath,
-      markdown: `![image](${result.relativePath})`,
-    }
-  }
-  // 非章节：老的全局缓存流程
-  if (opts.base64DataUrl) {
-    const r = await window.services?.saveImageToCache?.(opts.base64DataUrl)
-    if (!r) return null
-    return {
-      src: `cacheimg://${r.relativePath}`,
-      markdown: `![image](cacheimg://${r.relativePath})`,
-    }
-  }
-  return null
-}
+// ===== 章节图片双向转换（使用 composable）=====
 
 // 替换编辑器内容
 // 关键：openFile/newFile 后会置 pendingBaselineSync=true，
@@ -626,7 +559,7 @@ async function replaceContent(markdown: string) {
   const editor = editorRef.value
   if (!editor) return
   // 章节文件：扫描 markdown 中的 .image/... 引用，重建 chimg:// 映射
-  const chapterDir = getChapterDir()
+  const chapterDir = getChapterDir(noteStore.currentFilePath, sidebar.fileTreeRootPath)
   if (chapterDir) {
     await ensureChapterRegistered(chapterDir)
     if (currentChapterId.value) {
@@ -894,6 +827,7 @@ defineExpose({
   replaceContent,
   receiveContent,
   openFileFromExternal,
+  handleOpenFromHistory,
   handleResetEditor,
 })
 
@@ -1041,7 +975,8 @@ function getImageFormat(): string {
 async function handlePaste(e: ClipboardEvent) {
   // 章节文件始终拦截并存入 .image（与全局图片格式设置无关）；
   // 非章节文件仅在全局 path 模式下拦截
-  if (!getChapterDir() && getImageFormat() !== 'path') return
+  const chapterDir = getChapterDir(noteStore.currentFilePath, sidebar.fileTreeRootPath)
+  if (!chapterDir && getImageFormat() !== 'path') return
 
   const items = e.clipboardData?.items
   if (!items) return
@@ -1062,7 +997,11 @@ async function handlePaste(e: ClipboardEvent) {
         if (!base64DataUrl) return
 
         // 章节文件 / 普通文件：分别走不同存储路径
-        const inserted = await insertImageForCurrentFile({ base64DataUrl })
+        const inserted = await insertImageForCurrentFile({
+          base64DataUrl,
+          filePath: noteStore.currentFilePath,
+          rootPath: sidebar.fileTreeRootPath,
+        })
         if (!inserted) return
         const { src, markdown: mdImage } = inserted
 
@@ -1094,7 +1033,7 @@ async function handlePaste(e: ClipboardEvent) {
           document.execCommand('insertText', false, mdImage)
         }
 
-        toast.show(getChapterDir() ? '图片已保存到 .image 文件夹' : '图片已缓存到本地')
+        toast.show(chapterDir ? '图片已保存到 .image 文件夹' : '图片已缓存到本地')
       }
       reader.readAsDataURL(file)
       return // 只处理第一张图片
@@ -1111,6 +1050,8 @@ onMounted(() => {
   // 光标在代码块内时显示语言切换器，并在编辑器滚动时重新定位
   document.addEventListener('selectionchange', scheduleCodeBlockSelector)
   editorContainerRef.value?.addEventListener('scroll', scheduleCodeBlockSelector)
+  // 点击外部关闭代码语言下拉框
+  document.addEventListener('mousedown', onCodeLangDocClick)
   // 加载历史记录
   sidebar.loadHistory?.();
   // 暴露保存函数到全局，供 TitleBar 调用
@@ -1130,6 +1071,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('wheel', handleWheelZoom)
   window.removeEventListener('note-reset-editor', handleResetEditor)
   document.removeEventListener('selectionchange', scheduleCodeBlockSelector)
+  document.removeEventListener('mousedown', onCodeLangDocClick)
   editorContainerRef.value?.removeEventListener('scroll', scheduleCodeBlockSelector)
   // 清除全局暴露的保存函数
   delete (window as any).__noteEditorSave
@@ -1219,18 +1161,53 @@ onBeforeUnmount(() => {
       </div>
 
       <!-- 代码块语言切换器（定位在光标所在代码块右下角） -->
-      <select
+      <div
         v-if="codeSelector.visible"
-        class="code-lang-selector"
+        class="code-lang-selector-wrap"
         :style="{ top: codeSelectorPos.top + 'px', left: codeSelectorPos.left + 'px' }"
-        :value="codeSelector.language"
-        title="切换代码语言"
-        @change="onCodeLangSelectorChange"
         @mousedown.stop
-        @blur="codeSelector.visible = false"
       >
-        <option v-for="lang in CODE_LANGS" :key="lang" :value="lang">{{ lang }}</option>
-      </select>
+        <!-- 触发按钮：显示当前语言 -->
+        <button
+          class="code-lang-selector"
+          :class="{ open: codeLangDropdownOpen }"
+          title="切换代码语言"
+          @click="toggleCodeLangDropdown"
+        >
+          <span class="code-lang-label">{{ codeSelector.language }}</span>
+          <span class="code-lang-arrow">▾</span>
+        </button>
+
+        <!-- 下拉列表面板 -->
+        <Transition name="code-lang-fade">
+          <div v-if="codeLangDropdownOpen" class="code-lang-dropdown">
+            <!-- 搜索框 -->
+            <div class="code-lang-search">
+              <input
+                ref="codeLangInputRef"
+                type="text"
+                class="code-lang-search-input"
+                placeholder="筛选语言..."
+                :value="codeLangFilter"
+                @input="onCodeLangFilterInput"
+                @keydown="onCodeLangFilterKeydown"
+                spellcheck="false"
+              />
+            </div>
+            <!-- 语言列表 -->
+            <ul ref="codeLangListRef" class="code-lang-list custom-scrollbar-compact">
+              <li
+                v-for="lang in filteredCodeLangs"
+                :key="lang"
+                class="code-lang-item"
+                :class="{ active: lang === codeSelector.language }"
+                @mousedown.stop.prevent="selectCodeLang(lang)"
+              >{{ lang }}</li>
+              <li v-if="filteredCodeLangs.length === 0" class="code-lang-item empty">无匹配</li>
+            </ul>
+          </div>
+        </Transition>
+      </div>
     </div>
 
     <!-- 未保存更改对话框 -->
@@ -1444,28 +1421,140 @@ onBeforeUnmount(() => {
 }
 
 /* 代码块右下角的语言切换下拉框 */
-.code-lang-selector {
+// 代码块语言切换器：包裹层（绝对定位在代码块右下角）
+.code-lang-selector-wrap {
   position: absolute;
   z-index: 40;
+}
+
+// 触发按钮（替换原生 <select>）
+.code-lang-selector {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   height: 24px;
+  padding: 0 6px;
   border: 1px solid var(--border-color);
   background: var(--bg-secondary);
   color: var(--text-secondary);
   border-radius: 4px;
-  padding: 0 4px;
   font-size: 11px;
   cursor: pointer;
   outline: none;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: border-color 0.12s, color 0.12s;
 
-  &:hover {
+  &:hover, &.open {
     border-color: var(--accent-color);
     color: var(--text-primary);
+  }
+}
+
+.code-lang-label {
+  max-width: 72px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.code-lang-arrow {
+  font-size: 10px;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+// 下拉面板
+.code-lang-dropdown {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  right: 0;
+  width: 160px;
+  max-height: 260px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+// 搜索框
+.code-lang-search {
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.code-lang-search-input {
+  width: 100%;
+  height: 24px;
+  padding: 0 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 11px;
+  outline: none;
+
+  &::placeholder {
+    color: var(--text-tertiary);
   }
 
   &:focus {
     border-color: var(--accent-color);
   }
+}
+
+// 语言列表
+.code-lang-list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.code-lang-item {
+  padding: 4px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: background 0.08s, color 0.08s;
+
+  &:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+  }
+
+  &.active {
+    color: var(--accent-color);
+    font-weight: 600;
+  }
+
+  &.empty {
+    color: var(--text-tertiary);
+    font-style: italic;
+    cursor: default;
+
+    &:hover {
+      background: transparent;
+      color: var(--text-tertiary);
+    }
+  }
+}
+
+// 下拉动画
+.code-lang-fade-enter-active {
+  transition: opacity 0.1s ease, transform 0.1s ease;
+}
+.code-lang-fade-leave-active {
+  transition: opacity 0.08s ease, transform 0.08s ease;
+}
+.code-lang-fade-enter-from,
+.code-lang-fade-leave-to {
+  opacity: 0;
+  transform: translateY(4px);
 }
 
 .note-editor-container {

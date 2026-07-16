@@ -132,7 +132,7 @@ const MilkdownEditor = defineComponent({
           ctx.set(rootCtx, root)
           ctx.set(defaultValueCtx, initialContent || '# 镜像笔记\n\n')
           ctx.set(editorViewOptionsCtx, {
-            attributes: { class: 'float-milkdown-body' },
+            attributes: { class: 'float-milkdown-body', spellcheck: 'false' },
           })
           ctx.get(listenerCtx)
             .markdownUpdated((_ctx, markdown) => {

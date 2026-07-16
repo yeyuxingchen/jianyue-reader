@@ -26,9 +26,12 @@ import {
 import { useNoteEditorStore } from '@/stores/appMode'
 import { useToastStore } from '@/stores/toast'
 import { CODE_LANGS } from '@/editor/codeLanguages'
+import { insertImageForCurrentFile } from '@/composables/useNoteImage'
+import { useNoteSidebarStore } from '@/stores/noteSidebar'
 
 const noteStore = useNoteEditorStore()
 const toast = useToastStore()
+const sidebar = useNoteSidebarStore()
 
 // 当前选区/光标处的激活格式状态（用于高亮工具栏按钮，类似 Word 的"开始"栏）
 const active = reactive({
@@ -215,7 +218,12 @@ async function insertImage() {
       return
     }
     // 章节文件：存到 .image/，markdown 用相对引用；其他：走全局缓存
-    const inserted = await insertImageForCurrentFile({ base64DataUrl: dataUrl, sourceFilePath: filePath })
+    const inserted = await insertImageForCurrentFile({
+      base64DataUrl: dataUrl,
+      sourceFilePath: filePath,
+      filePath: noteStore.currentFilePath,
+      rootPath: sidebar.fileTreeRootPath,
+    })
     if (!inserted) {
       toast.show('插入图片失败')
       return

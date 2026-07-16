@@ -56,6 +56,9 @@ onMounted(() => {
   window.addEventListener('note-open-file', () => noteEditorRef.value?.handleOpenFile())
   window.addEventListener('note-save-file', () => noteEditorRef.value?.handleSaveFile())
   window.addEventListener('note-save-as-file', () => noteEditorRef.value?.handleSaveAsFile())
+  window.addEventListener('note-open-history', ((e: CustomEvent) => {
+    noteEditorRef.value?.handleOpenFromHistory(e.detail)
+  }) as EventListener)
 
   // 监听"发送备注到简记"事件
   window.addEventListener('send-to-note', handleSendToNote)
@@ -67,6 +70,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('note-save-file', () => {})
   window.removeEventListener('note-save-as-file', () => {})
   window.removeEventListener('send-to-note', handleSendToNote)
+  window.removeEventListener('note-open-history', () => {})
 })
 
 // 处理"发送备注到简记"

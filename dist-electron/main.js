@@ -17502,6 +17502,9 @@ require$$1$1.protocol.registerSchemesAsPrivileged([
   { scheme: "fontfile", privileges: { standard: true, secure: true, supportFetchAPI: true } },
   { scheme: "chimg", privileges: { standard: true, secure: true, supportFetchAPI: true } }
 ]);
+const chapterDirRegistry = /* @__PURE__ */ new Map();
+const chapterDirReverse = /* @__PURE__ */ new Map();
+let chapterDirSeq = 0;
 const gotTheLock = require$$1$1.app.requestSingleInstanceLock();
 if (!gotTheLock) {
   require$$1$1.app.quit();
@@ -17535,6 +17538,14 @@ require$$1$1.app.whenReady().then(() => {
   initSecurity();
   Store.initRenderer();
   registerAllIpcHandlers();
+  require$$1$1.ipcMain.handle("epub:registerChapterDir", (_event, dir) => {
+    const existing = chapterDirReverse.get(dir);
+    if (existing) return existing;
+    const id2 = `c${++chapterDirSeq}`;
+    chapterDirRegistry.set(id2, dir);
+    chapterDirReverse.set(dir, id2);
+    return id2;
+  });
   if (!pendingFilePath) {
     const filePath = parseFilePathFromArgs(process.argv);
     if (filePath) pendingFilePath = filePath;
@@ -17552,11 +17563,10 @@ require$$1$1.app.whenReady().then(() => {
       const urlPath = request.url.replace("chimg://", "");
       const segs = urlPath.split("/").filter((s) => s.length > 0);
       if (segs.length < 2) return new Response("bad request", { status: 400 });
-      const safe = segs[0];
+      const id2 = segs[0];
       const relPath = decodeURIComponent(segs.slice(1).join("/"));
-      let b64 = safe.replace(/-/g, "+").replace(/_/g, "/");
-      while (b64.length % 4) b64 += "=";
-      const chapterDir = Buffer.from(b64, "base64").toString("utf-8");
+      const chapterDir = chapterDirRegistry.get(id2);
+      if (!chapterDir) return new Response("unknown chapter id", { status: 404 });
       const filePath = path$7.join(chapterDir, relPath);
       return require$$1$1.net.fetch("file:///" + filePath.replace(/\\/g, "/"));
     } catch (err) {
