@@ -16,6 +16,7 @@ import { registerStoreHandlers } from './store'
 import { registerShellHandlers } from './shell'
 import { registerClipboardHandlers } from './clipboard'
 import { registerImageHandlers } from './image'
+import { registerFileTreeHandlers } from './fileTree'
 
 /**
  * 注册所有 IPC 处理器
@@ -35,4 +36,5 @@ export function registerAllIpcHandlers(): void {
   registerShellHandlers()
   registerClipboardHandlers()
   registerImageHandlers()
+  registerFileTreeHandlers()
 }

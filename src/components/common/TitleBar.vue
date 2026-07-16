@@ -4,6 +4,7 @@ import { useSettingsStore } from '@/stores/settings'
 import { useLibraryStore } from '@/stores/library'
 import { useToastStore } from '@/stores/toast'
 import { useAppModeStore, useNoteEditorStore } from '@/stores/appMode'
+import { useNoteSidebarStore } from '@/stores/noteSidebar'
 import { Minus, Square, X, Copy } from 'lucide-vue-next'
 import UnsavedChangesDialog from './UnsavedChangesDialog.vue'
 import type { ThemeMode } from '@/types'
@@ -13,6 +14,7 @@ const library = useLibraryStore()
 const toast = useToastStore()
 const appModeStore = useAppModeStore()
 const noteStore = useNoteEditorStore()
+const noteSidebar = useNoteSidebarStore()
 
 // 未保存更改对话框状态
 const unsavedDialog = reactive({
@@ -139,6 +141,8 @@ const menus = computed<MenuGroup[]>(() => {
         items: [
           { label: '新建文件', shortcut: 'Ctrl+N', action: handleNewFile },
           { label: '打开文件...', shortcut: 'Ctrl+O', action: handleOpenFile },
+          { divider: true, label: '' },
+          { label: '创建epub目录', action: handleCreateEpubDirectory },
           { divider: true, label: '' },
           { label: '保存', shortcut: 'Ctrl+S', action: handleSaveFile },
           { label: '另存为...', shortcut: 'Ctrl+Shift+S', action: handleSaveAsFile },
@@ -480,6 +484,49 @@ async function handleSaveFile() {
 
 async function handleSaveAsFile() {
   window.dispatchEvent(new CustomEvent('note-save-as-file'))
+}
+
+/**
+ * 创建 epub 目录（特殊目录）。
+ * 1. 先弹出文件夹选择器，让用户选 epub 目录的父位置
+ * 2. 在所选目录下创建名为 "epub" 的子目录
+ * 3. 创建成功后：
+ *    - 授权该 epub 目录
+ *    - 自动打开文件目录面板
+ *    - 将根目录切换为 epub 目录本身（这样它就在根级别展示）
+ *    - 选中新创建的 epub 目录
+ */
+async function handleCreateEpubDirectory() {
+  try {
+    // 1. 弹出文件夹选择器，让用户选父目录
+    const parentDir = await window.electronAPI?.dialog.showFolderPicker()
+    if (!parentDir) return // 用户取消
+
+    // 2. 授权父目录（创建子目录需要先授权父目录）
+    await window.electronAPI?.security.addAuthorizedDir(parentDir)
+
+    // 3. 在所选目录下创建 epub 目录
+    const result = await window.services.createEpubDirectory(parentDir)
+    if (!result) {
+      toast.show('创建失败')
+      return
+    }
+    toast.show('已创建 epub 目录')
+
+    // 4. 授权 epub 目录本身（后续需要扫描该目录）
+    await window.electronAPI?.security.addAuthorizedDir(result.path)
+
+    // 5. 自动打开文件目录面板并把根目录切换到 epub 目录本身
+    noteSidebar.setFileTreeRoot(result.path)
+    noteSidebar.selectNode(result.path)
+    noteSidebar.togglePanel('files')
+    await noteSidebar.refreshFileTree()
+    // 6. 通知编辑器清空内容（类似新建未保存文件的状态）
+    window.dispatchEvent(new CustomEvent('note-reset-editor'))
+  } catch (err: any) {
+    console.error('创建 epub 目录失败:', err)
+    toast.show(err?.message || '创建失败')
+  }
 }
 </script>
 

@@ -2,7 +2,7 @@
  * 简阅 - 主进程入口
  */
 
-import { app, BrowserWindow, protocol, net } from 'electron'
+import { app, BrowserWindow, protocol, net, ipcMain } from 'electron'
 import { join } from 'path'
 import { tmpdir } from 'os'
 import Store from 'electron-store'
@@ -123,7 +123,15 @@ function createMainWindow() {
 protocol.registerSchemesAsPrivileged([
   { scheme: 'cacheimg', privileges: { standard: true, secure: true, supportFetchAPI: true } },
   { scheme: 'fontfile', privileges: { standard: true, secure: true, supportFetchAPI: true } },
+  { scheme: 'chimg', privileges: { standard: true, secure: true, supportFetchAPI: true } },
 ])
+
+// 章节图片目录注册表：id -> 章节根目录（epub 根）。
+// 渲染端打开章节时把目录注册进来，拿到稳定短 id，URL 用 chimg://<id>/...，
+// 避免在 URL 里塞完整路径的 base64（易被浏览器改写导致解码失败）。
+const chapterDirRegistry = new Map<string, string>() // id -> dir
+const chapterDirReverse = new Map<string, string>() // dir -> id
+let chapterDirSeq = 0
 
 // ===== 单实例锁 + 外部文件打开处理 =====
 const gotTheLock = app.requestSingleInstanceLock()
@@ -178,6 +186,16 @@ app.whenReady().then(() => {
   // 注册所有 IPC 处理器
   registerAllIpcHandlers()
 
+  // 章节图片目录注册：渲染端打开章节时调用，返回稳定 id，供 chimg://<id>/... 使用
+  ipcMain.handle('epub:registerChapterDir', (_event, dir: string) => {
+    const existing = chapterDirReverse.get(dir)
+    if (existing) return existing
+    const id = `c${++chapterDirSeq}`
+    chapterDirRegistry.set(id, dir)
+    chapterDirReverse.set(dir, id)
+    return id
+  })
+
   // 检查首次启动时是否通过命令行传入了文件路径
   if (!pendingFilePath) {
     const filePath = parseFilePathFromArgs(process.argv)
@@ -194,6 +212,26 @@ app.whenReady().then(() => {
     const decodedPath = decodeURIComponent(urlPath)
     const filePath = join(BASE_DIR, decodedPath)
     return net.fetch('file://' + filePath)
+  })
+
+  // 注册 chimg://<id>/.image/<rel> 协议，给章节图片用。
+  // <id> 是主进程注册表里的章节目录编号（由渲染端打开章节时注册），
+  // 避免在 URL 里塞完整路径的 base64（易被浏览器改写导致解码失败）。
+  protocol.handle('chimg', (request) => {
+    try {
+      const urlPath = request.url.replace('chimg://', '') // "<id>/<rel>"
+      const segs = urlPath.split('/').filter((s) => s.length > 0)
+      if (segs.length < 2) return new Response('bad request', { status: 400 })
+      const id = segs[0]
+      const relPath = decodeURIComponent(segs.slice(1).join('/'))
+      const chapterDir = chapterDirRegistry.get(id)
+      if (!chapterDir) return new Response('unknown chapter id', { status: 404 })
+      const filePath = join(chapterDir, relPath)
+      return net.fetch('file:///' + filePath.replace(/\\/g, '/'))
+    } catch (err) {
+      console.error('chimg protocol error:', err)
+      return new Response('not found', { status: 404 })
+    }
   })
 
   // 注册 fontfile:///?path=xxx 协议，加载本地字体文件

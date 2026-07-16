@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, reactive, onMounted, onBeforeUnmount, nextTick, defineComponent, h } from 'vue'
+import { ref, reactive, onMounted, onBeforeUnmount, nextTick, defineComponent, h, watch } from 'vue'
 import { Milkdown as MilkdownComponent, MilkdownProvider, useEditor } from '@milkdown/vue'
 import { Editor, rootCtx, defaultValueCtx, editorViewOptionsCtx, parserCtx, editorViewCtx } from '@milkdown/kit/core'
 import { commonmark } from '@milkdown/kit/preset/commonmark'
@@ -399,13 +399,15 @@ const MilkdownEditor = defineComponent({
           })
           ctx.get(listenerCtx)
             .markdownUpdated((_ctx, markdown) => {
+              // 章节文件：把编辑器里的 file:// URL 还原为 .image/... 相对引用
+              const normalized = collapseChapterImageSrcs(markdown)
               if (noteStore.pendingBaselineSync) {
                 // openFile/newFile 后的首次 markdownUpdated：
                 // 把 lastSavedContent 同步为当前 markdown 字符串，
                 // 作为后续"是否修改"判定的基准（消除磁盘原文与 serializer 的微差异）。
                 // 不修改 isModified（保持 openFile 时设置的 false）。
-                noteStore.syncBaseline(markdown)
-              } else if (!isMarkdownContentEqual(markdown, noteStore.lastSavedContent)) {
+                noteStore.syncBaseline(normalized)
+              } else if (!isMarkdownContentEqual(normalized, noteStore.lastSavedContent)) {
                 noteStore.markModified()
               } else {
                 noteStore.markSaved()
@@ -457,10 +459,162 @@ function getMarkdownContent(): string {
   const editor = editorRef.value
   if (!editor) return ''
   try {
-    return editor.action(getMarkdown())
+    // 章节文件：把编辑器里的 file:// URL 还原为 .image/... 相对引用
+    return collapseChapterImageSrcs(editor.action(getMarkdown()))
   } catch {
     return ''
   }
+}
+
+// ===== 章节图片双向转换 =====
+// 章节 markdown 源使用相对引用：![alt](.image/<filename>)
+// 但浏览器/编辑器无法解析相对路径，所以渲染时替换为 chimg:// 协议 URL
+// （chimg 在主进程里映射到 file://，避开 webSecurity 限制）
+// 保存时再还原为相对路径。
+// imageSrcMap: 相对路径 -> chimg:// 协议 URL
+const imageSrcMap = new Map<string, string>()
+
+// 当前章节在主进程注册表里的 id（chimg://<id>/... 用），避免把路径塞进 URL 被改写
+const currentChapterId = ref<string | null>(null)
+
+/** 打开章节时把目录注册到主进程，拿到稳定 id；同一目录复用同一 id */
+async function ensureChapterRegistered(chapterDir: string) {
+  try {
+    const id = await window.services?.registerChapterDir?.(chapterDir)
+    currentChapterId.value = id || null
+  } catch {
+    currentChapterId.value = null
+  }
+}
+
+/** 将 markdown 中 .image/... 引用替换为 chimg:// URL，给编辑器用 */
+function expandChapterImageSrcs(md: string): string {
+  if (imageSrcMap.size === 0) return md
+  let result = md
+  for (const [rel, abs] of imageSrcMap) {
+    // 同时覆盖 ![alt](rel) 和 <img src="rel"> 两种形式
+    result = result.split(`(${rel})`).join(`(${abs})`)
+    result = result.split(`src="${rel}"`).join(`src="${abs}"`)
+  }
+  return result
+}
+
+/** 将 markdown 中 chimg:// 协议 URL 还原为 .image/... 相对引用，给磁盘用 */
+function collapseChapterImageSrcs(md: string): string {
+  if (imageSrcMap.size === 0) return md
+  let result = md
+  for (const [rel, abs] of imageSrcMap) {
+    result = result.split(`(${abs})`).join(`(${rel})`)
+    result = result.split(`src="${abs}"`).join(`src="${rel}"`)
+  }
+  return result
+}
+
+/** 当前文件是否位于某个 epub 目录下（章节文件） */
+function isChapterFile(): boolean {
+  const cur = noteStore.currentFilePath
+  const root = sidebar.fileTreeRootPath
+  if (!cur || !root) return false
+  // 路径前缀匹配（兼容 / 与 \）
+  const curNorm = cur.replace(/\\/g, '/')
+  const rootNorm = (root + '/').replace(/\\/g, '/')
+  return curNorm.startsWith(rootNorm)
+}
+
+/** 取得当前章节所在目录（epub 根目录），用于存图片 */
+function getChapterDir(): string | null {
+  const cur = noteStore.currentFilePath
+  const root = sidebar.fileTreeRootPath
+  if (!cur || !root) return null
+  const curNorm = cur.replace(/\\/g, '/')
+  const rootNorm = (root + '/').replace(/\\/g, '/')
+  if (!curNorm.startsWith(rootNorm)) return null
+  return root
+}
+
+/** 注册一张图片到映射表（重复注册会覆盖） */
+function registerChapterImage(rel: string, abs: string) {
+  imageSrcMap.set(rel, abs)
+}
+
+/** 清空映射表（切换文件时调用） */
+function clearChapterImages() {
+  imageSrcMap.clear()
+}
+
+/**
+ * 扫描 markdown 中的 .image/<name> 引用，重建映射。
+ * 仅在打开章节时调用，避免误把用户自己写的相对路径吞了。
+ */
+function rebuildChapterImageMap(md: string) {
+  imageSrcMap.clear()
+  // 匹配 ![alt](.image/xxx.ext) 和 <img src=".image/xxx.ext">
+  const reMd = /!\[[^\]]*\]\(\.image\/([^)\s]+)\)/g
+  const reHtml = /<img[^>]+src="\.image\/([^"]+)"/g
+  let m: RegExpExecArray | null
+  while ((m = reMd.exec(md)) !== null) {
+    const rel = `.image/${m[1]}`
+    if (imageSrcMap.has(rel)) continue
+    const abs = fileUrlForChapter(m[1])
+    if (abs) imageSrcMap.set(rel, abs)
+  }
+  while ((m = reHtml.exec(md)) !== null) {
+    const rel = `.image/${m[1]}`
+    if (imageSrcMap.has(rel)) continue
+    const abs = fileUrlForChapter(m[1])
+    if (abs) imageSrcMap.set(rel, abs)
+  }
+}
+
+/** 把章节 .image/<name> 拼成 chimg://<id> 协议 URL（id 由主进程注册返回，映射到真实目录） */
+function fileUrlForChapter(name: string): string | null {
+  const id = currentChapterId.value
+  if (!id) return null
+  return `chimg://${id}/.image/${name}`
+}
+
+/**
+ * 往当前章节插入一张图片。
+ * - 自动检测是否在章节文件
+ * - 非章节：走老的全局缓存流程
+ * - 章节：存到 <chapterDir>/.image/，用相对引用，编辑器内展开为 file://
+ * - 返回 { src, markdown }：src 是编辑器用的可渲染 URL，markdown 是要写进文档的语法
+ */
+async function insertImageForCurrentFile(opts: {
+  /** 从 base64 dataURL 插入（粘贴/拖拽） */
+  base64DataUrl?: string
+  /** 从本地文件路径插入（工具栏选图） */
+  sourceFilePath?: string
+}): Promise<{ src: string; markdown: string } | null> {
+  const chapterDir = getChapterDir()
+  if (chapterDir) {
+    // 章节模式：存到 .image/，返回相对引用
+    let result: { filePath: string; relativePath: string } | null = null
+    if (opts.base64DataUrl) {
+      result = await window.services?.saveChapterImage?.(chapterDir, opts.base64DataUrl)
+    } else if (opts.sourceFilePath) {
+      result = await window.services?.saveChapterImageFromFile?.(chapterDir, opts.sourceFilePath)
+    }
+    if (!result) return null
+    // 确保目录已注册（拿到 chimg 用的 id），再拼可渲染 URL
+    await ensureChapterRegistered(chapterDir)
+    const absUrl = fileUrlForChapter(result.relativePath.slice('.image/'.length))
+    if (absUrl) registerChapterImage(result.relativePath, absUrl)
+    return {
+      src: absUrl || result.relativePath,
+      markdown: `![image](${result.relativePath})`,
+    }
+  }
+  // 非章节：老的全局缓存流程
+  if (opts.base64DataUrl) {
+    const r = await window.services?.saveImageToCache?.(opts.base64DataUrl)
+    if (!r) return null
+    return {
+      src: `cacheimg://${r.relativePath}`,
+      markdown: `![image](cacheimg://${r.relativePath})`,
+    }
+  }
+  return null
 }
 
 // 替换编辑器内容
@@ -471,9 +625,23 @@ function getMarkdownContent(): string {
 async function replaceContent(markdown: string) {
   const editor = editorRef.value
   if (!editor) return
+  // 章节文件：扫描 markdown 中的 .image/... 引用，重建 chimg:// 映射
+  const chapterDir = getChapterDir()
+  if (chapterDir) {
+    await ensureChapterRegistered(chapterDir)
+    if (currentChapterId.value) {
+      rebuildChapterImageMap(markdown)
+    } else {
+      clearChapterImages()
+    }
+  } else {
+    clearChapterImages()
+    currentChapterId.value = null
+  }
   try {
     const { replaceAll } = await import('@milkdown/kit/utils')
-    editor.action(replaceAll(markdown))
+    // 章节文件：把 .image/... 相对引用展开为 file:// URL，编辑器才能渲染
+    editor.action(replaceAll(expandChapterImageSrcs(markdown)))
   } catch (err) {
     console.error('替换内容失败:', err)
   }
@@ -497,6 +665,16 @@ async function handleNewFile() {
   await nextTick()
   await replaceContent('# 未命名\n\n')
   toast.show('新建文件')
+}
+
+/**
+ * 静默重置编辑器（不弹未保存对话框）。
+ * 用于"创建 epub 目录"等场景：用户已做出明确选择，无需再询问。
+ */
+async function handleResetEditor() {
+  noteStore.newFile()
+  await nextTick()
+  await replaceContent('# 未命名\n\n')
 }
 
 async function handleOpenFile() {
@@ -541,6 +719,17 @@ async function handleSaveFile() {
           sidebar.addToHistory(noteStore.currentFilePath, noteStore.currentFileName, content)
           // 清除草稿（已正常保存到磁盘）
           clearDraftAfterSave()
+          // 若文件目录面板有根目录且与当前文件同目录，刷新文件树
+          if (sidebar.fileTreeRootPath) {
+            const fileDirIdx = Math.max(noteStore.currentFilePath.lastIndexOf('/'), noteStore.currentFilePath.lastIndexOf('\\'))
+            if (fileDirIdx > 0) {
+              const fileDir = noteStore.currentFilePath.substring(0, fileDirIdx)
+              // 简单判断：根目录与文件目录相同，或根目录是文件目录的祖先
+              if (fileDir === sidebar.fileTreeRootPath || fileDir.startsWith(sidebar.fileTreeRootPath)) {
+                sidebar.refreshFileTree()
+              }
+            }
+          }
         }
       } catch (err) {
         console.error('保存失败:', err)
@@ -563,8 +752,21 @@ async function handleSaveAsFile() {
     const content = noteStore.sourceMode ? sourceContent.value : getMarkdownContent()
     if (!content && content !== '') return
 
+    // 决定保存对话框的默认目录：
+    //   1. 当前正在编辑的文件的父目录
+    //   2. 文件目录面板的根目录
+    //   3. 都不存在则不传，使用后端默认（用户文档目录）
+    let defaultDir: string | undefined
+    if (noteStore.currentFilePath) {
+      const idx = Math.max(noteStore.currentFilePath.lastIndexOf('/'), noteStore.currentFilePath.lastIndexOf('\\'))
+      if (idx > 0) defaultDir = noteStore.currentFilePath.substring(0, idx)
+    }
+    if (!defaultDir && sidebar.fileTreeRootPath) {
+      defaultDir = sidebar.fileTreeRootPath
+    }
+
     // 弹出保存对话框（文件名输入框，默认"简记-XX.md"）
-    const result = await window.electronAPI?.dialog.showNoteSaveDialog(content)
+    const result = await window.electronAPI?.dialog.showNoteSaveDialog(content, defaultDir)
     if (result) {
       // 注意：不要调 openFile（它会置 pendingBaselineSync=true，导致下次
       // markdownUpdated 误用序列化结果覆盖刚保存的 lastSavedContent）。
@@ -579,6 +781,16 @@ async function handleSaveAsFile() {
       sidebar.parseOutline(content)
       // 清除草稿（已正常保存到磁盘）
       clearDraftAfterSave()
+      // 若文件目录面板的根目录与保存目录一致（或为其祖先），刷新文件树
+      if (sidebar.fileTreeRootPath) {
+        const fileDirIdx = Math.max(result.filePath.lastIndexOf('/'), result.filePath.lastIndexOf('\\'))
+        if (fileDirIdx > 0) {
+          const fileDir = result.filePath.substring(0, fileDirIdx)
+          if (fileDir === sidebar.fileTreeRootPath || fileDir.startsWith(sidebar.fileTreeRootPath)) {
+            sidebar.refreshFileTree()
+          }
+        }
+      }
     }
   } catch (err) {
     console.error('另存为失败:', err)
@@ -682,10 +894,11 @@ defineExpose({
   replaceContent,
   receiveContent,
   openFileFromExternal,
+  handleResetEditor,
 })
 
 // ===== 侧边栏交互 =====
-// 从历史记录打开文件
+// 从历史记录或文件目录打开文件
 async function handleOpenFromHistory(filePath: string) {
   try {
     const content = await window.services.readFileAsText(filePath)
@@ -708,6 +921,8 @@ async function handleOpenFromHistory(filePath: string) {
     toast.show(`已打开: ${fileName}`)
     sidebar.addToHistory(filePath, fileName, content)
     sidebar.parseOutline(content)
+    // 同步文件目录面板的高亮
+    sidebar.selectNode(filePath)
   } catch (err) {
     console.error('打开历史文件失败:', err)
     toast.show('文件不存在或无法打开')
@@ -824,8 +1039,9 @@ function getImageFormat(): string {
 }
 
 async function handlePaste(e: ClipboardEvent) {
-  // 仅在路径缓存模式下拦截图片粘贴
-  if (getImageFormat() !== 'path') return
+  // 章节文件始终拦截并存入 .image（与全局图片格式设置无关）；
+  // 非章节文件仅在全局 path 模式下拦截
+  if (!getChapterDir() && getImageFormat() !== 'path') return
 
   const items = e.clipboardData?.items
   if (!items) return
@@ -845,34 +1061,40 @@ async function handlePaste(e: ClipboardEvent) {
         const base64DataUrl = ev.target?.result as string
         if (!base64DataUrl) return
 
-        // 保存到缓存目录
-        const result = await window.services.saveImageToCache(base64DataUrl)
-        if (result) {
-          // 使用 cacheimg:// 自定义协议加载图片（兼容开发/生产模式）
-          const mdImage = `![image](cacheimg://${result.relativePath})`
+        // 章节文件 / 普通文件：分别走不同存储路径
+        const inserted = await insertImageForCurrentFile({ base64DataUrl })
+        if (!inserted) return
+        const { src, markdown: mdImage } = inserted
 
-          // 在编辑器中插入图片
-          if (noteStore.sourceMode && sourceTextareaRef.value) {
-            const ta = sourceTextareaRef.value
-            const start = ta.selectionStart
-            const end = ta.selectionEnd
-            sourceContent.value = sourceContent.value.substring(0, start) + mdImage + sourceContent.value.substring(end)
-            ta.selectionStart = ta.selectionEnd = start + mdImage.length
-            onSourceInput()
-          } else if (editorRef.value) {
-            // Milkdown：获取当前 Markdown，追加图片语法后用 replaceAll 重新解析渲染
+        // 在编辑器中插入图片
+        if (noteStore.sourceMode && sourceTextareaRef.value) {
+          // 源码模式：直接插入 markdown 语法（相对引用）
+          const ta = sourceTextareaRef.value
+          const start = ta.selectionStart
+          const end = ta.selectionEnd
+          sourceContent.value = sourceContent.value.substring(0, start) + mdImage + sourceContent.value.substring(end)
+          ta.selectionStart = ta.selectionEnd = start + mdImage.length
+          onSourceInput()
+        } else if (editorRef.value) {
+          // Milkdown：用 imageCommand 插入，src 给可渲染的 URL（file:// 或 cacheimg://）
+          try {
+            const { insertImageCommand } = await import('@milkdown/kit/preset/commonmark')
+            // 通过 Milkdown 自身的命令插入
+            ;(editorRef.value as any).action(insertImageCommand.key, { src, alt: 'image' })
+          } catch (err) {
+            // 兜底：把整段 markdown 追加到当前内容
             const currentMd = getMarkdownContent()
             const newMd = currentMd
               ? currentMd.trimEnd() + '\n\n' + mdImage + '\n'
               : mdImage + '\n'
             await replaceContent(newMd)
             sidebar.parseOutline(newMd)
-          } else {
-            document.execCommand('insertText', false, mdImage)
           }
-
-          toast.show('图片已缓存到本地')
+        } else {
+          document.execCommand('insertText', false, mdImage)
         }
+
+        toast.show(getChapterDir() ? '图片已保存到 .image 文件夹' : '图片已缓存到本地')
       }
       reader.readAsDataURL(file)
       return // 只处理第一张图片
@@ -892,8 +1114,13 @@ onMounted(() => {
   // 加载历史记录
   sidebar.loadHistory?.();
   // 暴露保存函数到全局，供 TitleBar 调用
-  (window as any).__noteEditorSave = handleSaveFile
+  ;(window as any).__noteEditorSave = handleSaveFile
   ;(window as any).__noteEditorSaveAs = handleSaveAsFile
+  // 监听 currentFilePath 变化：切换/新建文件时清空章节图片映射
+  watch(() => noteStore.currentFilePath, () => {
+    clearChapterImages()
+    currentChapterId.value = null
+  })
 })
 
 onBeforeUnmount(() => {
@@ -901,6 +1128,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('paste', handlePaste)
   window.removeEventListener('beforeunload', handleBeforeUnload)
   window.removeEventListener('wheel', handleWheelZoom)
+  window.removeEventListener('note-reset-editor', handleResetEditor)
   document.removeEventListener('selectionchange', scheduleCodeBlockSelector)
   editorContainerRef.value?.removeEventListener('scroll', scheduleCodeBlockSelector)
   // 清除全局暴露的保存函数

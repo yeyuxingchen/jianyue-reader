@@ -122,14 +122,19 @@ export function registerDialogHandlers(): void {
     return savePath
   }, 'dialog:saveFile'))
 
-  ipcMain.handle('dialog:showNoteSaveDialog', wrapHandler(async (_event, data: string) => {
+  ipcMain.handle('dialog:showNoteSaveDialog', wrapHandler(async (_event, data: string, defaultDir?: string) => {
     if (!mainWindow) return null
 
-    // 在用户文档目录中扫描已有编号，生成下一个可用文件名
-    const defaultDir = app.getPath('documents')
+    // 优先使用调用方传入的默认目录（当前打开文件所在目录），
+    // 否则回退到用户文档目录。
+    const baseDir = (defaultDir && fs.existsSync(defaultDir) && fs.statSync(defaultDir).isDirectory())
+      ? defaultDir
+      : app.getPath('documents')
+
+    // 在默认目录中扫描已有编号，生成下一个可用文件名
     let maxNum = 0
     try {
-      const files = fs.readdirSync(defaultDir)
+      const files = fs.readdirSync(baseDir)
       const pattern = /^简记-?(\d+)\.md$/i
       for (const file of files) {
         const match = file.match(pattern)
@@ -145,7 +150,7 @@ export function registerDialogHandlers(): void {
     // 弹出系统保存对话框（文件名输入框）
     const result = await dialog.showSaveDialog(mainWindow, {
       title: '保存简记',
-      defaultPath: path.join(defaultDir, defaultName),
+      defaultPath: path.join(baseDir, defaultName),
       filters: [
         { name: 'Markdown', extensions: ['md'] },
       ],

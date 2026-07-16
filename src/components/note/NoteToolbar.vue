@@ -210,12 +210,18 @@ async function insertImage() {
     if (!paths || paths.length === 0) return
     const filePath = paths[0]
     const dataUrl = await readFileAsDataURL(filePath)
-    let src = `file://${filePath}`
-    if (dataUrl) {
-      const result = await window.services.saveImageToCache(dataUrl)
-      if (result) src = `cacheimg://${result.relativePath}`
+    if (!dataUrl) {
+      toast.show('读取图片失败')
+      return
     }
-    exec(insertImageCommand, { src, alt: '' })
+    // 章节文件：存到 .image/，markdown 用相对引用；其他：走全局缓存
+    const inserted = await insertImageForCurrentFile({ base64DataUrl: dataUrl, sourceFilePath: filePath })
+    if (!inserted) {
+      toast.show('插入图片失败')
+      return
+    }
+    // src 给 milkdown 渲染用（file:// 或 cacheimg://），markdown 是落到磁盘的语法
+    exec(insertImageCommand, { src: inserted.src, alt: '' })
   } catch (err) {
     console.error('插入图片失败:', err)
     toast.show('插入图片失败')

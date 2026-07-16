@@ -157,6 +157,19 @@ declare global {
         scanFolder: (folderPath: string) => Promise<string[]>
         generateNextFileName: (dirPath: string, prefix: string) => Promise<string>
         writeToFile: (filePath: string, data: string) => Promise<string | null>
+        // 文件目录（简记模式左侧"文件目录"面板）
+        scanFileTree: (rootPath: string) => Promise<any[]>
+        createChapter: (parentDir: string, name: string) => Promise<{ name: string; path: string; type: string } | null>
+        createDirectory: (parentDir: string, name: string) => Promise<{ name: string; path: string; type: string } | null>
+        renameNode: (oldPath: string, newName: string) => Promise<{ name: string; path: string; type: string } | null>
+        createEpubDirectory: (parentDir: string) => Promise<{ name: string; path: string; type: string }>
+        pathExists: (p: string) => Promise<boolean>
+        exportEpub: (dirPath: string) => Promise<{ filePath: string; fileName: string; size: number; chapterCount: number } | null>
+        setEpubCover: (dirPath: string) => Promise<{ coverPath: string } | null>
+        getEpubCover: (dirPath: string) => Promise<{ coverPath: string } | null>
+        saveChapterImage: (dirPath: string, base64DataUrl: string) => Promise<{ filePath: string; relativePath: string } | null>
+        saveChapterImageFromFile: (dirPath: string, sourcePath: string) => Promise<{ filePath: string; relativePath: string } | null>
+        registerChapterDir: (dirPath: string) => Promise<string>
       }
       dialog: {
         showFilePicker: () => Promise<string[] | undefined>
@@ -165,7 +178,7 @@ declare global {
         showFontPicker: () => Promise<string[] | undefined>
         showFolderPicker: () => Promise<string | undefined>
         saveFile: (defaultName: string, data: string | Buffer) => Promise<string | null>
-        showNoteSaveDialog: (data: string) => Promise<{ filePath: string; fileName: string } | null>
+        showNoteSaveDialog: (data: string, defaultDir?: string) => Promise<{ filePath: string; fileName: string } | null>
       }
       book: {
         copyToCache: (bookId: string, srcPath: string) => Promise<string>
@@ -250,7 +263,7 @@ declare global {
     showNoteFilePicker: () => Promise<string[] | undefined>
     showImagePicker: () => Promise<string[] | undefined>
     saveFile: (defaultName: string, data: string | Buffer) => Promise<string | null>
-    showNoteSaveDialog: (data: string) => Promise<{ filePath: string; fileName: string } | null>
+    showNoteSaveDialog: (data: string, defaultDir?: string) => Promise<{ filePath: string; fileName: string } | null>
     writeTextFile: (text: string) => Promise<string>
     writeImageFile: (base64Url: string) => Promise<string | undefined>
     getFileName: (filePath: string) => Promise<string>
@@ -275,6 +288,19 @@ declare global {
     showFolderPicker: () => Promise<string | undefined>
     generateNextFileName: (dirPath: string, prefix: string) => Promise<string>
     writeToFile: (filePath: string, data: string) => Promise<string | null>
+    // 文件目录（简记模式左侧"文件目录"面板）
+    scanFileTree: (rootPath: string) => Promise<any[]>
+    createChapter: (parentDir: string, name: string) => Promise<{ name: string; path: string; type: string } | null>
+    createDirectory: (parentDir: string, name: string) => Promise<{ name: string; path: string; type: string } | null>
+    renameNode: (oldPath: string, newName: string) => Promise<{ name: string; path: string; type: string } | null>
+    createEpubDirectory: (parentDir: string) => Promise<{ name: string; path: string; type: string }>
+    pathExists: (p: string) => Promise<boolean>
+    exportEpub: (dirPath: string) => Promise<{ filePath: string; fileName: string; size: number; chapterCount: number } | null>
+    setEpubCover: (dirPath: string) => Promise<{ coverPath: string } | null>
+    getEpubCover: (dirPath: string) => Promise<{ coverPath: string } | null>
+    saveChapterImage: (dirPath: string, base64DataUrl: string) => Promise<{ filePath: string; relativePath: string } | null>
+    saveChapterImageFromFile: (dirPath: string, sourcePath: string) => Promise<{ filePath: string; relativePath: string } | null>
+    registerChapterDir: (dirPath: string) => Promise<string>
     saveImageToCache: (base64DataUrl: string) => Promise<{ filePath: string; relativePath: string } | null>
     createFloatReader: (text: string, bookTitle: string, chapterTitle: string, opacity: number) => Promise<boolean>
     closeFloatReader: (returnToMain?: boolean) => Promise<void>

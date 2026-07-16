@@ -10923,7 +10923,19 @@ const electronAPI = {
     writeImageFile: (base64Url) => require$$1$1.ipcRenderer.invoke("fs:writeImageFile", base64Url),
     scanFolder: (folderPath) => require$$1$1.ipcRenderer.invoke("fs:scanFolder", folderPath),
     generateNextFileName: (dirPath, prefix) => require$$1$1.ipcRenderer.invoke("fs:generateNextFileName", dirPath, prefix),
-    writeToFile: (filePath, data) => require$$1$1.ipcRenderer.invoke("fs:writeToFile", filePath, data)
+    writeToFile: (filePath, data) => require$$1$1.ipcRenderer.invoke("fs:writeToFile", filePath, data),
+    // 文件目录（简记模式左侧"文件目录"面板）
+    scanFileTree: (rootPath) => require$$1$1.ipcRenderer.invoke("fs:scanFileTree", rootPath),
+    createChapter: (parentDir, name) => require$$1$1.ipcRenderer.invoke("fs:createChapter", parentDir, name),
+    createDirectory: (parentDir, name) => require$$1$1.ipcRenderer.invoke("fs:createDirectory", parentDir, name),
+    renameNode: (oldPath, newName) => require$$1$1.ipcRenderer.invoke("fs:renameNode", oldPath, newName),
+    createEpubDirectory: (parentDir) => require$$1$1.ipcRenderer.invoke("fs:createEpubDirectory", parentDir),
+    pathExists: (p) => require$$1$1.ipcRenderer.invoke("fs:pathExists", p),
+    exportEpub: (dirPath) => require$$1$1.ipcRenderer.invoke("epub:exportFromDir", dirPath),
+    setEpubCover: (dirPath) => require$$1$1.ipcRenderer.invoke("epub:setCover", dirPath),
+    getEpubCover: (dirPath) => require$$1$1.ipcRenderer.invoke("epub:getCover", dirPath),
+    saveChapterImage: (dirPath, base64DataUrl) => require$$1$1.ipcRenderer.invoke("epub:saveChapterImage", dirPath, base64DataUrl),
+    saveChapterImageFromFile: (dirPath, sourcePath) => require$$1$1.ipcRenderer.invoke("epub:saveChapterImageFromFile", dirPath, sourcePath)
   },
   // ===== 文件对话框 =====
   dialog: {
@@ -10933,7 +10945,7 @@ const electronAPI = {
     showFontPicker: () => require$$1$1.ipcRenderer.invoke("dialog:showFontPicker"),
     showFolderPicker: () => require$$1$1.ipcRenderer.invoke("dialog:showFolderPicker"),
     saveFile: (defaultName, data) => require$$1$1.ipcRenderer.invoke("dialog:saveFile", defaultName, data),
-    showNoteSaveDialog: (data) => require$$1$1.ipcRenderer.invoke("dialog:showNoteSaveDialog", data)
+    showNoteSaveDialog: (data, defaultDir) => require$$1$1.ipcRenderer.invoke("dialog:showNoteSaveDialog", data, defaultDir)
   },
   // ===== 书籍缓存管理 =====
   book: {
@@ -11087,7 +11099,7 @@ require$$1$1.contextBridge.exposeInMainWorld("services", {
   showFontPicker: () => require$$1$1.ipcRenderer.invoke("dialog:showFontPicker"),
   showFolderPicker: () => require$$1$1.ipcRenderer.invoke("dialog:showFolderPicker"),
   saveFile: (defaultName, data) => require$$1$1.ipcRenderer.invoke("dialog:saveFile", defaultName, data),
-  showNoteSaveDialog: (data) => require$$1$1.ipcRenderer.invoke("dialog:showNoteSaveDialog", data),
+  showNoteSaveDialog: (data, defaultDir) => require$$1$1.ipcRenderer.invoke("dialog:showNoteSaveDialog", data, defaultDir),
   writeTextFile: (text) => require$$1$1.ipcRenderer.invoke("fs:writeTextFile", text),
   writeImageFile: (base64Url) => require$$1$1.ipcRenderer.invoke("fs:writeImageFile", base64Url),
   getFileName: (filePath) => require$$1$1.ipcRenderer.invoke("fs:getFileName", filePath),
@@ -11111,6 +11123,18 @@ require$$1$1.contextBridge.exposeInMainWorld("services", {
   listAiCacheFiles: () => require$$1$1.ipcRenderer.invoke("ai:listCacheFiles"),
   generateNextFileName: (dirPath, prefix) => require$$1$1.ipcRenderer.invoke("fs:generateNextFileName", dirPath, prefix),
   writeToFile: (filePath, data) => require$$1$1.ipcRenderer.invoke("fs:writeToFile", filePath, data),
+  // 文件目录（简记模式左侧"文件目录"面板）
+  scanFileTree: (rootPath) => require$$1$1.ipcRenderer.invoke("fs:scanFileTree", rootPath),
+  createChapter: (parentDir, name) => require$$1$1.ipcRenderer.invoke("fs:createChapter", parentDir, name),
+  createDirectory: (parentDir, name) => require$$1$1.ipcRenderer.invoke("fs:createDirectory", parentDir, name),
+  renameNode: (oldPath, newName) => require$$1$1.ipcRenderer.invoke("fs:renameNode", oldPath, newName),
+  createEpubDirectory: (parentDir) => require$$1$1.ipcRenderer.invoke("fs:createEpubDirectory", parentDir),
+  pathExists: (p) => require$$1$1.ipcRenderer.invoke("fs:pathExists", p),
+  exportEpub: (dirPath) => require$$1$1.ipcRenderer.invoke("epub:exportFromDir", dirPath),
+  setEpubCover: (dirPath) => require$$1$1.ipcRenderer.invoke("epub:setCover", dirPath),
+  getEpubCover: (dirPath) => require$$1$1.ipcRenderer.invoke("epub:getCover", dirPath),
+  saveChapterImage: (dirPath, base64DataUrl) => require$$1$1.ipcRenderer.invoke("epub:saveChapterImage", dirPath, base64DataUrl),
+  saveChapterImageFromFile: (dirPath, sourcePath) => require$$1$1.ipcRenderer.invoke("epub:saveChapterImageFromFile", dirPath, sourcePath),
   saveImageToCache: (base64DataUrl) => require$$1$1.ipcRenderer.invoke("image:saveToCache", base64DataUrl),
   createFloatReader: (text, bookTitle, chapterTitle, opacity) => require$$1$1.ipcRenderer.invoke("floatReader:create", text, bookTitle, chapterTitle, opacity),
   closeFloatReader: () => require$$1$1.ipcRenderer.invoke("floatReader:close"),

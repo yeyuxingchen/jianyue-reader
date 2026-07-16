@@ -1,13 +1,29 @@
 <script lang="ts" setup>
-import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue'
+import { computed, ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useNoteSidebarStore } from '@/stores/noteSidebar'
-import type { OutlineItem, NoteHistoryItem, SidebarPanel } from '@/stores/noteSidebar'
+import { useNoteEditorStore } from '@/stores/appMode'
+import { useToastStore } from '@/stores/toast'
+import type { OutlineItem, NoteHistoryItem, FileNode, SidebarPanel } from '@/stores/noteSidebar'
 import {
   Clock,
   ListTree,
   Trash2,
   FileText,
   X,
+  FolderOpen,
+  RefreshCw,
+  Plus,
+  FilePlus,
+  FolderPlus,
+  ChevronRight,
+  ChevronDown,
+  File as FileIcon,
+  Folder as FolderIcon,
+  BookOpen,
+  Download,
+  Loader2,
+  Image as ImageIcon,
+  ImagePlus,
 } from 'lucide-vue-next'
 
 const MIN_WIDTH = 150
@@ -15,6 +31,8 @@ const MAX_WIDTH = 500
 const COLLAPSE_THRESHOLD = 120
 
 const sidebar = useNoteSidebarStore()
+const noteStore = useNoteEditorStore()
+const toast = useToastStore()
 
 const emit = defineEmits<{
   (e: 'open-file', filePath: string): void
@@ -22,19 +40,69 @@ const emit = defineEmits<{
 }>()
 
 const isOpen = computed(() => sidebar.activePanel !== null)
+
 const panelTitle = computed(() => {
   if (sidebar.activePanel === 'history') return '历史记录'
   if (sidebar.activePanel === 'outline') return '文档结构'
+  if (sidebar.activePanel === 'files') {
+    if (!sidebar.fileTreeRootPath) return '文件目录'
+    const parts = sidebar.fileTreeRootPath.split(/[\\/]/).filter(Boolean)
+    if (parts.length === 0) return '文件目录'
+    // 当根目录是 epub 目录时，标题显示父目录的名字（更符合"项目名"语义），
+    // "epub" 仅作为右侧 tag，避免与目录名重复。
+    if (parts[parts.length - 1].toLowerCase() === 'epub' && parts.length >= 2) {
+      return parts[parts.length - 2]
+    }
+    return parts[parts.length - 1]
+  }
   return ''
 })
 
-// 面板实际渲染的内容：关闭时延迟清空，等待收缩动画结束，避免内容瞬间消失
+// 标题对应的完整路径（用于 tooltip 验证，避免被误认为硬编码）
+const panelTitleTooltip = computed(() => {
+  if (sidebar.activePanel === 'files' && sidebar.fileTreeRootPath) {
+    return sidebar.fileTreeRootPath
+  }
+  return ''
+})
+
+const showEpubTag = computed(() => {
+  if (sidebar.activePanel !== 'files') return false
+  // 选中节点是 epub
+  if (sidebar.selectedNodePath) {
+    const node = sidebar.findNode(sidebar.fileTreeNodes, sidebar.selectedNodePath)
+    if (node?.type === 'epub') return true
+  }
+  // 根目录本身就是 epub 目录
+  if (sidebar.fileTreeRootPath) {
+    const parts = sidebar.fileTreeRootPath.split(/[\\/]/)
+    if (parts[parts.length - 1]?.toLowerCase() === 'epub') return true
+  }
+  return false
+})
+
+// 当根目录就是 epub 目录时，显示"导出 epub"按钮
+const isEpubRoot = computed(() => {
+  if (sidebar.activePanel !== 'files' || !sidebar.fileTreeRootPath) return false
+  const parts = sidebar.fileTreeRootPath.split(/[\\/]/).filter(Boolean)
+  return parts.length > 0 && parts[parts.length - 1].toLowerCase() === 'epub'
+})
+
+// 是否存在封面（由 store 维护；切换 root 时会重新查询）
+const hasCover = computed(() => !!sidebar.coverPath)
+
+// 导出时的 loading 状态
+const isExporting = ref(false)
+
 const displayPanel = ref<SidebarPanel>(null)
 watch(
   () => sidebar.activePanel,
   (val) => {
     if (val) {
       displayPanel.value = val
+      if (val === 'files' && sidebar.fileTreeRootPath) {
+        sidebar.refreshFileTree()
+      }
     } else {
       window.setTimeout(() => {
         if (sidebar.activePanel === null) displayPanel.value = null
@@ -51,7 +119,6 @@ const currentWidth = ref(sidebar.panelWidth)
 const dragStartX = ref(0)
 const dragStartWidth = ref(0)
 
-// 面板展开时的拖拽：从面板右边缘开始
 function onResizeStart(e: MouseEvent) {
   e.preventDefault()
   e.stopPropagation()
@@ -61,7 +128,6 @@ function onResizeStart(e: MouseEvent) {
   startDragListeners()
 }
 
-// 面板关闭时的拖拽：从 activity bar 右边缘开始，向右展开
 function onExpandStart(e: MouseEvent) {
   e.preventDefault()
   e.stopPropagation()
@@ -69,7 +135,6 @@ function onExpandStart(e: MouseEvent) {
   dragStartX.value = e.clientX
   dragStartWidth.value = 0
   currentWidth.value = 0
-  // 立即打开上次的活动面板
   sidebar.reopenLastPanel()
   startDragListeners()
 }
@@ -88,15 +153,12 @@ function onDragMove(e: MouseEvent) {
   const delta = e.clientX - dragStartX.value
 
   if (dragMode.value === 'expand') {
-    // 展开模式：只有向右拖拽才增大宽度，向左不会触发隐藏
     if (delta <= 0) {
       currentWidth.value = 0
       return
     }
-    // 宽度跟随鼠标（向右为正方向）
     const newWidth = delta
     if (newWidth < MIN_WIDTH) {
-      // 还不够宽，显示拖拽中的临时宽度
       currentWidth.value = newWidth
     } else {
       currentWidth.value = Math.min(MAX_WIDTH, newWidth)
@@ -104,10 +166,8 @@ function onDragMove(e: MouseEvent) {
     return
   }
 
-  // resize 模式：面板已展开，调整宽度
   const newWidth = dragStartWidth.value + delta
   if (newWidth < COLLAPSE_THRESHOLD) {
-    // 宽度低于阈值 — 立刻收起，结束拖拽
     cleanupDrag()
     sidebar.closePanel()
     return
@@ -117,24 +177,18 @@ function onDragMove(e: MouseEvent) {
 
 function onDragEnd() {
   if (dragMode.value === 'none') return
-
   const finalWidth = currentWidth.value
-
   if (dragMode.value === 'expand') {
     if (finalWidth < MIN_WIDTH) {
-      // 展开拖拽距离不够，收起
       cleanupDrag()
       sidebar.closePanel()
     } else {
-      // 展开成功，保存宽度
       cleanupDrag()
       sidebar.panelWidth = finalWidth
       sidebar.savePanelWidth()
     }
     return
   }
-
-  // resize 模式
   if (finalWidth < MIN_WIDTH) {
     cleanupDrag()
     sidebar.closePanel()
@@ -159,16 +213,16 @@ const isDragging = computed(() => dragMode.value !== 'none')
 
 const panelStyle = computed(() => {
   if (isDragging.value) {
-    // 拖拽中实时跟随鼠标，且由 .is-dragging 关闭过渡动画
     return { width: `${currentWidth.value}px` }
   }
-  // 展开时为目标宽度，收起时收缩为 0，配合 CSS transition 形成展开/收起动效
   const w = sidebar.activePanel ? sidebar.panelWidth : 0
   return { width: `${w}px` }
 })
 
 onBeforeUnmount(() => {
   cleanupDrag()
+  document.removeEventListener('keydown', onPanelKeydown)
+  document.removeEventListener('click', onDocumentClickForPopup)
 })
 
 // ===== 辅助函数 =====
@@ -198,17 +252,347 @@ function onHistoryClick(item: NoteHistoryItem) {
   emit('open-file', item.filePath)
 }
 
+// ===== 文件目录相关 =====
+
+async function onFilesIconClick() {
+  // 已打开 → 关闭
+  if (sidebar.activePanel === 'files') {
+    sidebar.togglePanel('files')
+    return
+  }
+  // 还没有根目录：优先用当前文件所在目录；没有就提示先打开一个文件
+  if (!sidebar.fileTreeRootPath) {
+    const cur = noteStore.currentFilePath
+    if (cur) {
+      const parentDir = getParentDir(cur)
+      if (parentDir) {
+        await window.electronAPI?.security.addAuthorizedDir(parentDir)
+        sidebar.setFileTreeRoot(parentDir)
+      } else {
+        toast.show('无法识别当前文件所在目录')
+        return
+      }
+    } else {
+      toast.show('请先打开或新建一个文件')
+      return
+    }
+  }
+  // 切换面板，下方 watch(activePanel) 会自动触发刷新
+  sidebar.togglePanel('files')
+}
+
+/**
+ * 从文件路径中提取父目录（兼容 / 与 \）。
+ * 若本身就是根目录（找不到分隔符），返回空串。
+ */
+function getParentDir(filePath: string): string {
+  const idx = Math.max(filePath.lastIndexOf('/'), filePath.lastIndexOf('\\'))
+  return idx > 0 ? filePath.substring(0, idx) : ''
+}
+
+async function onRefreshTree() {
+  await sidebar.refreshFileTree()
+}
+
+/**
+ * 导出当前 epub 目录为 .epub 文件。
+ * - 委托后端完成 markdown → HTML → epub 打包
+ * - 后端内部弹系统保存对话框
+ * - 成功后通过 toast 反馈
+ */
+async function onExportEpub() {
+  if (isExporting.value) return
+  if (!sidebar.fileTreeRootPath) {
+    toast.show('请先选择 epub 目录')
+    return
+  }
+  isExporting.value = true
+  try {
+    const result = await window.services?.exportEpub?.(sidebar.fileTreeRootPath)
+    if (result) {
+      const sizeKB = (result.size / 1024).toFixed(1)
+      toast.show(`已导出 ${result.chapterCount} 章 → ${result.fileName}（${sizeKB} KB）`)
+    }
+    // 用户取消保存对话框 → 静默不提示
+  } catch (err: any) {
+    console.error('导出 epub 失败:', err)
+    toast.show(err?.message || '导出失败')
+  } finally {
+    isExporting.value = false
+  }
+}
+
+/**
+ * 选择一个图片作为 epub 封面。
+ * 后端会弹系统图片选择对话框，选中后复制到 <epubDir>/.image/cover.<ext>。
+ * 若封面已存在则替换。.image 目录在文件树中不展示。
+ */
+async function onPickCover() {
+  if (!sidebar.fileTreeRootPath) {
+    toast.show('请先选择 epub 目录')
+    return
+  }
+  try {
+    const result = await window.services?.setEpubCover?.(sidebar.fileTreeRootPath)
+    if (result) {
+      // 同步 store 中的封面路径（hasCover 由此计算）
+      sidebar.setCoverPath(result.coverPath)
+      toast.show('封面已更新')
+    }
+    // 用户取消 → 静默
+  } catch (err: any) {
+    console.error('设置封面失败:', err)
+    toast.show(err?.message || '设置封面失败')
+  }
+}
+
+function onToggleNewPopup() {
+  if (!sidebar.fileTreeRootPath) {
+    toast.show('请先选择文件目录')
+    return
+  }
+  sidebar.showNewPopup = !sidebar.showNewPopup
+}
+
+function onCreateChapter() {
+  sidebar.showNewPopup = false
+  if (!sidebar.fileTreeRootPath) {
+    toast.show('请先选择文件目录')
+    return
+  }
+  sidebar.startCreating('chapter')
+  nextTick(() => focusCreatingInput())
+}
+
+function onCreateDirectory() {
+  sidebar.showNewPopup = false
+  if (!sidebar.fileTreeRootPath) {
+    toast.show('请先选择文件目录')
+    return
+  }
+  sidebar.startCreating('directory')
+  nextTick(() => focusCreatingInput())
+}
+
+function focusCreatingInput() {
+  const el = document.querySelector('.tree-input.creating') as HTMLInputElement | null
+  if (el) {
+    el.focus()
+    el.select()
+  }
+}
+
+function focusRenamingInput() {
+  const el = document.querySelector('.tree-input.renaming') as HTMLInputElement | null
+  if (el) {
+    el.focus()
+    el.select()
+  }
+}
+
+async function onCreatingSubmit(value: string) {
+  if (!sidebar.creatingState) return
+  const { type, parentDir } = sidebar.creatingState
+  const name = (value || '').trim()
+  if (!name) {
+    sidebar.cancelCreating()
+    return
+  }
+  try {
+    if (type === 'chapter') {
+      const result = await window.services?.createChapter?.(parentDir, name)
+      if (result) {
+        toast.show(`已创建章节: ${result.name}`)
+        await sidebar.refreshFileTree()
+        sidebar.selectNode(result.path)
+        emit('open-file', result.path)
+      }
+    } else {
+      const result = await window.services?.createDirectory?.(parentDir, name)
+      if (result) {
+        toast.show(`已创建目录: ${result.name}`)
+        await sidebar.refreshFileTree()
+        sidebar.selectNode(result.path)
+      }
+    }
+  } catch (err: any) {
+    console.error('创建失败:', err)
+    toast.show(err?.message || '创建失败')
+  } finally {
+    sidebar.cancelCreating()
+  }
+}
+
+function onCreatingCancel() {
+  sidebar.cancelCreating()
+}
+
+async function onRenamingSubmit(value: string) {
+  if (!sidebar.renamingPath) return
+  const newName = (value || '').trim()
+  if (!newName) {
+    sidebar.cancelRenaming()
+    return
+  }
+  const oldPath = sidebar.renamingPath
+  try {
+    await window.services?.renameNode?.(oldPath, newName)
+    toast.show('已重命名')
+    await sidebar.refreshFileTree()
+  } catch (err: any) {
+    console.error('重命名失败:', err)
+    toast.show(err?.message || '重命名失败')
+  } finally {
+    sidebar.cancelRenaming()
+  }
+}
+
+function onRenamingCancel() {
+  sidebar.cancelRenaming()
+}
+
+function onChapterClick(node: FileNode) {
+  sidebar.selectNode(node.path)
+  emit('open-file', node.path)
+}
+
+function onDirectoryClick(node: FileNode) {
+  sidebar.selectNode(node.path)
+  sidebar.showNewPopup = false
+}
+
+function onToggleExpand(dirPath: string) {
+  sidebar.toggleExpand(dirPath)
+}
+
+function onDocumentClickForPopup(e: MouseEvent) {
+  if (!sidebar.showNewPopup) return
+  const target = e.target as HTMLElement
+  if (!target.closest('.new-popup') && !target.closest('.new-btn')) {
+    sidebar.showNewPopup = false
+  }
+}
+
+function onPanelKeydown(e: KeyboardEvent) {
+  if (sidebar.activePanel !== 'files') return
+  if (e.key === 'F2' && sidebar.selectedNodePath && !sidebar.renamingPath && !sidebar.creatingState) {
+    e.preventDefault()
+    sidebar.startRenaming(sidebar.selectedNodePath)
+    nextTick(() => focusRenamingInput())
+  }
+  if (e.key === 'Escape') {
+    if (sidebar.renamingPath) sidebar.cancelRenaming()
+    else if (sidebar.creatingState) sidebar.cancelCreating()
+  }
+}
+
+const creatingDefaultName = computed(() => {
+  if (!sidebar.creatingState) return ''
+  return sidebar.creatingState.type === 'chapter'
+    ? sidebar.computeNextChapterName()
+    : sidebar.computeNextDirectoryName()
+})
+
+const renamingDefaultName = computed(() => {
+  if (!sidebar.renamingPath) return ''
+  const node = sidebar.findNode(sidebar.fileTreeNodes, sidebar.renamingPath)
+  return node?.name || ''
+})
+
+function isCreatingInDir(dirPath: string): boolean {
+  if (!sidebar.creatingState) return false
+  return sidebar.creatingState.parentDir === dirPath
+}
+
+function isNodeSelected(p: string): boolean {
+  return sidebar.selectedNodePath === p
+}
+
+function nodeKey(n: FileNode): string {
+  return n.type + ':' + n.path
+}
+
+// 构建"扁平化"渲染列表：递归遍历 fileTreeNodes，生成每行信息
+interface FlatRow {
+  node: FileNode
+  depth: number
+  expanded: boolean
+  isDir: boolean
+  isRenaming: boolean
+  showChildren: boolean
+  showCreatingHere: boolean
+}
+
+function flattenTree(nodes: FileNode[], depth: number): FlatRow[] {
+  const rows: FlatRow[] = []
+  for (const n of nodes) {
+    const isDir = n.type === 'directory' || n.type === 'epub'
+    const expanded = isDir ? sidebar.isExpanded(n.path) : false
+    const isRenaming = sidebar.renamingPath === n.path
+    const showCreatingHere = isDir && isCreatingInDir(n.path)
+    rows.push({
+      node: n,
+      depth,
+      expanded,
+      isDir,
+      isRenaming,
+      showChildren: isDir && expanded,
+      showCreatingHere,
+    })
+    if (isDir && expanded) {
+      if (n.children) {
+        rows.push(...flattenTree(n.children, depth + 1))
+      }
+    }
+  }
+  return rows
+}
+
+const flatRows = computed<FlatRow[]>(() => {
+  return flattenTree(sidebar.fileTreeNodes, 0)
+})
+
 onMounted(() => {
   sidebar.loadHistory()
   sidebar.loadPanelWidth()
+  sidebar.loadFileRootPath()
   currentWidth.value = sidebar.panelWidth
+  document.addEventListener('keydown', onPanelKeydown)
+  document.addEventListener('click', onDocumentClickForPopup)
 })
+
+watch(
+  () => sidebar.activePanel,
+  (val) => {
+    if (val === 'files' && sidebar.fileTreeRootPath) {
+      sidebar.refreshFileTree()
+    }
+  }
+)
+
+watch(
+  () => noteStore.currentFilePath,
+  (val) => {
+    if (val && sidebar.activePanel === 'files') {
+      sidebar.selectNode(val)
+    }
+  }
+)
 </script>
 
 <template>
   <div class="note-sidebar" :class="{ 'panel-open': isOpen, 'is-dragging': isDragging }">
     <!-- Activity Bar (图标导航栏) -->
     <div class="activity-bar">
+      <!-- 文件目录（在历史记录之上） -->
+      <button
+        class="activity-btn"
+        :class="{ active: sidebar.activePanel === 'files' }"
+        @click="onFilesIconClick"
+        title="文件目录"
+      >
+        <FolderOpen :size="20" :stroke-width="1.8" />
+      </button>
       <button
         class="activity-btn"
         :class="{ active: sidebar.activePanel === 'history' }"
@@ -245,10 +629,70 @@ onMounted(() => {
 
       <!-- 面板头部 -->
       <div class="panel-header">
-        <span class="panel-title">{{ panelTitle }}</span>
+        <div class="panel-header-left">
+          <span class="panel-title" :title="panelTitleTooltip">{{ panelTitle }}</span>
+          <span v-if="showEpubTag" class="epub-tag">epub</span>
+        </div>
         <button class="panel-close" @click="sidebar.closePanel()" title="关闭面板">
           <X :size="14" />
         </button>
+      </div>
+
+      <!-- 文件目录：操作面板（无 border / box-shadow，仅有高度） -->
+      <div v-if="displayPanel === 'files'" class="panel-actions">
+        <button
+          class="action-btn"
+          @click="onRefreshTree"
+          title="刷新"
+        >
+          <RefreshCw :size="14" :stroke-width="1.8" />
+        </button>
+        <div class="action-spacer"></div>
+        <!-- 导出 epub：仅在根目录是 epub 时显示，位于"+"按钮左侧 -->
+        <button
+          v-if="isEpubRoot"
+          class="action-btn export-btn"
+          :disabled="isExporting"
+          @click="onExportEpub"
+          :title="isExporting ? '正在导出…' : '导出 epub'"
+        >
+          <!-- 导出中：切换为 Loader2 图标（自带旋转动画） -->
+          <Loader2 v-if="isExporting" :size="14" :stroke-width="1.8" class="loader-icon" />
+          <Download v-else :size="14" :stroke-width="1.8" />
+        </button>
+        <!-- 封面：位于导出按钮右侧 -->
+        <button
+          v-if="isEpubRoot"
+          class="action-btn cover-btn"
+          :class="{ 'has-cover': hasCover }"
+          @click="onPickCover"
+          :title="hasCover ? '替换封面' : '设置封面'"
+        >
+          <ImagePlus v-if="!hasCover" :size="14" :stroke-width="1.8" />
+          <ImageIcon v-else :size="14" :stroke-width="1.8" />
+        </button>
+        <div class="new-btn-wrap">
+          <button
+            class="action-btn new-btn"
+            @click="onToggleNewPopup"
+            title="新建"
+          >
+            <Plus :size="14" :stroke-width="2" />
+          </button>
+          <!-- 新建弹窗 -->
+          <Transition name="popup-fade">
+            <div v-if="sidebar.showNewPopup" class="new-popup">
+              <div class="new-popup-item" @mousedown.prevent="onCreateChapter">
+                <FilePlus :size="13" :stroke-width="1.8" />
+                <span>创建章节</span>
+              </div>
+              <div class="new-popup-item" @mousedown.prevent="onCreateDirectory">
+                <FolderPlus :size="13" :stroke-width="1.8" />
+                <span>创建目录</span>
+              </div>
+            </div>
+          </Transition>
+        </div>
       </div>
 
       <!-- 历史记录面板 -->
@@ -310,6 +754,149 @@ onMounted(() => {
           </div>
         </div>
       </div>
+
+      <!-- 文件目录面板 -->
+      <div v-if="displayPanel === 'files'" class="panel-body custom-scrollbar-compact">
+        <div v-if="!sidebar.fileTreeRootPath" class="panel-empty">
+          <FolderOpen :size="32" :stroke-width="1.2" class="empty-icon" />
+          <p>未选择文件目录</p>
+          <p class="empty-hint">请先打开或新建一个文件</p>
+        </div>
+        <div v-else-if="sidebar.fileTreeLoading" class="panel-empty">
+          <RefreshCw :size="24" :stroke-width="1.4" class="empty-icon spin" />
+          <p>加载中…</p>
+        </div>
+        <div v-else>
+          <!-- 根级 creating 输入行：始终显示（即使目录为空） -->
+          <div
+            v-if="isCreatingInDir(sidebar.fileTreeRootPath)"
+            class="tree-row is-creating"
+            :style="{ paddingLeft: 8 + 'px' }"
+          >
+            <span class="tree-toggle-spacer"></span>
+            <span class="tree-icon">
+              <FilePlus v-if="sidebar.creatingState?.type === 'chapter'" :size="14" :stroke-width="1.8" />
+              <FolderPlus v-else :size="14" :stroke-width="1.8" />
+            </span>
+            <input
+              class="tree-input creating"
+              type="text"
+              :value="creatingDefaultName"
+              :placeholder="sidebar.creatingState?.type === 'chapter' ? '章节名' : '目录名'"
+              @mousedown.stop
+              @click.stop
+              @keydown.stop="(e: KeyboardEvent) => {
+                if (e.key === 'Enter') { e.preventDefault(); onCreatingSubmit((e.target as HTMLInputElement).value) }
+                else if (e.key === 'Escape') { e.preventDefault(); onCreatingCancel() }
+              }"
+              @blur="(e: FocusEvent) => {
+                const v = (e.target as HTMLInputElement).value.trim()
+                onCreatingSubmit(v || creatingDefaultName)
+              }"
+            />
+          </div>
+          <!-- 空目录：仅在非 creating 时显示 -->
+          <div
+            v-else-if="sidebar.fileTreeNodes.length === 0"
+            class="panel-empty"
+          >
+            <FolderOpen :size="32" :stroke-width="1.2" class="empty-icon" />
+            <p>该目录为空</p>
+            <p class="empty-hint">点击右上角 + 创建章节或目录</p>
+          </div>
+          <!-- 正常的文件树 -->
+          <div v-else class="file-tree">
+            <!-- 扁平化的文件树 -->
+            <template v-for="row in flatRows" :key="nodeKey(row.node)">
+            <div
+              class="tree-row"
+              :class="{
+                'is-dir': row.isDir,
+                'is-chapter': !row.isDir,
+                'is-selected': isNodeSelected(row.node.path),
+                'is-epub': row.node.type === 'epub',
+              }"
+              :style="{ paddingLeft: (8 + row.depth * 14) + 'px' }"
+              @click="(e: MouseEvent) => {
+                const t = e.target as HTMLElement
+                if (t.closest('.tree-input, .tree-toggle')) return
+                if (row.isDir) onDirectoryClick(row.node)
+                else onChapterClick(row.node)
+              }"
+              @dblclick="(e: MouseEvent) => {
+                const t = e.target as HTMLElement
+                if (t.closest('.tree-input, .tree-toggle')) return
+                if (isNodeSelected(row.node.path)) {
+                  sidebar.startRenaming(row.node.path)
+                  nextTick(() => focusRenamingInput())
+                }
+              }"
+            >
+              <span
+                v-if="row.isDir"
+                class="tree-toggle"
+                @click.stop="onToggleExpand(row.node.path)"
+              >
+                <ChevronDown v-if="row.expanded" :size="12" :stroke-width="2" />
+                <ChevronRight v-else :size="12" :stroke-width="2" />
+              </span>
+              <span v-else class="tree-toggle-spacer"></span>
+              <span class="tree-icon">
+                <BookOpen v-if="row.node.type === 'epub'" :size="14" :stroke-width="1.8" />
+                <FolderIcon v-else-if="row.isDir" :size="14" :stroke-width="1.8" />
+                <FileIcon v-else :size="14" :stroke-width="1.8" />
+              </span>
+              <input
+                v-if="row.isRenaming"
+                class="tree-input renaming"
+                type="text"
+                :value="renamingDefaultName"
+                @mousedown.stop
+                @click.stop
+                @keydown.stop="(e: KeyboardEvent) => {
+                  if (e.key === 'Enter') { e.preventDefault(); onRenamingSubmit((e.target as HTMLInputElement).value) }
+                  else if (e.key === 'Escape') { e.preventDefault(); onRenamingCancel() }
+                }"
+                @blur="(e: FocusEvent) => {
+                  onRenamingSubmit((e.target as HTMLInputElement).value)
+                }"
+              />
+              <span v-else class="tree-name">
+                {{ row.node.name }}<span v-if="row.node.type === 'chapter'" class="tree-ext">.md</span>
+              </span>
+            </div>
+            <!-- 目录展开后，该目录下的 creating 输入行 -->
+            <div
+              v-if="row.showCreatingHere"
+              class="tree-row is-creating"
+              :style="{ paddingLeft: (8 + (row.depth + 1) * 14) + 'px' }"
+            >
+              <span class="tree-toggle-spacer"></span>
+              <span class="tree-icon">
+                <FilePlus v-if="sidebar.creatingState?.type === 'chapter'" :size="14" :stroke-width="1.8" />
+                <FolderPlus v-else :size="14" :stroke-width="1.8" />
+              </span>
+              <input
+                class="tree-input creating"
+                type="text"
+                :value="creatingDefaultName"
+                :placeholder="sidebar.creatingState?.type === 'chapter' ? '章节名' : '目录名'"
+                @mousedown.stop
+                @click.stop
+                @keydown.stop="(e: KeyboardEvent) => {
+                  if (e.key === 'Enter') { e.preventDefault(); onCreatingSubmit((e.target as HTMLInputElement).value) }
+                  else if (e.key === 'Escape') { e.preventDefault(); onCreatingCancel() }
+                }"
+                @blur="(e: FocusEvent) => {
+                  const v = (e.target as HTMLInputElement).value.trim()
+                  onCreatingSubmit(v || creatingDefaultName)
+                }"
+              />
+            </div>
+          </template>
+        </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -323,7 +910,6 @@ onMounted(() => {
   z-index: 10;
 
   &.is-dragging {
-    // 拖拽期间禁止任何过渡动画
     *, *::before, *::after {
       transition: none !important;
     }
@@ -339,17 +925,13 @@ onMounted(() => {
   align-items: center;
   padding-top: 6px;
   gap: 6px;
-  // 使用主题专属的 chrome 色阶（--bg-chrome），保留主题色相、干净不灰，
-  // 使图标栏与编辑区拉开层次（所有主题通用）
   background: var(--bg-chrome);
   border-right: 1px solid var(--border-color);
-  // 向右投出极轻的阴影，让图标栏像一条独立的功能轨道浮在编辑区之上
   box-shadow: 1px 0 4px -2px rgba(0, 0, 0, 0.08);
   position: relative;
   z-index: 2;
 }
 
-// 面板关闭时 activity bar 右侧的展开拖拽区域
 .expand-handle {
   position: absolute;
   right: -3px;
@@ -383,7 +965,6 @@ onMounted(() => {
 
   &:hover {
     color: var(--text-primary);
-    // 悬停时以主题强调色做淡色填充，柔和且统一
     background: color-mix(in srgb, var(--accent-color) 14%, transparent);
   }
 
@@ -413,38 +994,30 @@ onMounted(() => {
 .side-panel {
   display: flex;
   flex-direction: column;
-  // 面板为中间一档（bg-primary），比编辑区（bg-secondary）深、比图标栏浅
   background: var(--bg-primary);
   overflow: hidden;
   position: relative;
   flex-shrink: 0;
-  // 去掉右边框，仅用右侧阴影与编辑区区分层次（阴影略加强以补偿无边框）
   box-shadow: 4px 0 12px -6px rgba(0, 0, 0, 0.14);
-  // 展开/收起宽度过渡；拖拽时由 .is-dragging 强制关闭过渡
   transition: width 0.26s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.26s ease;
 
   &.collapsed {
-    // 完全收起时不显示阴影与拖拽手柄
     box-shadow: none;
-
-    .resize-handle {
-      display: none;
-    }
-
-    // 内容随收起淡出，过渡更自然
+    .resize-handle { display: none; }
     .panel-header,
-    .panel-body {
+    .panel-body,
+    .panel-actions {
       opacity: 0;
     }
   }
 
   .panel-header,
-  .panel-body {
+  .panel-body,
+  .panel-actions {
     transition: opacity 0.2s ease;
   }
 }
 
-// ===== 拖拽手柄 =====
 .resize-handle {
   position: absolute;
   right: -3px;
@@ -469,10 +1042,15 @@ onMounted(() => {
   justify-content: space-between;
   padding: 4px 12px;
   flex-shrink: 0;
-  // 与 NoteToolbar 一致：去掉底边框，改用底部投影与面板内容区分
   box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.10);
-  // 与 NoteToolbar 高度（min-height: 36px）保持一致，底部对齐
   min-height: 36px;
+}
+
+.panel-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }
 
 .panel-title {
@@ -481,6 +1059,21 @@ onMounted(() => {
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.epub-tag {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: lowercase;
+  letter-spacing: 0.5px;
+  color: var(--accent-color);
+  background: color-mix(in srgb, var(--accent-color) 14%, transparent);
+  padding: 1px 6px;
+  border-radius: 3px;
+  flex-shrink: 0;
 }
 
 .panel-close {
@@ -502,13 +1095,131 @@ onMounted(() => {
   }
 }
 
+// ===== 文件目录：操作面板 =====
+.panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+  min-height: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border: none;
+  box-shadow: none;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.12s;
+  flex-shrink: 0;
+
+  &:hover:not(:disabled) {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.action-btn.export-btn {
+  color: var(--accent-color);
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--accent-color) 14%, transparent);
+    color: var(--accent-color);
+  }
+}
+
+// Loader2 图标旋转动画
+.loader-icon {
+  animation: loader-spin 1s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes loader-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.action-btn.cover-btn {
+  color: var(--text-tertiary);
+
+  &:hover {
+    color: var(--accent-color);
+    background: color-mix(in srgb, var(--accent-color) 14%, transparent);
+  }
+
+  &.has-cover {
+    color: var(--accent-color);
+  }
+}
+
+.action-spacer {
+  flex: 1;
+}
+
+.new-btn-wrap {
+  position: relative;
+}
+
+.new-popup {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 130px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  padding: 4px 0;
+  z-index: 100;
+}
+
+.new-popup-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.1s;
+
+  &:hover {
+    background: color-mix(in srgb, var(--accent-color) 14%, transparent);
+    color: var(--accent-color);
+  }
+}
+
+.popup-fade-enter-active,
+.popup-fade-leave-active {
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+.popup-fade-enter-from,
+.popup-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+// ===== panel body =====
 .panel-body {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
-// ===== 空状态 =====
 .panel-empty {
   display: flex;
   flex-direction: column;
@@ -521,6 +1232,10 @@ onMounted(() => {
   .empty-icon {
     margin-bottom: 12px;
     opacity: 0.4;
+  }
+
+  .spin {
+    animation: spin 1.2s linear infinite;
   }
 
   p {
@@ -549,7 +1264,6 @@ onMounted(() => {
 
   &:hover {
     background: var(--bg-tertiary);
-
     .history-remove {
       opacity: 1;
     }
@@ -680,4 +1394,116 @@ onMounted(() => {
 .outline-h4 .outline-text,
 .outline-h5 .outline-text,
 .outline-h6 .outline-text { font-weight: 400; color: var(--text-tertiary); font-size: 11px; }
+
+// ===== 文件目录树 =====
+.file-tree {
+  padding: 4px 0;
+}
+
+.tree-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: background 0.1s;
+  user-select: none;
+  min-height: 24px;
+
+  &:hover {
+    background: var(--bg-tertiary);
+  }
+
+  &.is-selected {
+    background: color-mix(in srgb, var(--accent-color) 14%, transparent);
+
+    .tree-name {
+      color: var(--accent-color);
+      font-weight: 500;
+    }
+  }
+
+  &.is-epub .tree-name {
+    color: var(--accent-color);
+  }
+
+  &.is-creating {
+    background: color-mix(in srgb, var(--accent-color) 8%, transparent);
+    cursor: default;
+  }
+}
+
+.tree-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: color 0.1s;
+
+  &:hover {
+    color: var(--text-primary);
+    background: rgba(0, 0, 0, 0.05);
+  }
+}
+
+.tree-toggle-spacer {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.tree-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--text-secondary);
+
+  .is-epub & {
+    color: var(--accent-color);
+  }
+}
+
+.tree-name {
+  font-size: 12px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+  line-height: 1.4;
+}
+
+.tree-ext {
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+
+.tree-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--accent-color);
+  border-radius: 3px;
+  padding: 1px 6px;
+  outline: none;
+  height: 20px;
+  line-height: 1.2;
+  font-family: inherit;
+
+  &:focus {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-color) 25%, transparent);
+  }
+}
 </style>
