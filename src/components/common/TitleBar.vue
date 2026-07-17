@@ -534,7 +534,7 @@ async function handleCreateEpubDirectory() {
     await window.electronAPI?.security.addAuthorizedDir(result.path)
 
     // 5. 自动打开文件目录面板并把根目录切换到 epub 目录本身
-    sidebar.setFileTreeRoot(result.path)
+    await sidebar.setFileTreeRoot(result.path)
     sidebar.selectNode(result.path)
     sidebar.togglePanel('files')
     await sidebar.refreshFileTree()
@@ -556,11 +556,11 @@ async function handleOpenEpubDirectory() {
     if (!dirPath) return
 
     await window.electronAPI?.security.addAuthorizedDir(dirPath)
-    sidebar.setFileTreeRoot(dirPath)
-    sidebar.selectNode(dirPath)
+    await sidebar.setFileTreeRoot(dirPath)
+    sidebar.selectNode(sidebar.fileTreeRootPath || dirPath)
     sidebar.togglePanel('files')
     await sidebar.refreshFileTree()
-    sidebar.addToHistory(dirPath)
+    sidebar.addToHistory(sidebar.fileTreeRootPath || dirPath)
     toast.show('已打开目录')
   } catch (err: any) {
     console.error('打开 epub 目录失败:', err)

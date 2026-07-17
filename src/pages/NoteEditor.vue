@@ -755,12 +755,13 @@ async function handleOpenFromHistory(filePath: string) {
 async function handleOpenEpubProject(epubDir: string) {
   try {
     await window.electronAPI?.security.addAuthorizedDir(epubDir)
-    sidebar.setFileTreeRoot(epubDir)
+    await sidebar.setFileTreeRoot(epubDir)
     if (sidebar.activePanel !== 'files') {
       sidebar.togglePanel('files')
     }
     await sidebar.refreshFileTree()
-    sidebar.addToHistory(epubDir)
+    // setFileTreeRoot 可能将根路径收敛到 epub 子目录，使用收敛后的路径记录历史
+    sidebar.addToHistory(sidebar.fileTreeRootPath || epubDir)
   } catch (err) {
     console.error('打开 epub 项目失败:', err)
     toast.show('目录不存在或无法打开')
@@ -844,7 +845,7 @@ async function syncFileTreeRootToFileDir(filePath: string) {
   }
   try {
     await window.electronAPI?.security.addAuthorizedDir(parentDir)
-    sidebar.setFileTreeRoot(parentDir)
+    await sidebar.setFileTreeRoot(parentDir)
   } catch (err) {
     console.warn('同步文件目录失败:', err)
   }

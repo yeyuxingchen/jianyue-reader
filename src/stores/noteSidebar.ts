@@ -18,11 +18,23 @@ export interface NoteHistoryItem {
 }
 
 /**
- * 判断路径是否为 epub 目录（路径最后一段为 'epub'，不区分大小写）。
+ * 判断路径本身是否为名为 'epub' 的目录（不区分大小写）。
  */
 export function isEpubDirPath(path: string): boolean {
   const parts = path.split(/[\\/]/).filter(Boolean)
   return parts.length > 0 && parts[parts.length - 1].toLowerCase() === 'epub'
+}
+
+/**
+ * 在文件树中查找名为 'epub' 的子目录节点（不区分大小写）。
+ */
+function findEpubChild(nodes: FileNode[]): FileNode | null {
+  for (const n of nodes) {
+    if ((n.type === 'directory' || n.type === 'epub') && n.name.toLowerCase() === 'epub') {
+      return n
+    }
+  }
+  return null
 }
 
 /**
@@ -230,19 +242,41 @@ export const useNoteSidebarStore = defineStore('noteSidebar', () => {
     electronStore.setItem(FILE_ROOT_STORAGE_KEY, fileTreeRootPath.value)
   }
 
-  /** 设置文件目录根路径（不会自动刷新，调用方需显式 refreshFileTree） */
-  function setFileTreeRoot(path: string | null) {
-    fileTreeRootPath.value = path
+  /**
+   * 设置文件目录根路径。
+   * - 若根目录自身不是 epub 目录，但其下存在名为 'epub' 的子目录，
+   *   则自动将根路径收敛到该 epub 子目录（视为打开 epub 项目目录）。
+   * - 不会自动刷新，调用方需显式 refreshFileTree。
+   */
+  async function setFileTreeRoot(path: string | null) {
     if (path === null) {
+      fileTreeRootPath.value = null
       fileTreeNodes.value = []
       selectedNodePath.value = null
       renamingPath.value = null
       creatingState.value = null
       expandedDirs.value = {}
       coverPath.value = null
+      saveFileRootPath()
+      return
     }
+
+    // 若根路径本身不是 epub 目录，尝试探测其下是否存在 epub 子目录
+    if (!isEpubDirPath(path)) {
+      try {
+        const nodes = await window.services?.scanFileTree?.(path)
+        const epubChild = findEpubChild(Array.isArray(nodes) ? nodes : [])
+        if (epubChild) {
+          path = epubChild.path
+        }
+      } catch {
+        // 探测失败则按普通目录处理
+      }
+    }
+
+    fileTreeRootPath.value = path
     saveFileRootPath()
-    if (path) loadCover(path)
+    loadCover(path)
   }
 
   async function loadCover(dirPath: string) {
