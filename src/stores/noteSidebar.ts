@@ -267,7 +267,7 @@ export const useNoteSidebarStore = defineStore('noteSidebar', () => {
     fileTreeLoading.value = true
     try {
       const nodes = await window.services?.scanFileTree?.(fileTreeRootPath.value)
-      fileTreeNodes.value = Array.isArray(nodes) ? nodes : []
+      fileTreeNodes.value = Array.isArray(nodes) ? sortFileTree(nodes) : []
     } catch (err) {
       console.error('刷新文件树失败:', err)
       fileTreeNodes.value = []
@@ -435,6 +435,57 @@ export const useNoteSidebarStore = defineStore('noteSidebar', () => {
     const max = seq.length > 0 ? Math.max(...seq) : 0
     if (max === 0) return prefix
     return `${prefix}${toCn(max + 1)}`
+  }
+
+  /**
+   * 提取节点名的数字排序键：
+   * - "章节N"（中文或阿拉伯数字）→ N
+   * - "新建目录" → 0，"新建目录N" → N
+   * - 其他 → null（按名称字母序排列）
+   */
+  function getNodeSortKey(name: string): number | null {
+    const chapterMatch = name.match(/^章节(.+)$/)
+    if (chapterMatch) {
+      const tail = chapterMatch[1].trim()
+      const cnNum = fromCn(tail)
+      if (cnNum > 0) return cnNum
+      const arNum = parseInt(tail, 10)
+      if (!isNaN(arNum) && arNum > 0) return arNum
+    }
+    const dirMatch = name.match(/^新建目录(.*)$/)
+    if (dirMatch) {
+      const tail = dirMatch[1].trim()
+      if (tail === '') return 0
+      const cnNum = fromCn(tail)
+      if (cnNum > 0) return cnNum
+      const arNum = parseInt(tail, 10)
+      if (!isNaN(arNum) && arNum > 0) return arNum
+    }
+    return null
+  }
+
+  /** 数字感知比较：双方都有数字键时按数字排序，否则按名称字母序 */
+  function compareNodesByName(a: FileNode, b: FileNode): number {
+    const ka = getNodeSortKey(a.name)
+    const kb = getNodeSortKey(b.name)
+    if (ka !== null && kb !== null) {
+      if (ka !== kb) return ka - kb
+    }
+    return a.name.localeCompare(b.name, 'zh-Hans-CN')
+  }
+
+  /** 递归排序文件树：目录在前、章节在后，各自按数字优先排序 */
+  function sortFileTree(nodes: FileNode[]): FileNode[] {
+    const dirs = nodes.filter(n => n.type === 'directory' || n.type === 'epub')
+    const chapters = nodes.filter(n => n.type === 'chapter')
+    dirs.sort(compareNodesByName)
+    chapters.sort(compareNodesByName)
+    for (const d of dirs) {
+      if (d.children && d.children.length > 0) {
+        d.children = sortFileTree(d.children)
+      }
+    }
+    return [...dirs, ...chapters]
   }
 
   return {
