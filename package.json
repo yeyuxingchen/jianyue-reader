@@ -128,7 +128,8 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "shortcutName": "简阅",
-      "artifactName": "${productName} Setup ${version}-${arch}.${ext}"
+      "artifactName": "${productName} Setup ${version}-${arch}.${ext}",
+      "include": "build/installer.nsh"
     },
     "fileAssociations": [
       {
