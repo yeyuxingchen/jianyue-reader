@@ -151,6 +151,7 @@ const menus = computed<MenuGroup[]>(() => {
           },
           { divider: true, label: '' },
           { label: '创建epub目录', action: handleCreateEpubDirectory },
+          { label: '打开epub目录...', action: handleOpenEpubDirectory },
           { divider: true, label: '' },
           { label: '保存', shortcut: 'Ctrl+S', action: handleSaveFile },
           { label: '另存为...', shortcut: 'Ctrl+Shift+S', action: handleSaveAsFile },
@@ -537,11 +538,33 @@ async function handleCreateEpubDirectory() {
     sidebar.selectNode(result.path)
     sidebar.togglePanel('files')
     await sidebar.refreshFileTree()
-    // 6. 通知编辑器清空内容（类似新建未保存文件的状态）
+    // 通知编辑器清空内容（类似新建未保存文件的状态）
     window.dispatchEvent(new CustomEvent('note-reset-editor'))
   } catch (err: any) {
     console.error('创建 epub 目录失败:', err)
     toast.show(err?.message || '创建失败')
+  }
+}
+
+/**
+ * 打开已有的 epub 目录：选择文件夹后切换文件树根到该目录。
+ * 选中目录名不要求为 "epub"（兼容用户已有的小说项目目录）。
+ */
+async function handleOpenEpubDirectory() {
+  try {
+    const dirPath = await window.electronAPI?.dialog.showFolderPicker()
+    if (!dirPath) return
+
+    await window.electronAPI?.security.addAuthorizedDir(dirPath)
+    sidebar.setFileTreeRoot(dirPath)
+    sidebar.selectNode(dirPath)
+    sidebar.togglePanel('files')
+    await sidebar.refreshFileTree()
+    sidebar.addToHistory(dirPath)
+    toast.show('已打开目录')
+  } catch (err: any) {
+    console.error('打开 epub 目录失败:', err)
+    toast.show(err?.message || '打开失败')
   }
 }
 </script>

@@ -309,12 +309,12 @@ function clearDraftAfterSave() {
 }
 
 // 未保存更改对话框
-const unsavedDialog = {
+const unsavedDialog = reactive({
   visible: false,
   message: '',
   messagePrefix: '',
   _resolve: null as ((result: 'save' | 'discard' | 'cancel') => void) | null,
-}
+})
 
 function showUnsavedDialog(messagePrefix = ''): Promise<'save' | 'discard' | 'cancel'> {
   return new Promise((resolve) => {
@@ -708,11 +708,15 @@ async function openFileFromExternal(filePath: string) {
     noteStore.openFile(filePath, fileName, content)
     sidebar.parseOutline(content)
     sidebar.addToHistory(filePath, fileName, content)
+    sidebar.selectNode(filePath)
 
     const ready = await waitForEditor()
     if (ready) {
       await replaceContent(content)
     }
+
+    // 同步切换文件目录到文件所在目录（视为普通目录）
+    await syncFileTreeRootToFileDir(filePath)
 
     toast.show(`已打开: ${fileName}`)
   } catch (err) {
@@ -755,11 +759,37 @@ async function handleOpenEpubProject(epubDir: string) {
     if (sidebar.activePanel !== 'files') {
       sidebar.togglePanel('files')
     }
+    await sidebar.refreshFileTree()
     sidebar.addToHistory(epubDir)
   } catch (err) {
     console.error('打开 epub 项目失败:', err)
     toast.show('目录不存在或无法打开')
     sidebar.removeFromHistory(epubDir)
+  }
+}
+
+/**
+ * 文件树章节切换：自动保存当前章节（若有修改），然后打开目标章节。
+ * 不弹未保存对话框，实现无缝切换。
+ */
+async function handleSwitchChapter(filePath: string) {
+  try {
+    // 当前章节已修改且有路径：自动保存
+    if (noteStore.isModified && noteStore.currentFilePath) {
+      await handleSaveFile()
+    }
+    const content = await window.services.readFileAsText(filePath)
+    const fileName = await window.services.getFileName(filePath)
+    noteStore.openFile(filePath, fileName, content)
+    await nextTick()
+    await replaceContent(content)
+    toast.show(`已打开: ${fileName}`)
+    sidebar.addToHistory(filePath, fileName, content)
+    sidebar.parseOutline(content)
+    sidebar.selectNode(filePath)
+  } catch (err) {
+    console.error('切换章节失败:', err)
+    toast.show('打开章节失败')
   }
 }
 
@@ -982,6 +1012,11 @@ async function handlePaste(e: ClipboardEvent) {
   }
 }
 
+// 外部 md 文件打开事件（由 useExternalFileOpen composable dispatch）
+const handleNoteOpenExternal = ((e: CustomEvent) => {
+  openFileFromExternal(e.detail.filePath)
+}) as EventListener
+
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
   window.addEventListener('paste', handlePaste)
@@ -991,6 +1026,8 @@ onMounted(() => {
   document.addEventListener('selectionchange', scheduleCodeBlockSelector)
   editorContainerRef.value?.addEventListener('scroll', scheduleCodeBlockSelector)
   document.addEventListener('mousedown', onCodeLangDocClick)
+  window.addEventListener('note-open-external', handleNoteOpenExternal)
+  window.addEventListener('note-reset-editor', handleResetEditor)
   sidebar.loadHistory?.();
   // 暴露保存函数到全局，供 TitleBar 调用
   ;(window as any).__noteEditorSave = handleSaveFile
@@ -1006,6 +1043,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('paste', handlePaste)
   window.removeEventListener('beforeunload', handleBeforeUnload)
   window.removeEventListener('wheel', handleWheelZoom)
+  window.removeEventListener('note-open-external', handleNoteOpenExternal)
   window.removeEventListener('note-reset-editor', handleResetEditor)
   document.removeEventListener('selectionchange', scheduleCodeBlockSelector)
   document.removeEventListener('mousedown', onCodeLangDocClick)
@@ -1032,6 +1070,7 @@ onBeforeUnmount(() => {
   <div class="note-editor" :class="'theme-' + settings.settings.theme">
     <NoteSidebar
       @open-file="handleOpenFromHistory"
+      @open-chapter="handleSwitchChapter"
       @scroll-to-line="handleScrollToLine"
     />
     <div class="note-main" ref="noteMainRef" :style="{ '--note-zoom': noteZoom }">

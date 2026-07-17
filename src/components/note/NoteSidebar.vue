@@ -36,6 +36,7 @@ const toast = useToastStore()
 
 const emit = defineEmits<{
   (e: 'open-file', filePath: string): void
+  (e: 'open-chapter', filePath: string): void
   (e: 'scroll-to-line', line: number): void
 }>()
 
@@ -452,7 +453,8 @@ function onRenamingCancel() {
 
 function onChapterClick(node: FileNode) {
   sidebar.selectNode(node.path)
-  emit('open-file', node.path)
+  // 文件树点击章节：直接走普通文件打开，不经过历史记录的 epub 归一化
+  emit('open-chapter', node.path)
 }
 
 function onDirectoryClick(node: FileNode) {
@@ -670,7 +672,7 @@ watch(
           <ImagePlus v-if="!hasCover" :size="14" :stroke-width="1.8" />
           <ImageIcon v-else :size="14" :stroke-width="1.8" />
         </button>
-        <div class="new-btn-wrap">
+        <div v-if="isEpubRoot" class="new-btn-wrap">
           <button
             class="action-btn new-btn"
             @click="onToggleNewPopup"
@@ -770,7 +772,7 @@ watch(
           <p>加载中…</p>
         </div>
         <div v-else>
-          <!-- 根级 creating 输入行：始终显示（即使目录为空） -->
+          <!-- 根级 creating 输入行：始终显示（即使目录为空），不隐藏已有文件树 -->
           <div
             v-if="isCreatingInDir(sidebar.fileTreeRootPath)"
             class="tree-row is-creating"
@@ -800,15 +802,16 @@ watch(
           </div>
           <!-- 空目录：仅在非 creating 时显示 -->
           <div
-            v-else-if="sidebar.fileTreeNodes.length === 0"
+            v-if="!isCreatingInDir(sidebar.fileTreeRootPath) && sidebar.fileTreeNodes.length === 0"
             class="panel-empty"
           >
             <FolderOpen :size="32" :stroke-width="1.2" class="empty-icon" />
             <p>该目录为空</p>
-            <p class="empty-hint">点击右上角 + 创建章节或目录</p>
+            <p v-if="isEpubRoot" class="empty-hint">点击右上角 + 创建章节或目录</p>
+            <p v-else class="empty-hint">将 .md 文件放入此目录后刷新</p>
           </div>
-          <!-- 正常的文件树 -->
-          <div v-else class="file-tree">
+          <!-- 正常的文件树：creating 时也显示，让其他文件可见 -->
+          <div v-if="sidebar.fileTreeNodes.length > 0" class="file-tree">
             <!-- 扁平化的文件树 -->
             <template v-for="row in flatRows" :key="nodeKey(row.node)">
             <div
