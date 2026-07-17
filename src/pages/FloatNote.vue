@@ -1,14 +1,17 @@
 <script lang="ts" setup>
-import { ref, onMounted, onBeforeUnmount, nextTick, defineComponent, h } from 'vue'
+import { ref, reactive, computed, onMounted, onBeforeUnmount, nextTick, defineComponent, h } from 'vue'
 import { Milkdown as MilkdownComponent, MilkdownProvider, useEditor } from '@milkdown/vue'
-import { Editor, rootCtx, defaultValueCtx, editorViewOptionsCtx } from '@milkdown/kit/core'
+import { Editor, rootCtx, defaultValueCtx, editorViewOptionsCtx, editorViewCtx } from '@milkdown/kit/core'
 import { commonmark } from '@milkdown/kit/preset/commonmark'
 import { gfm } from '@milkdown/kit/preset/gfm'
 import { history } from '@milkdown/kit/plugin/history'
 import { clipboard } from '@milkdown/kit/plugin/clipboard'
 import { listener, listenerCtx } from '@milkdown/kit/plugin/listener'
+import { prism, prismConfig } from '@milkdown/plugin-prism'
 import { getMarkdown } from '@milkdown/kit/utils'
 import type { Editor as EditorType } from '@milkdown/kit/core'
+import '@/editor/codeHighlight' // 副作用导入：注册代码块语法高亮语言
+import { CODE_LANGS } from '@/editor/codeLanguages'
 import { Code, Monitor, Pin } from 'lucide-vue-next'
 
 // ===== 状态 =====
@@ -22,9 +25,146 @@ const isPinned = ref(true)
 
 const editorRef = ref<EditorType | null>(null)
 const sourceTextareaRef = ref<HTMLTextAreaElement | null>(null)
+const floatMainRef = ref<HTMLElement | null>(null)
+const editorContainerRef = ref<HTMLElement | null>(null)
 
 let autoSyncTimer: ReturnType<typeof setTimeout> | null = null
 const AUTO_SYNC_DELAY = 800
+
+// 代码块语言切换器（定位在光标所在代码块右下角）
+const codeSelector = reactive({ visible: false, pos: -1, language: 'plaintext' })
+const codeSelectorPos = reactive({ top: 0, left: 0 })
+const codeLangDropdownOpen = ref(false)
+const codeLangFilter = ref('')
+const codeLangListRef = ref<HTMLElement | null>(null)
+const codeLangInputRef = ref<HTMLInputElement | null>(null)
+
+const filteredCodeLangs = computed(() => {
+  const q = codeLangFilter.value.toLowerCase()
+  if (!q) return [...CODE_LANGS]
+  return CODE_LANGS.filter(l => l.toLowerCase().includes(q))
+})
+
+function getEditorView(): any | null {
+  const editor = editorRef.value
+  if (!editor || typeof editor.action !== 'function') return null
+  try {
+    return editor.action((ctx: any) => ctx.get(editorViewCtx))
+  } catch {
+    return null
+  }
+}
+
+function updateCodeBlockSelector() {
+  if (sourceMode.value) {
+    codeSelector.visible = false
+    return
+  }
+  const view = getEditorView()
+  const main = floatMainRef.value
+  const container = editorContainerRef.value
+  if (!view || !main) {
+    codeSelector.visible = false
+    return
+  }
+  const { state } = view
+  const { $from } = state.selection
+  let pos = -1
+  for (let d = $from.depth; d > 0; d--) {
+    if ($from.node(d).type.name === 'code_block') {
+      pos = $from.before(d)
+      break
+    }
+  }
+  if (pos < 0) {
+    codeSelector.visible = false
+    return
+  }
+  const dom = view.nodeDOM(pos) as HTMLElement | null
+  if (!dom) {
+    codeSelector.visible = false
+    return
+  }
+  const dr = dom.getBoundingClientRect()
+  const mr = main.getBoundingClientRect()
+  // 代码块已滚动出编辑器可视区域时隐藏
+  if (container) {
+    const cr = container.getBoundingClientRect()
+    if (dr.bottom < cr.top || dr.top > cr.bottom) {
+      codeSelector.visible = false
+      return
+    }
+  }
+  codeSelector.pos = pos
+  codeSelector.language = $from.parent.attrs.language || 'plaintext'
+  // 定位到代码块右下角（相对 .float-content）
+  codeSelectorPos.top = dr.bottom - mr.top - 28
+  codeSelectorPos.left = dr.right - mr.left - 104
+  codeSelector.visible = true
+}
+
+// selectionchange 触发时 ProseMirror 尚未提交最新 state，延迟到下一帧避免选区错位
+let codeSelRaf = 0
+function scheduleCodeBlockSelector() {
+  if (codeSelRaf) cancelAnimationFrame(codeSelRaf)
+  codeSelRaf = requestAnimationFrame(() => {
+    codeSelRaf = 0
+    updateCodeBlockSelector()
+  })
+}
+
+function selectCodeLang(lang: string) {
+  codeSelector.language = lang
+  codeLangDropdownOpen.value = false
+  codeLangFilter.value = ''
+  const view = getEditorView()
+  if (!view || codeSelector.pos < 0) return
+  try {
+    const tr = view.state.tr.setNodeAttribute(codeSelector.pos, 'language', lang === 'plaintext' ? '' : lang)
+    view.dispatch(tr)
+    scheduleCodeBlockSelector()
+  } catch (err) {
+    console.error('切换代码语言失败:', err)
+  }
+}
+
+function toggleCodeLangDropdown() {
+  codeLangDropdownOpen.value = !codeLangDropdownOpen.value
+  if (codeLangDropdownOpen.value) {
+    codeLangFilter.value = ''
+    nextTick(() => {
+      const list = codeLangListRef.value
+      if (list) {
+        const active = list.querySelector('.code-lang-item.active') as HTMLElement | null
+        active?.scrollIntoView({ block: 'nearest' })
+      }
+      codeLangInputRef.value?.focus()
+    })
+  }
+}
+
+function onCodeLangFilterInput(e: Event) {
+  codeLangFilter.value = (e.target as HTMLInputElement).value
+}
+
+function onCodeLangFilterKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape') {
+    codeLangDropdownOpen.value = false
+    codeLangFilter.value = ''
+  } else if (e.key === 'Enter') {
+    const first = filteredCodeLangs.value[0]
+    if (first) selectCodeLang(first)
+  }
+}
+
+function onCodeLangDocClick(e: MouseEvent) {
+  if (!codeLangDropdownOpen.value) return
+  const target = e.target as HTMLElement
+  if (!target.closest('.code-lang-selector-wrap')) {
+    codeLangDropdownOpen.value = false
+    codeLangFilter.value = ''
+  }
+}
 
 async function togglePin() {
   try {
@@ -139,11 +279,16 @@ const MilkdownEditor = defineComponent({
               charCount.value = markdown.length
               scheduleAutoSync()
             })
+          // 语法高亮语言已在 @/editor/codeHighlight 注册到共享 refractor 单例
+          ctx.set(prismConfig.key, {
+            configureRefractor: (r) => r,
+          })
         })
         .use(commonmark)
         .use(gfm)
         .use(history)
         .use(clipboard)
+        .use(prism)
         .use(listener)
     )
 
@@ -227,7 +372,18 @@ onMounted(() => {
     }
   }
   window.addEventListener('keydown', handleKeydown)
-  onBeforeUnmount(() => window.removeEventListener('keydown', handleKeydown))
+  // 代码块语言切换器：选区变化/编辑器滚动时重新定位
+  document.addEventListener('selectionchange', scheduleCodeBlockSelector)
+  document.addEventListener('mousedown', onCodeLangDocClick)
+  editorContainerRef.value?.addEventListener('scroll', scheduleCodeBlockSelector)
+
+  onBeforeUnmount(() => {
+    window.removeEventListener('keydown', handleKeydown)
+    document.removeEventListener('selectionchange', scheduleCodeBlockSelector)
+    document.removeEventListener('mousedown', onCodeLangDocClick)
+    editorContainerRef.value?.removeEventListener('scroll', scheduleCodeBlockSelector)
+    if (codeSelRaf) cancelAnimationFrame(codeSelRaf)
+  })
 })
 </script>
 
@@ -255,9 +411,13 @@ onMounted(() => {
     </div>
 
     <!-- 内容区 -->
-    <div class="float-content">
+    <div ref="floatMainRef" class="float-content">
       <!-- Milkdown 渲染（非源码模式）-->
-      <div v-show="!sourceMode" class="float-milkdown-wrap custom-scrollbar-dark">
+      <div
+        v-show="!sourceMode"
+        ref="editorContainerRef"
+        class="float-milkdown-wrap custom-scrollbar-dark"
+      >
         <MilkdownProvider>
           <MilkdownEditor />
         </MilkdownProvider>
@@ -271,6 +431,51 @@ onMounted(() => {
         spellcheck="false"
         @input="onSourceInput"
       ></textarea>
+
+      <!-- 代码块语言切换器（定位在光标所在代码块右下角） -->
+      <div
+        v-if="codeSelector.visible"
+        class="code-lang-selector-wrap"
+        :style="{ top: codeSelectorPos.top + 'px', left: codeSelectorPos.left + 'px' }"
+        @mousedown.stop
+      >
+        <button
+          class="code-lang-selector"
+          :class="{ open: codeLangDropdownOpen }"
+          title="切换代码语言"
+          @click="toggleCodeLangDropdown"
+        >
+          <span class="code-lang-label">{{ codeSelector.language }}</span>
+          <span class="code-lang-arrow">▾</span>
+        </button>
+
+        <Transition name="code-lang-fade">
+          <div v-if="codeLangDropdownOpen" class="code-lang-dropdown">
+            <div class="code-lang-search">
+              <input
+                ref="codeLangInputRef"
+                type="text"
+                class="code-lang-search-input"
+                placeholder="筛选语言..."
+                :value="codeLangFilter"
+                @input="onCodeLangFilterInput"
+                @keydown="onCodeLangFilterKeydown"
+                spellcheck="false"
+              />
+            </div>
+            <ul ref="codeLangListRef" class="code-lang-list custom-scrollbar-compact">
+              <li
+                v-for="lang in filteredCodeLangs"
+                :key="lang"
+                class="code-lang-item"
+                :class="{ active: lang === codeSelector.language }"
+                @mousedown.stop.prevent="selectCodeLang(lang)"
+              >{{ lang }}</li>
+              <li v-if="filteredCodeLangs.length === 0" class="code-lang-item empty">无匹配</li>
+            </ul>
+          </div>
+        </Transition>
+      </div>
     </div>
 
     <!-- 底栏 -->
@@ -343,6 +548,33 @@ onMounted(() => {
 }
 .float-milkdown-body code { background: rgba(255,255,255,0.08); padding: 1px 5px; border-radius: 3px; font-size: 0.9em; font-family: 'Consolas', 'Monaco', 'Courier New', monospace; }
 .float-milkdown-body pre code { background: none; padding: 0; }
+/* Prism 语法高亮 token 颜色（暗色主题） */
+.float-milkdown-body .token.comment,
+.float-milkdown-body .token.prolog,
+.float-milkdown-body .token.doctype,
+.float-milkdown-body .token.cdata { color: #8b949e; }
+.float-milkdown-body .token.punctuation { color: rgba(255, 255, 255, 0.65); }
+.float-milkdown-body .token.keyword,
+.float-milkdown-body .token.boolean,
+.float-milkdown-body .token.selector,
+.float-milkdown-body .token.important { color: #e06c75; }
+.float-milkdown-body .token.string,
+.float-milkdown-body .token.attr-value,
+.float-milkdown-body .token.char,
+.float-milkdown-body .token.inserted { color: #98c379; }
+.float-milkdown-body .token.number,
+.float-milkdown-body .token.property,
+.float-milkdown-body .token.constant,
+.float-milkdown-body .token.symbol,
+.float-milkdown-body .token.variable { color: #d19a66; }
+.float-milkdown-body .token.function,
+.float-milkdown-body .token.class-name { color: #61afef; }
+.float-milkdown-body .token.tag,
+.float-milkdown-body .token.operator { color: #56b6c2; }
+.float-milkdown-body .token.attr-name,
+.float-milkdown-body .token.builtin,
+.float-milkdown-body .token.deleted { color: #e5c07b; }
+.float-milkdown-body .token.regex { color: #d19a66; }
 .float-milkdown-body ul, .float-milkdown-body ol { padding-left: 1.8em; margin: 0.4em 0; }
 .float-milkdown-body table { border-collapse: collapse; width: 100%; margin: 0.5em 0; }
 .float-milkdown-body th, .float-milkdown-body td { border: 1px solid rgba(255,255,255,0.1); padding: 6px 10px; }
@@ -526,5 +758,136 @@ onMounted(() => {
 .float-char-count {
   font-size: 10px;
   color: rgba(255, 255, 255, 0.3);
+}
+
+/* 代码块语言切换器（暗色主题） */
+.code-lang-selector-wrap {
+  position: absolute;
+  z-index: 40;
+}
+
+.code-lang-selector {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 6px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(40, 40, 40, 0.92);
+  color: rgba(255, 255, 255, 0.65);
+  border-radius: 4px;
+  font-size: 11px;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: border-color 0.12s, color 0.12s;
+
+  &:hover, &.open {
+    border-color: #6ab4ff;
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+.code-lang-label {
+  max-width: 72px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.code-lang-arrow {
+  font-size: 10px;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.code-lang-dropdown {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  right: 0;
+  width: 160px;
+  max-height: 260px;
+  background: rgba(40, 40, 40, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.code-lang-search {
+  padding: 4px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.code-lang-search-input {
+  width: 100%;
+  height: 24px;
+  padding: 0 6px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  background: rgba(20, 20, 20, 0.9);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 11px;
+  outline: none;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+  }
+
+  &:focus {
+    border-color: #6ab4ff;
+  }
+}
+
+.code-lang-list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.code-lang-item {
+  padding: 4px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.65);
+  transition: background 0.08s, color 0.08s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  &.active {
+    color: #6ab4ff;
+    font-weight: 600;
+  }
+
+  &.empty {
+    color: rgba(255, 255, 255, 0.35);
+    font-style: italic;
+    cursor: default;
+
+    &:hover {
+      background: transparent;
+      color: rgba(255, 255, 255, 0.35);
+    }
+  }
+}
+
+.code-lang-fade-enter-active {
+  transition: opacity 0.1s ease, transform 0.1s ease;
+}
+.code-lang-fade-leave-active {
+  transition: opacity 0.1s ease;
+}
+.code-lang-fade-enter-from,
+.code-lang-fade-leave-to {
+  opacity: 0;
+  transform: translateY(4px);
 }
 </style>
