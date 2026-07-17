@@ -1,7 +1,3 @@
-/**
- * Vue Router 路由配置
- */
-
 import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-router'
 import Bookshelf from '@/pages/Bookshelf.vue'
 import Reader from '@/pages/Reader.vue'
@@ -51,9 +47,7 @@ export const router = createRouter({
   routes,
 })
 
-// 路由守卫
 router.beforeEach((to) => {
-  // 设置页面标题
   const title = to.meta.title as string
   if (title) {
     document.title = `${title} - 简阅`

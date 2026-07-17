@@ -390,8 +390,7 @@ async function handleLoad(detail: any) {
   const { doc } = detail
   if (doc) {
     await injectFontFaceToDoc(doc, settings.customFonts, settings.settings.fontFamily)
-    
-    // 处理 mousedown 事件
+
     doc.addEventListener('mousedown', (e: MouseEvent) => {
       window.dispatchEvent(new CustomEvent('iframe-mousedown'))
       tooltipVisible.value = false

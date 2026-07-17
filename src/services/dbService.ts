@@ -11,19 +11,12 @@ const KEY = {
   aiChatMeta: (bookId: string) => `reader:ai-chat:${bookId}`,
 }
 
-// 加密标记前缀
 const ENCRYPTED_PREFIX = 'ENCRYPTED:'
 
-/**
- * 检查数据是否已加密
- */
 function isEncrypted(data: string): boolean {
   return data.startsWith(ENCRYPTED_PREFIX)
 }
 
-/**
- * 获取安全 API（如果可用）
- */
 function getSecurityAPI() {
   return window.electronAPI?.security
 }
@@ -91,7 +84,6 @@ export const db = {
 
     const data = raw as string
 
-    // 检查是否已加密
     if (isEncrypted(data)) {
       const securityAPI = getSecurityAPI()
       if (securityAPI) {

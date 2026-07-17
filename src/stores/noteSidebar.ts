@@ -17,6 +17,59 @@ export interface NoteHistoryItem {
   lastContent?: string
 }
 
+/**
+ * 判断路径是否为 epub 目录（路径最后一段为 'epub'，不区分大小写）。
+ */
+export function isEpubDirPath(path: string): boolean {
+  const parts = path.split(/[\\/]/).filter(Boolean)
+  return parts.length > 0 && parts[parts.length - 1].toLowerCase() === 'epub'
+}
+
+/**
+ * 若文件路径位于 epub 目录下，返回该 epub 目录的路径；否则返回 null。
+ * 用于把 epub 章节文件的历史记录收敛到整个 epub 目录。
+ */
+function findEpubAncestor(filePath: string): string | null {
+  const norm = filePath.replace(/\\/g, '/')
+  const parts = norm.split('/')
+  // 从后向前查找 epub 段（跳过文件名本身）
+  for (let i = parts.length - 2; i >= 0; i--) {
+    if (parts[i].toLowerCase() === 'epub') {
+      return parts.slice(0, i + 1).join('/')
+    }
+  }
+  return null
+}
+
+/**
+ * 获取历史记录项的显示名：
+ * - epub 目录：取其父目录名（项目名语义，与文件目录面板标题一致）
+ * - 普通路径：取最后一段
+ */
+function getHistoryDisplayName(path: string): string {
+  const parts = path.split(/[\\/]/).filter(Boolean)
+  if (isEpubDirPath(path) && parts.length >= 2) {
+    return parts[parts.length - 2]
+  }
+  return parts[parts.length - 1] || path
+}
+
+/**
+ * 将历史记录路径归一化为最终记录目标：
+ * - epub 目录或 epub 目录下的文件 → epub 目录
+ * - 其他 → 原路径
+ */
+export function resolveHistoryTarget(filePath: string): { kind: 'epub' | 'file', path: string } {
+  if (isEpubDirPath(filePath)) {
+    return { kind: 'epub', path: filePath }
+  }
+  const epubRoot = findEpubAncestor(filePath)
+  if (epubRoot) {
+    return { kind: 'epub', path: epubRoot }
+  }
+  return { kind: 'file', path: filePath }
+}
+
 export interface OutlineItem {
   level: number
   text: string
@@ -86,22 +139,27 @@ export const useNoteSidebarStore = defineStore('noteSidebar', () => {
   }
 
   function saveHistory() {
-    // 深拷贝以完全去除响应式属性，确保可以序列化
+    // 深拷贝去除响应式代理，避免 Electron structured clone 报错
     const data = JSON.parse(JSON.stringify(toRaw(history.value)))
     electronStore.setItem(HISTORY_STORAGE_KEY, data)
   }
 
-  function addToHistory(filePath: string, fileName: string, content?: string) {
-    // 移除已存在的同路径记录
-    history.value = history.value.filter(h => h.filePath !== filePath)
-    // 添加到头部
+  function addToHistory(filePath: string, fileName?: string, content?: string) {
+    // epub 目录下的文件：记录整个 epub 目录而非单个章节文件
+    const target = resolveHistoryTarget(filePath)
+    const recordPath = target.path
+    // epub 目录使用项目名（父目录名），普通文件使用传入的 fileName 或自动推导
+    const recordName = target.kind === 'epub'
+      ? getHistoryDisplayName(recordPath)
+      : (fileName || getHistoryDisplayName(recordPath))
+
+    history.value = history.value.filter(h => h.filePath !== recordPath)
     history.value.unshift({
-      filePath,
-      fileName,
+      filePath: recordPath,
+      fileName: recordName,
       lastOpenedAt: Date.now(),
       lastContent: content?.slice(0, 200),
     })
-    // 限制数量
     if (history.value.length > MAX_HISTORY) {
       history.value = history.value.slice(0, MAX_HISTORY)
     }
@@ -118,7 +176,7 @@ export const useNoteSidebarStore = defineStore('noteSidebar', () => {
     saveHistory()
   }
 
-  // ===== 文档大纲 =====
+  // 文档大纲
   const outline = ref<OutlineItem[]>([])
 
   function parseOutline(markdown: string) {
@@ -128,7 +186,6 @@ export const useNoteSidebarStore = defineStore('noteSidebar', () => {
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]
-      // 跳过代码块
       if (line.trimStart().startsWith('```')) {
         inCodeBlock = !inCodeBlock
         continue
@@ -149,28 +206,22 @@ export const useNoteSidebarStore = defineStore('noteSidebar', () => {
     outline.value = items
   }
 
-  // ===== 文件目录（简记模式左侧"文件目录"面板） =====
+  // 文件目录（简记模式左侧"文件目录"面板）
   const fileTreeRootPath = ref<string | null>(null)
   const fileTreeNodes = ref<FileNode[]>([])
   const fileTreeLoading = ref(false)
   // 当前"转中"的节点（点击目录时设置，不打开文件）
   const selectedNodePath = ref<string | null>(null)
-  // 当前正在重命名的节点路径
   const renamingPath = ref<string | null>(null)
-  // epub 目录的封面路径（null 表示没有封面）
-  const coverPath = ref<string | null>(null)
-  // 当前正在创建的节点状态（在某个目录下创建章节/目录）
+  const coverPath = ref<string | null>(null) // epub 目录的封面路径
   const creatingState = ref<CreatingState | null>(null)
-  // 展开的目录路径集合
   const expandedDirs = ref<Record<string, boolean>>({})
-  // 新建按钮弹窗（创建章节 / 创建目录）
   const showNewPopup = ref(false)
 
   function loadFileRootPath() {
     const saved = electronStore.getItem(FILE_ROOT_STORAGE_KEY)
     if (typeof saved === 'string' && saved) {
       fileTreeRootPath.value = saved
-      // 异步恢复封面状态
       loadCover(saved)
     }
   }
@@ -179,10 +230,7 @@ export const useNoteSidebarStore = defineStore('noteSidebar', () => {
     electronStore.setItem(FILE_ROOT_STORAGE_KEY, fileTreeRootPath.value)
   }
 
-  /**
-   * 设置文件目录根路径。
-   * 不会自动刷新，调用方需要显式 refreshFileTree。
-   */
+  /** 设置文件目录根路径（不会自动刷新，调用方需显式 refreshFileTree） */
   function setFileTreeRoot(path: string | null) {
     fileTreeRootPath.value = path
     if (path === null) {
@@ -194,15 +242,9 @@ export const useNoteSidebarStore = defineStore('noteSidebar', () => {
       coverPath.value = null
     }
     saveFileRootPath()
-    // 切换根时异步查询封面
-    if (path) {
-      loadCover(path)
-    }
+    if (path) loadCover(path)
   }
 
-  /**
-   * 加载指定 epub 目录的封面状态。
-   */
   async function loadCover(dirPath: string) {
     try {
       const result = await window.services?.getEpubCover?.(dirPath)
@@ -213,16 +255,10 @@ export const useNoteSidebarStore = defineStore('noteSidebar', () => {
     }
   }
 
-  /**
-   * 设置封面路径（由 UI 在成功选择/替换封面后调用）。
-   */
   function setCoverPath(p: string | null) {
     coverPath.value = p
   }
 
-  /**
-   * 刷新当前根目录的文件树。
-   */
   async function refreshFileTree() {
     if (!fileTreeRootPath.value) {
       fileTreeNodes.value = []
@@ -240,9 +276,6 @@ export const useNoteSidebarStore = defineStore('noteSidebar', () => {
     }
   }
 
-  /**
-   * 在 nodes 树中查找指定路径对应的节点。
-   */
   function findNode(nodes: FileNode[], p: string): FileNode | null {
     for (const n of nodes) {
       if (n.path === p) return n
@@ -255,7 +288,7 @@ export const useNoteSidebarStore = defineStore('noteSidebar', () => {
   }
 
   /**
-   * 根据当前状态，计算"创建章节/目录"时的 parentDir。
+   * 计算"创建章节/目录"时的 parentDir。
    * 优先级：选中的目录（若 selectedNode 是目录）→ 否则根目录。
    */
   function computeNewItemParentDir(): string | null {
@@ -268,18 +301,11 @@ export const useNoteSidebarStore = defineStore('noteSidebar', () => {
     return fileTreeRootPath.value
   }
 
-  /**
-   * 选中节点。
-   * - 章节：调用方负责打开文件
-   * - 目录：仅高亮
-   */
+  /** 选中节点：章节由调用方打开文件，目录仅高亮 */
   function selectNode(path: string | null) {
     selectedNodePath.value = path
   }
 
-  /**
-   * 切换目录的展开/收起。
-   */
   function toggleExpand(dirPath: string) {
     expandedDirs.value = { ...expandedDirs.value, [dirPath]: !expandedDirs.value[dirPath] }
   }
@@ -304,7 +330,6 @@ export const useNoteSidebarStore = defineStore('noteSidebar', () => {
     }
     creatingState.value = { type, parentDir }
     renamingPath.value = null
-    // 自动展开父目录
     if (parentDir !== fileTreeRootPath.value) {
       expandedDirs.value = { ...expandedDirs.value, [parentDir]: true }
     }
@@ -314,7 +339,7 @@ export const useNoteSidebarStore = defineStore('noteSidebar', () => {
     creatingState.value = null
   }
 
-  // ===== 中文数字 / 阿拉伯数字互转 =====
+  // 中文数字 / 阿拉伯数字互转
   const CN_DIGITS: Array<{ cn: string; n: number }> = [
     { cn: '一', n: 1 },
     { cn: '二', n: 2 },
@@ -352,9 +377,7 @@ export const useNoteSidebarStore = defineStore('noteSidebar', () => {
     return isNaN(n) ? 0 : n
   }
 
-  /**
-   * 收集所有"章节N"形式的章节编号。
-   */
+  /** 收集所有"章节N"形式的章节编号 */
   function collectChapterSequence(nodes: FileNode[]): number[] {
     const result: number[] = []
     const walk = (list: FileNode[]) => {
@@ -373,9 +396,7 @@ export const useNoteSidebarStore = defineStore('noteSidebar', () => {
     return result
   }
 
-  /**
-   * 收集以指定前缀开头的目录编号序列（"新建目录" → 收集其后缀数字）。
-   */
+  /** 收集以指定前缀开头的目录编号序列（"新建目录" → 收集其后缀数字） */
   function collectDirectorySequence(nodes: FileNode[], prefix: string): number[] {
     const result: number[] = []
     const walk = (list: FileNode[]) => {
@@ -400,20 +421,14 @@ export const useNoteSidebarStore = defineStore('noteSidebar', () => {
     return result
   }
 
-  /**
-   * 计算下一可用章节名（不含 .md 后缀）。
-   * 默认"章节一"；存在"章节N"则 max(N)+1。
-   */
+  /** 计算下一可用章节名（不含 .md 后缀，默认"章节一"，存在"章节N"则 max(N)+1） */
   function computeNextChapterName(): string {
     const seq = collectChapterSequence(fileTreeNodes.value)
     const max = seq.length > 0 ? Math.max(...seq) : 0
     return `章节${toCn(max + 1)}`
   }
 
-  /**
-   * 计算下一可用目录名。
-   * 默认"新建目录"；存在"新建目录N"则 max(N)+1。
-   */
+  /** 计算下一可用目录名（默认"新建目录"，存在"新建目录N"则 max(N)+1） */
   function computeNextDirectoryName(): string {
     const prefix = '新建目录'
     const seq = collectDirectorySequence(fileTreeNodes.value, prefix)

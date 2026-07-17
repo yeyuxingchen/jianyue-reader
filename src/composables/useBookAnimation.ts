@@ -24,7 +24,6 @@ export function useBookAnimation() {
   const animRect = ref<{ left: number; top: number; width: number; height: number } | null>(null)
   const animBookTitle = ref('')
 
-  // 计算样式
   const flyStyle = computed(() => {
     const r = animRect.value
     return {
@@ -35,12 +34,10 @@ export function useBookAnimation() {
     }
   })
 
-  // 辅助函数
   function delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms))
   }
 
-  // 打开书籍动画
   async function startBookOpenAnimation(
     bookId: string,
     _coverUrl: string,
@@ -57,12 +54,10 @@ export function useBookAnimation() {
     animRect.value = rect
     animBookTitle.value = title
 
-    // 开始动画
     animating.value = true
     animDirection.value = 'open'
     animPhase.value = 'fly'
 
-    // 打开书籍
     reader.openBook(book)
 
     // Phase 1: 飞到中央 (250ms)
@@ -76,27 +71,21 @@ export function useBookAnimation() {
     // Phase 3: 淡入阅读器 (200ms)
     await delay(220)
 
-    // 动画完成
     animating.value = false
     revokeCoverUrl(animCoverUrl.value)
     animCoverUrl.value = ''
 
-    // 导航到阅读器
     router.push({ name: 'reader', params: { bookId } })
   }
 
-  // 关闭书籍动画
   async function startBookCloseAnimation(): Promise<void> {
     if (!reader.currentBook) return
 
-    // 保存进度
     reader.saveProgress()
 
-    // 准备封面
     revokeCoverUrl(animCoverUrl.value)
     animCoverUrl.value = animCoverKey.value ? await getCoverUrl(animCoverKey.value) : ''
 
-    // 开始动画
     animating.value = true
     animDirection.value = 'close'
 
@@ -104,7 +93,6 @@ export function useBookAnimation() {
     animPhase.value = 'unfade'
     await delay(200)
 
-    // 关闭书籍
     reader.closeBook()
 
     // Phase 2: 合书 (300ms)
@@ -115,15 +103,12 @@ export function useBookAnimation() {
     animPhase.value = 'fly-back'
     await delay(270)
 
-    // 动画完成
     animating.value = false
     revokeCoverUrl(animCoverUrl.value)
     animCoverUrl.value = ''
 
-    // 重新加载书架
     library.loadBooks()
 
-    // 导航到书架
     router.push({ name: 'bookshelf' })
   }
 

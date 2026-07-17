@@ -170,7 +170,6 @@ onMounted(() => {
     fileName.value = data.fileName || '未命名'
     if (typeof data.opacity === 'number') opacity.value = data.opacity
 
-    // 编辑器就绪后写入内容
     const applyContent = () => {
       if (editorRef.value) {
         replaceContent(initialContent)
@@ -199,7 +198,6 @@ onMounted(() => {
       fileName.value = data.fileName || '未命名'
       if (typeof data.opacity === 'number') opacity.value = data.opacity
 
-      // 编辑器就绪后写入内容
       const applyContent = () => {
         if (editorRef.value) {
           replaceContent(initialContent)
@@ -217,7 +215,6 @@ onMounted(() => {
     })
   }
 
-  // 通知主进程渲染进程已就绪
   if (window.electronAPI?.send) {
     window.electronAPI.send('float:note:ready')
   }

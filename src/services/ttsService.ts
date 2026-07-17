@@ -29,9 +29,6 @@ class TTSService {
     }
   }
 
-  /**
-   * 单句语音合成
-   */
   async synthesize(
     text: string,
     voice: TTSVoice = '冰糖',
@@ -89,9 +86,6 @@ class TTSService {
     return await ctx.decodeAudioData(bytes.buffer.slice(0))
   }
 
-  /**
-   * 播放 AudioBuffer
-   */
   playBuffer(buffer: AudioBuffer): Promise<void> {
     return new Promise((resolve) => {
       const ctx = this.getAudioCtx()
@@ -106,9 +100,6 @@ class TTSService {
 
   private currentSource: AudioBufferSourceNode | null = null
 
-  /**
-   * 停止当前播放
-   */
   stop() {
     if (this.currentSource) {
       try {

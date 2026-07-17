@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { computed, ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { useNoteSidebarStore } from '@/stores/noteSidebar'
+import { useNoteSidebarStore, isEpubDirPath } from '@/stores/noteSidebar'
+import type { OutlineItem, NoteHistoryItem, FileNode, SidebarPanel } from '@/stores/noteSidebar'
 import { useNoteEditorStore } from '@/stores/appMode'
 import { useToastStore } from '@/stores/toast'
-import type { OutlineItem, NoteHistoryItem, FileNode, SidebarPanel } from '@/stores/noteSidebar'
 import {
   Clock,
   ListTree,
@@ -91,7 +91,6 @@ const isEpubRoot = computed(() => {
 // 是否存在封面（由 store 维护；切换 root 时会重新查询）
 const hasCover = computed(() => !!sidebar.coverPath)
 
-// 导出时的 loading 状态
 const isExporting = ref(false)
 
 const displayPanel = ref<SidebarPanel>(null)
@@ -707,11 +706,15 @@ watch(
             v-for="item in sidebar.history"
             :key="item.filePath"
             class="history-item"
+            :class="{ 'is-epub': isEpubDirPath(item.filePath) }"
             @click="onHistoryClick(item)"
             :title="item.filePath"
           >
             <div class="history-item-main">
-              <span class="history-file-name">{{ item.fileName }}</span>
+              <span class="history-file-name">
+                <BookOpen v-if="isEpubDirPath(item.filePath)" :size="12" class="history-type-icon" />
+                {{ item.fileName }}
+              </span>
               <span class="history-file-path">{{ item.filePath }}</span>
             </div>
             <div class="history-item-meta">
@@ -1284,6 +1287,12 @@ watch(
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.history-type-icon {
+  vertical-align: -2px;
+  margin-right: 4px;
+  color: var(--accent-color);
 }
 
 .history-file-path {

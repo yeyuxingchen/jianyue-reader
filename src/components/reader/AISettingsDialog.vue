@@ -25,12 +25,10 @@ onMounted(async () => {
   ttsStore.loadSettings()
 })
 
-// 当前分类下的风格列表
 const currentStyles = computed(() => {
   return READING_STYLES[ttsStore.settings.styleCategory]?.styles || []
 })
 
-// 当前选中的风格
 const selectedStyle = computed(() => {
   if (ttsStore.settings.styleId === 'custom') return null
   return findStyleById(ttsStore.settings.styleId)

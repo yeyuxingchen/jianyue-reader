@@ -25,7 +25,6 @@ export function useExternalFileOpen() {
     const ext = filePath.substring(filePath.lastIndexOf('.')).toLowerCase()
 
     if (ext === '.md') {
-      // Markdown 文件 -> 简记模式
       if (appModeStore.isReaderMode) {
         appModeStore.switchToNote()
       }
@@ -37,7 +36,6 @@ export function useExternalFileOpen() {
         }))
       }, 100)
     } else if (BOOK_EXTS.has(ext)) {
-      // 书籍文件 -> 简阅模式
       if (appModeStore.isNoteMode) {
         appModeStore.switchToReader()
       }
@@ -61,12 +59,10 @@ export function useExternalFileOpen() {
   onMounted(() => {
     isReady.value = true
 
-    // 监听后续文件打开事件
     if (window.electronAPI?.onFileOpen) {
       cleanup = window.electronAPI.onFileOpen(handleExternalFileOpen)
     }
 
-    // 首次启动：获取待处理的文件
     if (window.electronAPI?.app?.getPendingFilePath) {
       window.electronAPI.app.getPendingFilePath().then((fp: string | null) => {
         if (fp) handleExternalFileOpen(fp)

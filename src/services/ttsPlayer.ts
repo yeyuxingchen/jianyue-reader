@@ -15,9 +15,6 @@ export class TTSPlayer {
   onBookEnd?: () => void
   onError?: (error: Error) => void
 
-  /**
-   * 准备文本
-   */
   prepare(text: string) {
     const { original, tagged } = ttsService.preprocessText(text)
     this.sentences = tagged
@@ -34,9 +31,6 @@ export class TTSPlayer {
     })
   }
 
-  /**
-   * 开始播放
-   */
   async play(startIndex = 0) {
     this.currentIndex = startIndex
     this.isPlaying = true
@@ -50,9 +44,6 @@ export class TTSPlayer {
     await this.playLoop()
   }
 
-  /**
-   * 播放循环
-   */
   private async playLoop() {
     while (this.isPlaying && this.currentIndex < this.sentences.length) {
       if (this.aborted) break
@@ -108,9 +99,6 @@ export class TTSPlayer {
     return this.isChapterEnd
   }
 
-  /**
-   * 等待音频就绪
-   */
   private async waitForAudio(index: number): Promise<void> {
     const store = useTTSStore()
     let waited = 0
@@ -127,9 +115,6 @@ export class TTSPlayer {
     store.updateState({ isLoading: false })
   }
 
-  /**
-   * 预加载音频
-   */
   private prefetch(fromIndex: number) {
     const store = useTTSStore()
     const prefetchSize = store.settings.prefetchSize
@@ -170,9 +155,6 @@ export class TTSPlayer {
     }
   }
 
-  /**
-   * 暂停
-   */
   pause() {
     this.isPlaying = false
     this.isChapterEnd = false
@@ -181,9 +163,6 @@ export class TTSPlayer {
     store.updateState({ isPlaying: false })
   }
 
-  /**
-   * 停止（重置）
-   */
   stop() {
     this.isPlaying = false
     this.aborted = true
@@ -196,9 +175,6 @@ export class TTSPlayer {
     this.cleanup()
   }
 
-  /**
-   * 跳转到指定句子
-   */
   async seek(sentenceIndex: number) {
     const wasPlaying = this.isPlaying
     this.pause()
@@ -210,9 +186,6 @@ export class TTSPlayer {
     }
   }
 
-  /**
-   * 清理
-   */
   private cleanup() {
     const store = useTTSStore()
     store.updateState({

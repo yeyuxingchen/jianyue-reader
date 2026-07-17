@@ -25,7 +25,6 @@ export function useSystemFonts() {
     try {
       const set = new Set<string>(COMMON_FONTS)
 
-      // 尝试使用 queryLocalFonts API（如果可用）
       if ('queryLocalFonts' in window) {
         try {
           const localFonts = await (window as any).queryLocalFonts()

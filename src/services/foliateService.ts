@@ -30,7 +30,6 @@ async function loadFoliate(): Promise<void> {
   })
 }
 
-// 存储从主进程预加载的 EPUB 条目数据
 let preloadedEpubEntries: Map<string, Uint8Array> | null = null
 
 export async function createView(
@@ -73,7 +72,6 @@ export async function createView(
 
   await view.open(file)
 
-  // 清理预加载数据
   preloadedEpubEntries = null
   ;(window as any).__preloadedEpubEntries = null
 
@@ -303,12 +301,10 @@ export async function preloadFontData(customFonts: { name: string; path: string 
 }
 
 function buildFontFaceCss(fontPath: string): string {
-  // 从缓存获取字体数据（同步）
   const fontData = fontBase64Cache.get(fontPath)
   if (fontData) {
     return `@font-face { font-family: 'CustomReaderFont'; src: url('data:${fontData.mimeType};base64,${fontData.data}'); }`
   }
-  // 缓存未命中时回退到 fontfile 协议
   const normalizedPath = fontPath.replace(/\\/g, '/')
   const encodedPath = encodeURIComponent(normalizedPath)
   return `@font-face { font-family: 'CustomReaderFont'; src: url('fontfile:///?path=${encodedPath}'); }`
@@ -333,11 +329,9 @@ export function injectFontFaceToDoc(doc: Document, customFonts: { name: string; 
 }
 
 export async function injectCustomFontFace(view: any, customFonts: { name: string; path: string }[] | undefined, fontFamily: string) {
-  // 先预加载字体数据到缓存
   if (customFonts) {
     await preloadFontData(customFonts, fontFamily)
   }
-  // 同步注入字体（使用缓存数据）
   injectFontFaceToDoc(document, customFonts, fontFamily)
   if (!view?.renderer?.getContents) return
   try {

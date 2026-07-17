@@ -16,7 +16,6 @@ const appModeStore = useAppModeStore()
 const noteStore = useNoteEditorStore()
 const sidebar = useNoteSidebarStore()
 
-// 未保存更改对话框状态
 const unsavedDialog = reactive({
   visible: false,
   message: '',
@@ -55,10 +54,8 @@ async function toggleMode() {
   if (appModeStore.isNoteMode) {
     const hasUnsavedChanges = noteStore.isModified || !noteStore.currentFilePath
     if (hasUnsavedChanges) {
-      // 显示未保存更改对话框
       const result = await showUnsavedDialog()
       if (result === 'save') {
-        // 用户选择保存
         if (!noteStore.currentFilePath) {
           // 临时文件：使用“另存为”
           if ((window as any).__noteEditorSaveAs) {
@@ -70,15 +67,12 @@ async function toggleMode() {
             await (window as any).__noteEditorSave()
           }
         }
-        // 保存后标记为已保存
         noteStore.markSaved()
         noteStore.clearDraft()
       } else if (result === 'discard') {
-        // 用户选择放弃修改
         noteStore.markSaved()
         noteStore.clearDraft()
       } else {
-        // 用户选择取消
         return
       }
     }
@@ -125,7 +119,6 @@ interface MenuGroup {
   items: MenuItem[]
 }
 
-// 图片存储格式设置
 const imageFormat = ref<string>('base64')
 
 function loadImageFormat() {
@@ -312,7 +305,6 @@ function onSelectSubmenu(item: MenuItem, sub: SubmenuItem) {
   if (item.submenuType === 'imageFormat') {
     setImageFormat(sub.value)
   } else if (item.submenuType === 'recentFiles') {
-    // 从历史记录打开文件
     window.dispatchEvent(new CustomEvent('note-open-history', { detail: sub.value }))
   } else {
     selectTheme(sub.value as ThemeMode)
@@ -524,7 +516,7 @@ async function handleCreateEpubDirectory() {
   try {
     // 1. 弹出文件夹选择器，让用户选父目录
     const parentDir = await window.electronAPI?.dialog.showFolderPicker()
-    if (!parentDir) return // 用户取消
+    if (!parentDir) return
 
     // 2. 授权父目录（创建子目录需要先授权父目录）
     await window.electronAPI?.security.addAuthorizedDir(parentDir)
@@ -598,7 +590,7 @@ async function handleCreateEpubDirectory() {
                 <Transition name="menu-fade">
                   <div
                     v-if="item.submenu && activeSubmenuIndex === i"
-                    class="menu-submenu"
+                    class="menu-submenu custom-scrollbar-compact"
                   >
                     <div
                       v-for="sub in item.submenu"

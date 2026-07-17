@@ -10,14 +10,13 @@ import { listener, listenerCtx } from '@milkdown/kit/plugin/listener'
 import { trailing } from '@milkdown/kit/plugin/trailing'
 import { prism, prismConfig } from '@milkdown/plugin-prism'
 import { getMarkdown } from '@milkdown/kit/utils'
-// 注册代码块语法高亮语言（副作用导入）
-import '@/editor/codeHighlight'
+import '@/editor/codeHighlight' // 副作用导入：注册代码块语法高亮语言
 import { CODE_LANGS } from '@/editor/codeLanguages'
 import type { Editor as EditorType } from '@milkdown/kit/core'
 import { useNoteEditorStore } from '@/stores/appMode'
 import { useSettingsStore } from '@/stores/settings'
 import { useToastStore } from '@/stores/toast'
-import { useNoteSidebarStore } from '@/stores/noteSidebar'
+import { useNoteSidebarStore, isEpubDirPath, resolveHistoryTarget } from '@/stores/noteSidebar'
 import {
   expandChapterImageSrcs,
   collapseChapterImageSrcs,
@@ -39,38 +38,27 @@ const toast = useToastStore()
 const sidebar = useNoteSidebarStore()
 
 /**
- * 规范化 markdown 内容用于"是否修改"判定。
- * 目的：消除 milkdown serializer 与磁盘原文之间的微差异，避免历史记录
- * 切换时误判"已修改"。
- * 注意：用户实际编辑（增删字符）通常不会被这种规范化抹平。
+ * 规范化 markdown 用于"是否修改"判定：消除 milkdown serializer 与磁盘原文的
+ * 微差异（末尾空白、连续空行等），避免历史记录切换时误判"已修改"。
  */
 function normalizeMarkdown(s: string): string {
   if (!s) return ''
   return s
-    // 统一换行符（\r\n → \n）
     .replace(/\r\n/g, '\n')
     .replace(/\r/g, '\n')
-    // 去除每行末尾的空白字符
     .replace(/[ \t]+$/gm, '')
-    // 去除每行开头的多余空白（milkdown 解析 list/blockquote 时会重排缩进，
-    // 序列化时又可能还原，但通常不会改变实际语义）
-    // 这里不处理开头缩进，避免破坏 code block
-    // 把 3 个或更多连续换行符合并为 2 个（标准段落分隔）
+    // 不处理开头缩进，避免破坏 code block
     .replace(/\n{3,}/g, '\n\n')
-    // 去除整个字符串的首尾空白
     .trim()
 }
 
-/**
- * 比较两个 markdown 字符串是否"内容上相等"（规范化后）
- */
+/** 比较两个 markdown 字符串规范化后是否相等 */
 function isMarkdownContentEqual(a: string, b: string): boolean {
   if (a === b) return true
   return normalizeMarkdown(a) === normalizeMarkdown(b)
 }
 
-// ===== 编辑器文字缩放（Ctrl + 滚轮）=====
-// 1.0 = 100%, 范围 [0.5, 2.0]，步进 0.1
+// 编辑器文字缩放（Ctrl + 滚轮）：1.0 = 100%, 范围 [0.5, 2.0], 步进 0.1
 const NOTE_ZOOM_MIN = 0.5
 const NOTE_ZOOM_MAX = 2.0
 const NOTE_ZOOM_STEP = 0.1
@@ -80,29 +68,20 @@ function clampZoom(z: number): number {
   return Math.max(NOTE_ZOOM_MIN, Math.min(NOTE_ZOOM_MAX, z))
 }
 
-/**
- * Ctrl + 鼠标滚轮调整编辑器/源码区文字大小。
- * 仅在事件目标位于编辑器/源码区/侧边栏面板内时生效，避免与系统/其他区域缩放冲突。
- */
+/** Ctrl + 滚轮调整文字大小，仅在编辑器/源码区/侧边栏面板内生效 */
 function handleWheelZoom(e: WheelEvent) {
   if (!e.ctrlKey) return
-  // 事件目标必须位于当前组件的滚动容器内
   const target = e.target as HTMLElement | null
   if (!target) return
-  // 通过 class 判定是否在编辑器区域或源码 textarea 内
   const inEditor = target.closest('.note-editor-container, .source-textarea, .side-panel, .note-status-bar')
   if (!inEditor) return
   e.preventDefault()
-  // 向上滚(deltaY<0)放大，向下滚(deltaY>0)缩小
   const direction = e.deltaY < 0 ? 1 : -1
   const next = clampZoom(Math.round((noteZoom.value + direction * NOTE_ZOOM_STEP) * 100) / 100)
   if (next === noteZoom.value) return
   noteZoom.value = next
 }
 
-/**
- * 恢复缩放到 100%
- */
 function resetNoteZoom() {
   noteZoom.value = 1.0
 }
@@ -113,9 +92,9 @@ const sourceTextareaRef = ref<HTMLTextAreaElement | null>(null)
 const noteMainRef = ref<HTMLElement | null>(null)
 const editorContainerRef = ref<HTMLElement | null>(null)
 let isSaving = false
-let isClosingAfterDialog = false // 用户在未保存对话框中做出选择后，跳过 beforeunload 拦截
+let isClosingAfterDialog = false // 未保存对话框做出选择后跳过 beforeunload 拦截
 
-// ===== 代码块语言切换器（定位在光标所在代码块右下角）=====
+// 代码块语言切换器（定位在光标所在代码块右下角）
 const codeSelector = reactive({ visible: false, pos: -1, language: 'plaintext' })
 const codeSelectorPos = reactive({ top: 0, left: 0 })
 const codeLangDropdownOpen = ref(false)
@@ -153,7 +132,6 @@ function updateCodeBlockSelector() {
   }
   const { state } = view
   const { $from } = state.selection
-  // 查找光标所在的代码块节点位置
   let pos = -1
   for (let d = $from.depth; d > 0; d--) {
     if ($from.node(d).type.name === 'code_block') {
@@ -188,8 +166,7 @@ function updateCodeBlockSelector() {
   codeSelector.visible = true
 }
 
-// selectionchange 触发时，ProseMirror 尚未提交最新 state，直接读取会得到旧选区。
-// 延迟到下一帧，待 PM 同步完 state 后再计算，避免"进代码块不显示 / 出代码块仍显示"。
+// selectionchange 触发时 ProseMirror 尚未提交最新 state，延迟到下一帧避免选区错位
 let codeSelRaf = 0
 function scheduleCodeBlockSelector() {
   if (codeSelRaf) cancelAnimationFrame(codeSelRaf)
@@ -244,7 +221,6 @@ function onCodeLangFilterKeydown(e: KeyboardEvent) {
   }
 }
 
-// 点击外部关闭语言下拉
 function onCodeLangDocClick(e: MouseEvent) {
   if (!codeLangDropdownOpen.value) return
   const target = e.target as HTMLElement
@@ -254,29 +230,21 @@ function onCodeLangDocClick(e: MouseEvent) {
   }
 }
 
-// ===== 启动时恢复草稿 =====
-// 必须在 MilkdownEditor 组件挂载前执行，因为 defaultValueCtx 在 setup 时读取
+// 启动时恢复草稿：必须在 MilkdownEditor 组件挂载前执行（defaultValueCtx 在 setup 时读取）
 const draft = noteStore.loadDraft()
-if (draft) {
-  // 防御性检查，确保 draft 对象有效
-  if (typeof draft === 'object' && draft !== null) {
-    try {
-      // 使用条件赋值，避免在 null 值上设置属性
-      if (draft.filePath !== undefined) noteStore.currentFilePath = draft.filePath
-      if (draft.fileName !== undefined) noteStore.currentFileName = draft.fileName
-      if (draft.content !== undefined) noteStore.lastSavedContent = draft.content
-      if (draft.sourceMode !== undefined) noteStore.sourceMode = draft.sourceMode
-      if (draft.sourceContent) {
-        sourceContent.value = draft.sourceContent
-      }
-    } catch (err) {
-      console.error('恢复草稿状态失败:', err)
-    }
+if (draft && typeof draft === 'object' && draft !== null) {
+  try {
+    if (draft.filePath !== undefined) noteStore.currentFilePath = draft.filePath
+    if (draft.fileName !== undefined) noteStore.currentFileName = draft.fileName
+    if (draft.content !== undefined) noteStore.lastSavedContent = draft.content
+    if (draft.sourceMode !== undefined) noteStore.sourceMode = draft.sourceMode
+    if (draft.sourceContent) sourceContent.value = draft.sourceContent
+  } catch (err) {
+    console.error('恢复草稿状态失败:', err)
   }
-  // 保留 filePath 状态（但不设置 isModified，因为这是恢复的状态）
 }
 
-// ===== 草稿自动保存（防抖） =====
+// 草稿自动保存（防抖）
 let draftTimer: ReturnType<typeof setTimeout> | null = null
 
 function scheduleSaveDraft() {
@@ -296,22 +264,18 @@ function saveCurrentDraft() {
 }
 
 function handleBeforeUnload(e: BeforeUnloadEvent) {
-  // 用户已在未保存对话框中做出选择，允许关闭
   if (isClosingAfterDialog) {
     saveCurrentDraft()
     return
   }
 
-  // 检测是否有未保存的更改或临时文件
   const hasUnsavedChanges = noteStore.isModified
   const isTempFile = !noteStore.currentFilePath
 
   if (hasUnsavedChanges || isTempFile) {
-    // 阻止窗口关闭
     e.preventDefault()
     e.returnValue = false
 
-    // 显示自定义未保存更改对话框
     const message = isTempFile
       ? '当前文件是临时文件，尚未保存到磁盘，是否保存？'
       : '当前文件已修改但尚未保存，是否保存？'
@@ -320,20 +284,13 @@ function handleBeforeUnload(e: BeforeUnloadEvent) {
     unsavedDialog.visible = true
     ;(window as any).__unsavedDialogVisible = true
     unsavedDialog._resolve = async (result) => {
-      // 标记已做出选择，使下一次 beforeunload 不再拦截
       isClosingAfterDialog = true
       if (result === 'save') {
-        // 用户选择保存
-        if (isTempFile) {
-          await handleSaveAsFile()
-        } else {
-          await handleSaveFile()
-        }
-        // 保存后标记为已保存，然后关闭
+        if (isTempFile) await handleSaveAsFile()
+        else await handleSaveFile()
         noteStore.markSaved()
         window.close()
       } else if (result === 'discard') {
-        // 用户选择放弃修改
         noteStore.markSaved()
         window.close()
       } else {
@@ -344,16 +301,14 @@ function handleBeforeUnload(e: BeforeUnloadEvent) {
 
     return false
   }
-  // 退出前保存草稿
   saveCurrentDraft()
 }
 
-// 清除草稿（当文件正常保存到磁盘后调用）
 function clearDraftAfterSave() {
   noteStore.clearDraft()
 }
 
-// ===== 未保存更改对话框 =====
+// 未保存更改对话框
 const unsavedDialog = {
   visible: false,
   message: '',
@@ -392,17 +347,14 @@ function onUnsavedCancel() {
   unsavedDialog._resolve = null
 }
 
-// ===== 源码模式切换 =====
 async function toggleSourceMode() {
   if (noteStore.sourceMode) {
-    // 退出源码模式 → 恢复 Milkdown 渲染
-    // 先把 textarea 内容同步回 Milkdown
+    // 退出源码模式：把 textarea 内容同步回 Milkdown
     await replaceContent(sourceContent.value)
     noteStore.sourceMode = false
-    // 更新大纲
     sidebar.parseOutline(sourceContent.value)
   } else {
-    // 进入源码模式 → 从 Milkdown 取出原始 Markdown
+    // 进入源码模式：从 Milkdown 取出原始 Markdown
     sourceContent.value = getMarkdownContent()
     noteStore.sourceMode = true
     await nextTick()
@@ -410,11 +362,9 @@ async function toggleSourceMode() {
   }
 }
 
-// 源码模式下内容变化时，标记已修改并更新大纲
 function onSourceInput() {
-  // 用规范化字符串比较，避免与 milkdown 序列化结果之间的微差异误判
+  // 用规范化字符串比较，避免与 milkdown 序列化结果的微差异误判
   if (noteStore.pendingBaselineSync) {
-    // 首次输入即同步基准（与 markdownUpdated 同样的机制）
     noteStore.syncBaseline(sourceContent.value)
   } else if (!isMarkdownContentEqual(sourceContent.value, noteStore.lastSavedContent)) {
     noteStore.markModified()
@@ -422,19 +372,16 @@ function onSourceInput() {
     noteStore.markSaved()
   }
   sidebar.parseOutline(sourceContent.value)
-  // 触发草稿自动保存
   scheduleSaveDraft()
 }
 
-// ===== 镜像笔记 =====
+// 镜像笔记
 let unsubFloatNote: (() => void) | null = null
 
 async function handleMirrorNote() {
   const content = noteStore.sourceMode ? sourceContent.value : getMarkdownContent()
-  // 即使内容为空也允许打开，用户可以继续编辑
   const result = await window.services.createFloatNote(content, noteStore.currentFileName, 0.85)
   if (result) {
-    // 监听浮窗内容同步
     if (unsubFloatNote) unsubFloatNote()
     unsubFloatNote = window.services.onFloatNoteContentUpdate((newContent: string) => {
       syncFromFloatNote(newContent)
@@ -442,7 +389,6 @@ async function handleMirrorNote() {
   }
 }
 
-// 从浮窗同步内容回主编辑器
 async function syncFromFloatNote(content: string) {
   if (noteStore.sourceMode) {
     sourceContent.value = content
@@ -474,25 +420,22 @@ const MilkdownEditor = defineComponent({
           })
           ctx.get(listenerCtx)
             .markdownUpdated((_ctx, markdown) => {
-              // 章节文件：把编辑器里的 file:// URL 还原为 .image/... 相对引用
+              // 章节文件：把 file:// URL 还原为 .image/... 相对引用
               const normalized = collapseChapterImageSrcs(markdown)
               if (noteStore.pendingBaselineSync) {
                 // openFile/newFile 后的首次 markdownUpdated：
-                // 把 lastSavedContent 同步为当前 markdown 字符串，
-                // 作为后续"是否修改"判定的基准（消除磁盘原文与 serializer 的微差异）。
-                // 不修改 isModified（保持 openFile 时设置的 false）。
+                // 把 lastSavedContent 同步为当前 markdown 作为"是否修改"判定基准，
+                // 消除磁盘原文与 serializer 的微差异。不修改 isModified。
                 noteStore.syncBaseline(normalized)
               } else if (!isMarkdownContentEqual(normalized, noteStore.lastSavedContent)) {
                 noteStore.markModified()
               } else {
                 noteStore.markSaved()
               }
-              // 实时更新文档大纲
               sidebar.parseOutline(markdown)
-              // 触发草稿自动保存
               scheduleSaveDraft()
             })
-          // 语法高亮：语言已在 @/editor/codeHighlight 注册到共享 refractor 单例
+          // 语法高亮语言已在 @/editor/codeHighlight 注册到共享 refractor 单例
           ctx.set(prismConfig.key, {
             configureRefractor: (r) => r,
           })
@@ -506,14 +449,12 @@ const MilkdownEditor = defineComponent({
         .use(trailing)
     )
 
-    // 编辑器创建后获取实例
     const checkEditor = setInterval(() => {
       const editor = get()
       if (editor) {
         editorRef.value = editor
         noteStore.setEditorInstance(editor)
         clearInterval(checkEditor)
-        // 编辑器就绪后解析初始内容大纲
         nextTick(() => {
           const md = getMarkdownContent()
           if (md) sidebar.parseOutline(md)
@@ -529,29 +470,28 @@ const MilkdownEditor = defineComponent({
   },
 })
 
-// 获取当前 Markdown 内容
 function getMarkdownContent(): string {
   const editor = editorRef.value
   if (!editor) return ''
   try {
-    // 章节文件：把编辑器里的 file:// URL 还原为 .image/... 相对引用
+    // 章节文件：把 file:// URL 还原为 .image/... 相对引用
     return collapseChapterImageSrcs(editor.action(getMarkdown()))
   } catch {
     return ''
   }
 }
 
-// ===== 章节图片双向转换（使用 composable）=====
+// 章节图片双向转换（使用 composable）
 
-// 替换编辑器内容
-// 关键：openFile/newFile 后会置 pendingBaselineSync=true，
-// markdownUpdated 首次触发时把 lastSavedContent 同步为当前 markdown 字符串，
-// 消除磁盘原文与 milkdown serializer 之间的微差异（末尾空白、连续空行等），
-// 避免历史记录切换时误判"已修改"。
+/**
+ * 替换编辑器内容。
+ * 关键：openFile/newFile 后会置 pendingBaselineSync=true，首次 markdownUpdated
+ * 会把 lastSavedContent 同步为当前 markdown，消除磁盘原文与 serializer 的微差异，
+ * 避免历史记录切换时误判"已修改"。
+ */
 async function replaceContent(markdown: string) {
   const editor = editorRef.value
   if (!editor) return
-  // 章节文件：扫描 markdown 中的 .image/... 引用，重建 chimg:// 映射
   const chapterDir = getChapterDir(noteStore.currentFilePath, sidebar.fileTreeRootPath)
   if (chapterDir) {
     await ensureChapterRegistered(chapterDir)
@@ -566,26 +506,22 @@ async function replaceContent(markdown: string) {
   }
   try {
     const { replaceAll } = await import('@milkdown/kit/utils')
-    // 章节文件：把 .image/... 相对引用展开为 file:// URL，编辑器才能渲染
+    // 章节文件：把 .image/... 相对引用展开为 file:// URL 才能渲染
     editor.action(replaceAll(expandChapterImageSrcs(markdown)))
   } catch (err) {
     console.error('替换内容失败:', err)
   }
 }
 
-// ===== 文件操作 =====
+// 文件操作
 async function handleNewFile() {
   if (noteStore.isModified) {
     const result = await showUnsavedDialog()
     if (result === 'cancel') return
     if (result === 'save') {
-      if (noteStore.currentFilePath) {
-        await handleSaveFile()
-      } else {
-        await handleSaveAsFile()
-      }
+      if (noteStore.currentFilePath) await handleSaveFile()
+      else await handleSaveAsFile()
     }
-    // 'discard' → 继续执行新建
   }
   noteStore.newFile()
   await nextTick()
@@ -593,10 +529,7 @@ async function handleNewFile() {
   toast.show('新建文件')
 }
 
-/**
- * 静默重置编辑器（不弹未保存对话框）。
- * 用于"创建 epub 目录"等场景：用户已做出明确选择，无需再询问。
- */
+/** 静默重置编辑器：用于"创建 epub 目录"等场景（用户已做出明确选择，无需再询问） */
 async function handleResetEditor() {
   noteStore.newFile()
   await nextTick()
@@ -616,9 +549,7 @@ async function handleOpenFile() {
     await nextTick()
     await replaceContent(content)
     toast.show(`已打开: ${fileName}`)
-    // 记录历史
     sidebar.addToHistory(filePath, fileName, content)
-    // 解析大纲
     sidebar.parseOutline(content)
   } catch (err) {
     console.error('打开文件失败:', err)
@@ -635,22 +566,18 @@ async function handleSaveFile() {
 
     if (noteStore.currentFilePath) {
       try {
-        // 已有文件路径，直接覆盖保存
         const savedPath = await window.services.writeToFile(noteStore.currentFilePath, content)
         if (savedPath) {
           noteStore.markSaved()
           noteStore.lastSavedContent = content
           toast.show('已保存')
-          // 更新历史记录
           sidebar.addToHistory(noteStore.currentFilePath, noteStore.currentFileName, content)
-          // 清除草稿（已正常保存到磁盘）
           clearDraftAfterSave()
-          // 若文件目录面板有根目录且与当前文件同目录，刷新文件树
+          // 文件目录面板根目录与当前文件同目录（或为其祖先）时刷新文件树
           if (sidebar.fileTreeRootPath) {
             const fileDirIdx = Math.max(noteStore.currentFilePath.lastIndexOf('/'), noteStore.currentFilePath.lastIndexOf('\\'))
             if (fileDirIdx > 0) {
               const fileDir = noteStore.currentFilePath.substring(0, fileDirIdx)
-              // 简单判断：根目录与文件目录相同，或根目录是文件目录的祖先
               if (fileDir === sidebar.fileTreeRootPath || fileDir.startsWith(sidebar.fileTreeRootPath)) {
                 sidebar.refreshFileTree()
               }
@@ -678,10 +605,7 @@ async function handleSaveAsFile() {
     const content = noteStore.sourceMode ? sourceContent.value : getMarkdownContent()
     if (!content && content !== '') return
 
-    // 决定保存对话框的默认目录：
-    //   1. 当前正在编辑的文件的父目录
-    //   2. 文件目录面板的根目录
-    //   3. 都不存在则不传，使用后端默认（用户文档目录）
+    // 默认目录优先级：当前文件父目录 → 文件目录面板根目录 → 后端默认（用户文档目录）
     let defaultDir: string | undefined
     if (noteStore.currentFilePath) {
       const idx = Math.max(noteStore.currentFilePath.lastIndexOf('/'), noteStore.currentFilePath.lastIndexOf('\\'))
@@ -691,12 +615,10 @@ async function handleSaveAsFile() {
       defaultDir = sidebar.fileTreeRootPath
     }
 
-    // 弹出保存对话框（文件名输入框，默认"简记-XX.md"）
     const result = await window.electronAPI?.dialog.showNoteSaveDialog(content, defaultDir)
     if (result) {
       // 注意：不要调 openFile（它会置 pendingBaselineSync=true，导致下次
-      // markdownUpdated 误用序列化结果覆盖刚保存的 lastSavedContent）。
-      // 直接设置状态即可。
+      // markdownUpdated 误用序列化结果覆盖刚保存的 lastSavedContent），直接设置状态即可
       noteStore.currentFilePath = result.filePath
       noteStore.currentFileName = result.fileName
       noteStore.lastSavedContent = content
@@ -705,9 +627,8 @@ async function handleSaveAsFile() {
       toast.show(`已保存: ${result.fileName}`)
       sidebar.addToHistory(result.filePath, result.fileName, content)
       sidebar.parseOutline(content)
-      // 清除草稿（已正常保存到磁盘）
       clearDraftAfterSave()
-      // 若文件目录面板的根目录与保存目录一致（或为其祖先），刷新文件树
+      // 文件目录面板根目录与保存目录一致（或为其祖先）时刷新文件树
       if (sidebar.fileTreeRootPath) {
         const fileDirIdx = Math.max(result.filePath.lastIndexOf('/'), result.filePath.lastIndexOf('\\'))
         if (fileDirIdx > 0) {
@@ -726,7 +647,6 @@ async function handleSaveAsFile() {
   }
 }
 
-// 等待编辑器实例就绪
 function waitForEditor(timeout = 3000): Promise<boolean> {
   return new Promise((resolve) => {
     if (editorRef.value) return resolve(true)
@@ -743,22 +663,17 @@ function waitForEditor(timeout = 3000): Promise<boolean> {
   })
 }
 
-// 接收外部内容（从阅读器发送备注），以临时/未保存形式展示
+/** 接收外部内容（从阅读器发送备注），以临时/未保存形式展示 */
 async function receiveContent(content: string, bookTitle: string) {
   if (noteStore.isModified) {
     const result = await showUnsavedDialog()
     if (result === 'cancel') return
     if (result === 'save') {
-      if (noteStore.currentFilePath) {
-        await handleSaveFile()
-      } else {
-        await handleSaveAsFile()
-      }
+      if (noteStore.currentFilePath) await handleSaveFile()
+      else await handleSaveAsFile()
     }
-    // 'discard' → 继续执行
   }
 
-  // 新建文件并填入内容（不触发保存，以临时形式展示）
   noteStore.newFile()
   noteStore.currentFileName = bookTitle || '简记'
   noteStore.markModified()
@@ -775,17 +690,14 @@ async function receiveContent(content: string, bookTitle: string) {
   }
 }
 
-// 从外部路径打开文件（"打开方式"触发）
+/** 从外部路径打开文件（"打开方式"触发） */
 async function openFileFromExternal(filePath: string) {
   if (noteStore.isModified) {
     const result = await showUnsavedDialog()
     if (result === 'cancel') return
     if (result === 'save') {
-      if (noteStore.currentFilePath) {
-        await handleSaveFile()
-      } else {
-        await handleSaveAsFile()
-      }
+      if (noteStore.currentFilePath) await handleSaveFile()
+      else await handleSaveAsFile()
     }
   }
 
@@ -797,7 +709,6 @@ async function openFileFromExternal(filePath: string) {
     sidebar.parseOutline(content)
     sidebar.addToHistory(filePath, fileName, content)
 
-    // 等待 Milkdown 编辑器实例就绪
     const ready = await waitForEditor()
     if (ready) {
       await replaceContent(content)
@@ -810,7 +721,6 @@ async function openFileFromExternal(filePath: string) {
   }
 }
 
-// 暴露方法给外部调用
 defineExpose({
   handleNewFile,
   handleOpenFile,
@@ -824,9 +734,39 @@ defineExpose({
   handleResetEditor,
 })
 
-// ===== 侧边栏交互 =====
-// 从历史记录或文件目录打开文件
+// 侧边栏交互：从历史记录或文件目录打开文件
 async function handleOpenFromHistory(filePath: string) {
+  const target = resolveHistoryTarget(filePath)
+  if (target.kind === 'epub') {
+    await handleOpenEpubProject(target.path)
+    return
+  }
+  await handleOpenHistoryFile(target.path)
+}
+
+/**
+ * 从历史记录打开 epub 项目：仅切换文件目录根到该 epub 目录，
+ * 不自动打开章节文件（用户可在文件树中点击章节打开）。
+ */
+async function handleOpenEpubProject(epubDir: string) {
+  try {
+    await window.electronAPI?.security.addAuthorizedDir(epubDir)
+    sidebar.setFileTreeRoot(epubDir)
+    if (sidebar.activePanel !== 'files') {
+      sidebar.togglePanel('files')
+    }
+    sidebar.addToHistory(epubDir)
+  } catch (err) {
+    console.error('打开 epub 项目失败:', err)
+    toast.show('目录不存在或无法打开')
+    sidebar.removeFromHistory(epubDir)
+  }
+}
+
+/**
+ * 从历史记录打开普通文件，并同步切换文件目录到文件所在目录（视为普通目录）。
+ */
+async function handleOpenHistoryFile(filePath: string) {
   try {
     const content = await window.services.readFileAsText(filePath)
     const fileName = await window.services.getFileName(filePath)
@@ -834,13 +774,9 @@ async function handleOpenFromHistory(filePath: string) {
       const result = await showUnsavedDialog('文件')
       if (result === 'cancel') return
       if (result === 'save') {
-        if (noteStore.currentFilePath) {
-          await handleSaveFile()
-        } else {
-          await handleSaveAsFile()
-        }
+        if (noteStore.currentFilePath) await handleSaveFile()
+        else await handleSaveAsFile()
       }
-      // 'discard' → 继续执行打开
     }
     noteStore.openFile(filePath, fileName, content)
     await nextTick()
@@ -848,8 +784,9 @@ async function handleOpenFromHistory(filePath: string) {
     toast.show(`已打开: ${fileName}`)
     sidebar.addToHistory(filePath, fileName, content)
     sidebar.parseOutline(content)
-    // 同步文件目录面板的高亮
     sidebar.selectNode(filePath)
+    // 同步切换文件目录到文件所在目录（视为普通目录）
+    await syncFileTreeRootToFileDir(filePath)
   } catch (err) {
     console.error('打开历史文件失败:', err)
     toast.show('文件不存在或无法打开')
@@ -857,10 +794,34 @@ async function handleOpenFromHistory(filePath: string) {
   }
 }
 
-// 滚动到指定行（文档大纲跳转）
+/**
+ * 将文件目录面板的根目录切换到指定文件所在的目录（普通目录，非 epub 目录）。
+ * 仅当目标目录与当前根目录不同（且不是当前根的子目录）时才切换。
+ */
+async function syncFileTreeRootToFileDir(filePath: string) {
+  const idx = Math.max(filePath.lastIndexOf('/'), filePath.lastIndexOf('\\'))
+  if (idx <= 0) return
+  const parentDir = filePath.substring(0, idx)
+  // 文件所在目录是 epub 目录：不在此处理（应由 epub 历史记录分支处理）
+  if (isEpubDirPath(parentDir)) return
+  // 当前根目录已经是该目录或其祖先：无需切换
+  const current = sidebar.fileTreeRootPath
+  if (current) {
+    const cur = current.replace(/[\\/]+$/, '')
+    if (parentDir === cur || parentDir.startsWith(cur + '/') || parentDir.startsWith(cur + '\\')) {
+      return
+    }
+  }
+  try {
+    await window.electronAPI?.security.addAuthorizedDir(parentDir)
+    sidebar.setFileTreeRoot(parentDir)
+  } catch (err) {
+    console.warn('同步文件目录失败:', err)
+  }
+}
+
 function handleScrollToLine(line: number) {
   try {
-    // 源码模式：在 textarea 中滚动到对应行
     if (noteStore.sourceMode && sourceTextareaRef.value) {
       scrollSourceToLine(line)
       return
@@ -883,18 +844,16 @@ function handleScrollToLine(line: number) {
   }
 }
 
-// 源码模式下将 textarea 平滑滚动到指定行（兼容软换行）
+/** 源码模式下将 textarea 平滑滚动到指定行（兼容软换行） */
 function scrollSourceToLine(line: number) {
   const ta = sourceTextareaRef.value
   if (!ta) return
   const text = sourceContent.value
   const lines = text.split('\n')
-  // 目标行的字符偏移
   let offset = 0
   for (let i = 0; i < line && i < lines.length; i++) {
     offset += lines[i].length + 1
   }
-  // 聚焦到该行，便于后续编辑
   ta.focus()
   ta.setSelectionRange(offset, offset)
 
@@ -908,7 +867,6 @@ function scrollSourceToLine(line: number) {
     'lineHeight', 'textTransform', 'wordSpacing', 'tabSize',
   ] as const
   copyProps.forEach((prop) => {
-    // 复制计算后的样式，确保换行方式一致
     // @ts-ignore - 动态拷贝样式
     mirror.style[prop] = cs[prop]
   })
@@ -919,11 +877,9 @@ function scrollSourceToLine(line: number) {
   mirror.style.overflow = 'hidden'
   mirror.textContent = text.substring(0, offset)
   document.body.appendChild(mirror)
-  // offsetHeight 包含上内边距，约等于目标行起始位置
   const targetY = Math.max(0, mirror.offsetHeight - ta.clientHeight / 2)
   document.body.removeChild(mirror)
 
-  // 平滑滚动
   const startY = ta.scrollTop
   const dist = targetY - startY
   if (Math.abs(dist) < 2) {
@@ -941,7 +897,6 @@ function scrollSourceToLine(line: number) {
   requestAnimationFrame(step)
 }
 
-// 监听快捷键
 function handleKeydown(e: KeyboardEvent) {
   if (e.ctrlKey && e.key === 'n') {
     e.preventDefault()
@@ -951,16 +906,13 @@ function handleKeydown(e: KeyboardEvent) {
     handleOpenFile()
   } else if (e.ctrlKey && e.key === 's') {
     e.preventDefault()
-    if (e.repeat) return  // 忽略长按连按
-    if (e.shiftKey) {
-      handleSaveAsFile()
-    } else {
-      handleSaveFile()
-    }
+    if (e.repeat) return
+    if (e.shiftKey) handleSaveAsFile()
+    else handleSaveFile()
   }
 }
 
-// ===== 图片粘贴处理 =====
+// 图片粘贴处理
 function getImageFormat(): string {
   return window.electronAPI?.store.get('note:imageFormat') || 'base64'
 }
@@ -983,13 +935,11 @@ async function handlePaste(e: ClipboardEvent) {
       const file = item.getAsFile()
       if (!file) return
 
-      // 将文件转为 base64 data URL
       const reader = new FileReader()
       reader.onload = async (ev) => {
         const base64DataUrl = ev.target?.result as string
         if (!base64DataUrl) return
 
-        // 章节文件 / 普通文件：分别走不同存储路径
         const inserted = await insertImageForCurrentFile({
           base64DataUrl,
           filePath: noteStore.currentFilePath,
@@ -998,9 +948,8 @@ async function handlePaste(e: ClipboardEvent) {
         if (!inserted) return
         const { src, markdown: mdImage } = inserted
 
-        // 在编辑器中插入图片
         if (noteStore.sourceMode && sourceTextareaRef.value) {
-          // 源码模式：直接插入 markdown 语法（相对引用）
+          // 源码模式：直接插入 markdown 语法
           const ta = sourceTextareaRef.value
           const start = ta.selectionStart
           const end = ta.selectionEnd
@@ -1008,10 +957,9 @@ async function handlePaste(e: ClipboardEvent) {
           ta.selectionStart = ta.selectionEnd = start + mdImage.length
           onSourceInput()
         } else if (editorRef.value) {
-          // Milkdown：用 imageCommand 插入，src 给可渲染的 URL（file:// 或 cacheimg://）
+          // Milkdown：用 imageCommand 插入，src 给可渲染的 URL
           try {
             const { insertImageCommand } = await import('@milkdown/kit/preset/commonmark')
-            // 通过 Milkdown 自身的命令插入
             ;(editorRef.value as any).action(insertImageCommand.key, { src, alt: 'image' })
           } catch (err) {
             // 兜底：把整段 markdown 追加到当前内容
@@ -1038,19 +986,15 @@ onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
   window.addEventListener('paste', handlePaste)
   window.addEventListener('beforeunload', handleBeforeUnload)
-  // Ctrl+滚轮缩放监听：必须 passive:false 才能 preventDefault 阻止浏览器内置缩放
+  // Ctrl+滚轮缩放：必须 passive:false 才能 preventDefault 阻止浏览器内置缩放
   window.addEventListener('wheel', handleWheelZoom, { passive: false })
-  // 光标在代码块内时显示语言切换器，并在编辑器滚动时重新定位
   document.addEventListener('selectionchange', scheduleCodeBlockSelector)
   editorContainerRef.value?.addEventListener('scroll', scheduleCodeBlockSelector)
-  // 点击外部关闭代码语言下拉框
   document.addEventListener('mousedown', onCodeLangDocClick)
-  // 加载历史记录
   sidebar.loadHistory?.();
   // 暴露保存函数到全局，供 TitleBar 调用
   ;(window as any).__noteEditorSave = handleSaveFile
   ;(window as any).__noteEditorSaveAs = handleSaveAsFile
-  // 监听 currentFilePath 变化：切换/新建文件时清空章节图片映射
   watch(() => noteStore.currentFilePath, () => {
     clearChapterImages()
     currentChapterId.value = null
@@ -1066,10 +1010,8 @@ onBeforeUnmount(() => {
   document.removeEventListener('selectionchange', scheduleCodeBlockSelector)
   document.removeEventListener('mousedown', onCodeLangDocClick)
   editorContainerRef.value?.removeEventListener('scroll', scheduleCodeBlockSelector)
-  // 清除全局暴露的保存函数
   delete (window as any).__noteEditorSave
   delete (window as any).__noteEditorSaveAs
-  // 退出时保存草稿
   saveCurrentDraft()
   if (draftTimer) {
     clearTimeout(draftTimer)
@@ -1088,23 +1030,19 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="note-editor" :class="'theme-' + settings.settings.theme">
-    <!-- 左侧 VSCode 风格侧边栏 -->
     <NoteSidebar
       @open-file="handleOpenFromHistory"
       @scroll-to-line="handleScrollToLine"
     />
     <div class="note-main" ref="noteMainRef" :style="{ '--note-zoom': noteZoom }">
-      <!-- 顶部格式化工具栏（类似 Word 的"开始"栏；源码模式下隐藏） -->
       <NoteToolbar v-show="!noteStore.sourceMode" />
 
-      <!-- Milkdown 编辑器（源码模式时隐藏） -->
       <div v-show="!noteStore.sourceMode" ref="editorContainerRef" class="note-editor-container custom-scrollbar">
         <MilkdownProvider>
           <MilkdownEditor />
         </MilkdownProvider>
       </div>
 
-      <!-- 源码模式 textarea（非源码模式时隐藏） -->
       <textarea
         v-show="noteStore.sourceMode"
         ref="sourceTextareaRef"
@@ -1114,9 +1052,7 @@ onBeforeUnmount(() => {
         @input="onSourceInput"
       ></textarea>
 
-      <!-- 底部状态栏 -->
       <div class="note-status-bar">
-        <!-- 源码模式切换按钮 -->
         <button
           class="source-mode-btn"
           :class="{ active: noteStore.sourceMode }"
@@ -1125,7 +1061,6 @@ onBeforeUnmount(() => {
         >
           <Code :size="13" :stroke-width="1.8" />
         </button>
-        <!-- 镜像笔记按钮 -->
         <button
           class="source-mode-btn"
           @click="handleMirrorNote"
@@ -1138,7 +1073,6 @@ onBeforeUnmount(() => {
         <span class="status-spacer"></span>
         <span class="status-item">Markdown</span>
         <span class="status-item">UTF-8</span>
-        <!-- 缩放状态：始终显示百分比；非 100% 时显示恢复按钮 -->
         <span class="status-item status-zoom" :class="{ 'status-zoom-modified': noteZoom !== 1.0 }">
           {{ Math.round(noteZoom * 100) }}%
         </span>
@@ -1160,7 +1094,6 @@ onBeforeUnmount(() => {
         :style="{ top: codeSelectorPos.top + 'px', left: codeSelectorPos.left + 'px' }"
         @mousedown.stop
       >
-        <!-- 触发按钮：显示当前语言 -->
         <button
           class="code-lang-selector"
           :class="{ open: codeLangDropdownOpen }"
@@ -1171,10 +1104,8 @@ onBeforeUnmount(() => {
           <span class="code-lang-arrow">▾</span>
         </button>
 
-        <!-- 下拉列表面板 -->
         <Transition name="code-lang-fade">
           <div v-if="codeLangDropdownOpen" class="code-lang-dropdown">
-            <!-- 搜索框 -->
             <div class="code-lang-search">
               <input
                 ref="codeLangInputRef"

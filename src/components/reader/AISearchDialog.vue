@@ -25,23 +25,19 @@ const isLoading = ref(false)
 const streamingContent = ref('')
 const errorMsg = ref('')
 
-// 模型与字数限制
 const modelList = ref<string[]>([])
 const selectedModel = ref('')
 const lengthLimit = ref<LengthLimitValue>(100)
 
-// 确认弹窗
 const showConfirm = ref(false)
 const confirmIdx = ref(-1)
 
-// 对话框尺寸与位置
 const dialogRef = ref<HTMLElement>()
 const dialogPos = ref({ x: 0, y: 0 })
 const dialogSize = ref({ w: 420, h: 380 })
 const MIN_W = 300
 const MIN_H = 250
 
-// 交互状态
 const isDragging = ref(false)
 const isResizingR = ref(false)
 const isResizingB = ref(false)
@@ -59,7 +55,6 @@ let resizeStartH = 0
 const chatContainer = ref<HTMLElement>()
 const inputRef = ref<HTMLTextAreaElement>()
 
-// Markdown 渲染
 marked.setOptions({
   breaks: true,
   gfm: true,
@@ -69,7 +64,6 @@ function renderMarkdown(content: string): string {
   return marked.parse(content) as string
 }
 
-// 初始居中
 function initPosition() {
   const parent = document.querySelector('.reader') as HTMLElement
   if (!parent) return
@@ -81,7 +75,6 @@ function initPosition() {
   }
 }
 
-// 标题栏拖拽
 function onTitleMouseDown(e: MouseEvent) {
   const target = e.target as HTMLElement
   if (target.closest('button')) return
@@ -93,7 +86,6 @@ function onTitleMouseDown(e: MouseEvent) {
   e.preventDefault()
 }
 
-// 右边框调整
 function onResizeRMousedown(e: MouseEvent) {
   isResizingR.value = true
   resizeStartX = e.clientX
@@ -102,7 +94,6 @@ function onResizeRMousedown(e: MouseEvent) {
   e.stopPropagation()
 }
 
-// 底部边框调整
 function onResizeBMousedown(e: MouseEvent) {
   isResizingB.value = true
   resizeStartY = e.clientY
@@ -154,7 +145,6 @@ onMounted(() => {
   initPosition()
   loadHistory()
 
-  // 初始化模型列表和持久化选择
   modelList.value = aiService.getModelList()
   selectedModel.value = aiService.getSelectedModel()
   // 如果持久化的模型不在列表中，回退到第一个
@@ -241,11 +231,9 @@ async function sendMessage(text: string) {
   isLoading.value = true
   streamingContent.value = ''
 
-  // 构建上下文消息，并注入书籍背景
   const contextMessages = messages.value.slice(-20)
   const bookContext = buildBookContext()
 
-  // 将书籍背景作为 system 消息插入到消息列表开头
   const messagesWithContext: AIChatMessage[] = [
     { role: 'system', content: bookContext, timestamp: Date.now() },
     ...contextMessages,
@@ -297,7 +285,6 @@ function handleKeydown(e: KeyboardEvent) {
   }
 }
 
-// 智能时间格式化
 function formatTime(timestamp: number): string {
   const now = new Date()
   const msgDate = new Date(timestamp)
@@ -326,7 +313,6 @@ function formatTime(timestamp: number): string {
   return `${msgDate.getFullYear()}年${msgDate.getMonth() + 1}月${msgDate.getDate()}日`
 }
 
-// 复制消息
 function handleCopy(content: string) {
   if (window.electronAPI?.clipboard) {
     window.electronAPI.clipboard.writeText(content)

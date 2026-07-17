@@ -3,9 +3,6 @@
  * 基于 electron-store 的键值存储
  */
 
-/**
- * 获取存储值（同步）
- */
 export function getItem(key: string): any {
   if (window.electronAPI?.store) {
     return window.electronAPI.store.get(key)
@@ -15,9 +12,6 @@ export function getItem(key: string): any {
   return raw ? JSON.parse(raw) : null
 }
 
-/**
- * 设置存储值（同步）
- */
 export function setItem(key: string, value: any): void {
   if (window.electronAPI?.store) {
     window.electronAPI.store.set(key, value)

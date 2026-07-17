@@ -28,7 +28,6 @@ export const aiService = {
    * 注意：加密数据需要使用 getSettingsAsync
    */
   getSettings(): AISettings {
-    // 尝试从缓存获取
     if (cachedSettings) {
       return { ...DEFAULT_AI_SETTINGS, ...cachedSettings }
     }
@@ -37,7 +36,6 @@ export const aiService = {
     if (raw) {
       try {
         const data = typeof raw === 'string' ? raw : String(raw)
-        // 检查是否是加密数据
         if (!data.startsWith('ENCRYPTED:')) {
           const parsed = JSON.parse(data)
           cachedSettings = parsed
@@ -68,14 +66,12 @@ export const aiService = {
     await db.saveAISettings(settings)
   },
 
-  // 解析模型列表
   getModelList(): string[] {
     const settings = this.getSettings()
     if (!settings.model) return []
     return settings.model.split(',').map(m => m.trim()).filter(Boolean)
   },
 
-  // 获取持久化的选中模型
   getSelectedModel(): string {
     const saved = electronStore.getItem('reader:ai-selected-model') as string | null
     if (saved) return saved
@@ -83,18 +79,15 @@ export const aiService = {
     return models[0] || ''
   },
 
-  // 持久化选中模型
   saveSelectedModel(model: string) {
     electronStore.setItem('reader:ai-selected-model', model)
   },
 
-  // 获取持久化的字数限制
   getLengthLimit(): LengthLimitValue {
     const saved = electronStore.getItem('reader:ai-length-limit') as LengthLimitValue | null
     return saved ?? 100
   },
 
-  // 持久化字数限制
   saveLengthLimit(limit: LengthLimitValue) {
     electronStore.setItem('reader:ai-length-limit', limit)
   },
@@ -129,7 +122,6 @@ export const aiService = {
 
     const model = options?.model || this.getSelectedModel() || settings.model.split(',')[0].trim()
 
-    // 构建消息列表
     const chatMessages = messages.map(m => ({ role: m.role, content: m.content }))
 
     // 字数限制：同时在 system 和用户消息中强调，提高模型遵从率

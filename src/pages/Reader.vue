@@ -117,7 +117,6 @@ function handleOpenSearch(e: Event) {
   }
 }
 
-// 构建备注 Markdown 内容
 function buildNotesMarkdown(): string {
   const anns = annotations.annotations
   const chapterMap = new Map<string, typeof anns>()
@@ -153,7 +152,6 @@ async function handleExportNotes() {
   }
 }
 
-// 发送备注到简记
 function handleSendToNote() {
   if (annotations.annotations.length === 0) return
   const mdContent = buildNotesMarkdown()

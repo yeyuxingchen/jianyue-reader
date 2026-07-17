@@ -9,9 +9,8 @@ const chapterTitle = ref('当前章节')
 const content = ref('')
 const opacity = ref(0.5)
 const hasContent = ref(false)
-const isPinned = ref(true) // 默认置顶
+const isPinned = ref(true)
 
-// 计算字体样式
 const fontFamily = computed(() => {
   const matchedFont = settings.customFonts.find(f => f.name === settings.settings.fontFamily)
   if (matchedFont) {
@@ -32,7 +31,6 @@ async function togglePin() {
   } catch {}
 }
 
-// 返回阅读器
 function backToMain() {
   try {
     if (window.electronAPI?.floatReader) {
@@ -41,7 +39,6 @@ function backToMain() {
   } catch {}
 }
 
-// 退出应用
 function closeApp() {
   try {
     if (window.electronAPI?.floatReader) {
@@ -51,7 +48,6 @@ function closeApp() {
 }
 
 onMounted(async () => {
-  // 加载设置（包括字体配置）
   settings.loadSettings()
 
   // 注入自定义字体到文档（使用 base64 data URI 避免跨域问题）
@@ -110,7 +106,6 @@ onMounted(async () => {
     })
   }
 
-  // 通知主进程渲染进程已就绪
   if (window.electronAPI?.send) {
     window.electronAPI.send('float:reader:ready')
   }

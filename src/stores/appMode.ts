@@ -63,16 +63,13 @@ export const useAppModeStore = defineStore('appMode', () => {
 })
 
 export const useNoteEditorStore = defineStore('noteEditor', () => {
-  // 当前文件信息
   const currentFilePath = ref<string | null>(null)
   const currentFileName = ref<string>('未命名')
   const isModified = ref(false)
   const lastSavedContent = ref('')
 
-  // 编辑器实例引用
   const editorInstance = ref<any>(null)
 
-  // 源码模式
   const sourceMode = ref(false)
 
   // 待同步标志：openFile/newFile 后置 true，markdownUpdated 首次触发时
