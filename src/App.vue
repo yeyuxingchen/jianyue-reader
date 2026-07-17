@@ -2,6 +2,7 @@
 import { onMounted, onBeforeUnmount, ref, nextTick, type ComponentPublicInstance } from 'vue'
 import { useSettingsStore } from '@/stores/settings'
 import { useAppModeStore } from '@/stores/appMode'
+import { useExternalFileOpen } from '@/composables/useExternalFileOpen'
 import FloatNote from '@/pages/FloatNote.vue'
 import FloatReader from '@/pages/FloatReader.vue'
 import TitleBar from '@/components/common/TitleBar.vue'
@@ -13,6 +14,12 @@ const floatMode = new URLSearchParams(window.location.search).get('float')
 
 const settings = useSettingsStore()
 const appModeStore = useAppModeStore()
+
+// 外部文件打开（双击 md/书籍文件唤起本应用时，加载文件内容）
+// 仅在正常应用模式启用，浮窗模式不需要
+if (!floatMode) {
+  useExternalFileOpen()
+}
 
 // 简记编辑器暴露的方法契约（对应 NoteEditor.vue 的 defineExpose）
 interface NoteEditorExpose {
