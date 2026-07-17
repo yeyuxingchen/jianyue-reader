@@ -25,6 +25,7 @@ import {
   Image as ImageIcon,
   ImagePlus,
 } from 'lucide-vue-next'
+import Tooltip from '@/components/common/Tooltip.vue'
 
 const MIN_WIDTH = 150
 const MAX_WIDTH = 500
@@ -241,7 +242,7 @@ function formatTime(ts: number): string {
 }
 
 function getOutlineIndent(level: number): string {
-  return `${(level - 1) * 12}px`
+  return `${8 + (level - 1) * 12}px`
 }
 
 function onOutlineClick(item: OutlineItem) {
@@ -267,7 +268,7 @@ async function onFilesIconClick() {
       const parentDir = getParentDir(cur)
       if (parentDir) {
         await window.electronAPI?.security.addAuthorizedDir(parentDir)
-        sidebar.setFileTreeRoot(parentDir)
+        await sidebar.setFileTreeRoot(parentDir)
       } else {
         toast.show('无法识别当前文件所在目录')
         return
@@ -586,30 +587,33 @@ watch(
     <!-- Activity Bar (图标导航栏) -->
     <div class="activity-bar">
       <!-- 文件目录（在历史记录之上） -->
-      <button
-        class="activity-btn"
-        :class="{ active: sidebar.activePanel === 'files' }"
-        @click="onFilesIconClick"
-        title="文件目录"
-      >
-        <FolderOpen :size="20" :stroke-width="1.8" />
-      </button>
-      <button
-        class="activity-btn"
-        :class="{ active: sidebar.activePanel === 'history' }"
-        @click="sidebar.togglePanel('history')"
-        title="历史记录"
-      >
-        <Clock :size="20" :stroke-width="1.8" />
-      </button>
-      <button
-        class="activity-btn"
-        :class="{ active: sidebar.activePanel === 'outline' }"
-        @click="sidebar.togglePanel('outline')"
-        title="文档结构"
-      >
-        <ListTree :size="20" :stroke-width="1.8" />
-      </button>
+      <Tooltip content="文件目录" placement="right">
+        <button
+          class="activity-btn"
+          :class="{ active: sidebar.activePanel === 'files' }"
+          @click="onFilesIconClick"
+        >
+          <FolderOpen :size="20" :stroke-width="1.8" />
+        </button>
+      </Tooltip>
+      <Tooltip content="历史记录" placement="right">
+        <button
+          class="activity-btn"
+          :class="{ active: sidebar.activePanel === 'history' }"
+          @click="sidebar.togglePanel('history')"
+        >
+          <Clock :size="20" :stroke-width="1.8" />
+        </button>
+      </Tooltip>
+      <Tooltip content="文档结构" placement="right">
+        <button
+          class="activity-btn"
+          :class="{ active: sidebar.activePanel === 'outline' }"
+          @click="sidebar.togglePanel('outline')"
+        >
+          <ListTree :size="20" :stroke-width="1.8" />
+        </button>
+      </Tooltip>
 
       <!-- 面板关闭时，activity bar 右侧边缘可向右拖拽展开 -->
       <div
@@ -622,7 +626,7 @@ watch(
     <!-- Content Panel (展开面板) -->
     <div
       class="side-panel"
-      :class="{ collapsed: sidebar.activePanel === null }"
+      :class="{ collapsed: sidebar.activePanel === null, 'is-dragging': isDragging }"
       :style="panelStyle"
     >
       <!-- 右侧拖拽手柄 -->
@@ -631,55 +635,63 @@ watch(
       <!-- 面板头部 -->
       <div class="panel-header">
         <div class="panel-header-left">
-          <span class="panel-title" :title="panelTitleTooltip">{{ panelTitle }}</span>
+          <Tooltip :content="panelTitleTooltip" placement="bottom" only-when-overflow>
+            <span class="panel-title">{{ panelTitle }}</span>
+          </Tooltip>
           <span v-if="showEpubTag" class="epub-tag">epub</span>
         </div>
-        <button class="panel-close" @click="sidebar.closePanel()" title="关闭面板">
-          <X :size="14" />
-        </button>
+        <Tooltip content="关闭面板" placement="bottom">
+          <button class="panel-close" @click="sidebar.closePanel()">
+            <X :size="14" />
+          </button>
+        </Tooltip>
       </div>
 
       <!-- 文件目录：操作面板（无 border / box-shadow，仅有高度） -->
       <div v-if="displayPanel === 'files'" class="panel-actions">
-        <button
-          class="action-btn"
-          @click="onRefreshTree"
-          title="刷新"
-        >
-          <RefreshCw :size="14" :stroke-width="1.8" />
-        </button>
+        <Tooltip content="刷新" placement="bottom">
+          <button
+            class="action-btn"
+            @click="onRefreshTree"
+          >
+            <RefreshCw :size="14" :stroke-width="1.8" />
+          </button>
+        </Tooltip>
         <div class="action-spacer"></div>
         <!-- 导出 epub：仅在根目录是 epub 时显示，位于"+"按钮左侧 -->
-        <button
-          v-if="isEpubRoot"
-          class="action-btn export-btn"
-          :disabled="isExporting"
-          @click="onExportEpub"
-          :title="isExporting ? '正在导出…' : '导出 epub'"
-        >
-          <!-- 导出中：切换为 Loader2 图标（自带旋转动画） -->
-          <Loader2 v-if="isExporting" :size="14" :stroke-width="1.8" class="loader-icon" />
-          <Download v-else :size="14" :stroke-width="1.8" />
-        </button>
-        <!-- 封面：位于导出按钮右侧 -->
-        <button
-          v-if="isEpubRoot"
-          class="action-btn cover-btn"
-          :class="{ 'has-cover': hasCover }"
-          @click="onPickCover"
-          :title="hasCover ? '替换封面' : '设置封面'"
-        >
-          <ImagePlus v-if="!hasCover" :size="14" :stroke-width="1.8" />
-          <ImageIcon v-else :size="14" :stroke-width="1.8" />
-        </button>
-        <div v-if="isEpubRoot" class="new-btn-wrap">
+        <Tooltip :content="isExporting ? '正在导出…' : '导出 epub'" placement="bottom">
           <button
-            class="action-btn new-btn"
-            @click="onToggleNewPopup"
-            title="新建"
+            v-if="isEpubRoot"
+            class="action-btn export-btn"
+            :disabled="isExporting"
+            @click="onExportEpub"
           >
-            <Plus :size="14" :stroke-width="2" />
+            <!-- 导出中：切换为 Loader2 图标（自带旋转动画） -->
+            <Loader2 v-if="isExporting" :size="14" :stroke-width="1.8" class="loader-icon" />
+            <Download v-else :size="14" :stroke-width="1.8" />
           </button>
+        </Tooltip>
+        <!-- 封面：位于导出按钮右侧 -->
+        <Tooltip :content="hasCover ? '替换封面' : '设置封面'" placement="bottom">
+          <button
+            v-if="isEpubRoot"
+            class="action-btn cover-btn"
+            :class="{ 'has-cover': hasCover }"
+            @click="onPickCover"
+          >
+            <ImagePlus v-if="!hasCover" :size="14" :stroke-width="1.8" />
+            <ImageIcon v-else :size="14" :stroke-width="1.8" />
+          </button>
+        </Tooltip>
+        <div v-if="isEpubRoot" class="new-btn-wrap">
+          <Tooltip content="新建" placement="bottom">
+            <button
+              class="action-btn new-btn"
+              @click="onToggleNewPopup"
+            >
+              <Plus :size="14" :stroke-width="2" />
+            </button>
+          </Tooltip>
           <!-- 新建弹窗 -->
           <Transition name="popup-fade">
             <div v-if="sidebar.showNewPopup" class="new-popup">
@@ -704,32 +716,34 @@ watch(
           <p class="empty-hint">打开文件后将自动记录</p>
         </div>
         <div v-else class="history-list">
-          <div
-            v-for="item in sidebar.history"
-            :key="item.filePath"
-            class="history-item"
-            :class="{ 'is-epub': isEpubDirPath(item.filePath) }"
-            @click="onHistoryClick(item)"
-            :title="item.filePath"
-          >
-            <div class="history-item-main">
-              <span class="history-file-name">
-                <BookOpen v-if="isEpubDirPath(item.filePath)" :size="12" class="history-type-icon" />
-                {{ item.fileName }}
-              </span>
-              <span class="history-file-path">{{ item.filePath }}</span>
-            </div>
-            <div class="history-item-meta">
-              <span class="history-time">{{ formatTime(item.lastOpenedAt) }}</span>
-              <button
-                class="history-remove"
-                @click.stop="sidebar.removeFromHistory(item.filePath)"
-                title="移除"
+          <template v-for="item in sidebar.history" :key="item.filePath">
+            <Tooltip :content="item.filePath" placement="right" only-when-overflow>
+              <div
+                class="history-item"
+                :class="{ 'is-epub': isEpubDirPath(item.filePath) }"
+                @click="onHistoryClick(item)"
               >
-                <Trash2 :size="12" />
-              </button>
-            </div>
-          </div>
+                <div class="history-item-main">
+                  <span class="history-file-name">
+                    <BookOpen v-if="isEpubDirPath(item.filePath)" :size="12" class="history-type-icon" />
+                    {{ item.fileName }}
+                  </span>
+                  <span class="history-file-path">{{ item.filePath }}</span>
+                </div>
+                <div class="history-item-meta">
+                  <span class="history-time">{{ formatTime(item.lastOpenedAt) }}</span>
+                  <Tooltip content="移除" placement="left">
+                    <button
+                      class="history-remove"
+                      @click.stop="sidebar.removeFromHistory(item.filePath)"
+                    >
+                      <Trash2 :size="12" />
+                    </button>
+                  </Tooltip>
+                </div>
+              </div>
+            </Tooltip>
+          </template>
           <div class="history-footer">
             <button class="clear-history-btn" @click="sidebar.clearHistory()">
               清空历史
@@ -746,17 +760,19 @@ watch(
           <p class="empty-hint">在文档中使用 # 创建标题</p>
         </div>
         <div v-else class="outline-list">
-          <div
-            v-for="item in sidebar.outline"
-            :key="item.id"
-            class="outline-item"
-            :class="'outline-h' + item.level"
-            :style="{ paddingLeft: getOutlineIndent(item.level) }"
-            @click="onOutlineClick(item)"
-          >
-            <span class="outline-level">H{{ item.level }}</span>
-            <span class="outline-text">{{ item.text }}</span>
-          </div>
+          <template v-for="item in sidebar.outline" :key="item.id">
+            <Tooltip :content="item.text" placement="right" only-when-overflow>
+              <div
+                class="outline-item"
+                :class="'outline-h' + item.level"
+                :style="{ paddingLeft: getOutlineIndent(item.level) }"
+                @click="onOutlineClick(item)"
+              >
+                <span class="outline-level">H{{ item.level }}</span>
+                <span class="outline-text">{{ item.text }}</span>
+              </div>
+            </Tooltip>
+          </template>
         </div>
       </div>
 
@@ -867,9 +883,16 @@ watch(
                   onRenamingSubmit((e.target as HTMLInputElement).value)
                 }"
               />
-              <span v-else class="tree-name">
-                {{ row.node.name }}<span v-if="row.node.type === 'chapter'" class="tree-ext">.md</span>
-              </span>
+              <Tooltip
+                v-else
+                :content="row.node.name + (row.node.type === 'chapter' ? '.md' : '')"
+                placement="right"
+                only-when-overflow
+              >
+                <span class="tree-name">
+                  {{ row.node.name }}<span v-if="row.node.type === 'chapter'" class="tree-ext">.md</span>
+                </span>
+              </Tooltip>
             </div>
             <!-- 目录展开后，该目录下的 creating 输入行 -->
             <div
@@ -1006,6 +1029,10 @@ watch(
   flex-shrink: 0;
   box-shadow: 4px 0 12px -6px rgba(0, 0, 0, 0.14);
   transition: width 0.26s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.26s ease;
+
+  &.is-dragging {
+    transition: none;
+  }
 
   &.collapsed {
     box-shadow: none;
@@ -1267,6 +1294,8 @@ watch(
   cursor: pointer;
   transition: background 0.1s;
   border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  min-width: 0;
+  overflow: hidden;
 
   &:hover {
     background: var(--bg-tertiary);
@@ -1372,6 +1401,8 @@ watch(
   padding: 6px 12px;
   cursor: pointer;
   transition: background 0.1s;
+  min-width: 0;
+  overflow: hidden;
 
   &:hover {
     background: var(--bg-tertiary);
@@ -1398,6 +1429,8 @@ watch(
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.4;
+  flex: 1;
+  min-width: 0;
 }
 
 .outline-h1 .outline-text { font-weight: 600; }
@@ -1421,6 +1454,7 @@ watch(
   transition: background 0.1s;
   user-select: none;
   min-height: 24px;
+  overflow: hidden;
 
   &:hover {
     background: var(--bg-tertiary);
