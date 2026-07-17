@@ -154,7 +154,7 @@ function confirmLink() {
   }
   view.focus()
   const { state } = view.state
-  const { from, to, empty } = state.selection
+  const { from, empty } = state.selection
   if (!empty) {
     // 已有选中文本：直接包裹链接
     toggleLinkCommand.run({ href: url })

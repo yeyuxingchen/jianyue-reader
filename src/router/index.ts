@@ -52,13 +52,12 @@ export const router = createRouter({
 })
 
 // 路由守卫
-router.beforeEach((to, _from, next) => {
+router.beforeEach((to) => {
   // 设置页面标题
   const title = to.meta.title as string
   if (title) {
     document.title = `${title} - 简阅`
   }
-  next()
 })
 
 export default router

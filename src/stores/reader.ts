@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { Book, TocItem } from '@/types'
 import { db } from '@/services/dbService'
-import { detectFormat } from '@/services/fileService'
 
 export const useReaderStore = defineStore('reader', () => {
   const currentBook = ref<Book | null>(null)
@@ -92,6 +91,7 @@ export const useReaderStore = defineStore('reader', () => {
     totalLocations,
     currentLocation,
     sidebarOpen,
+    fraction,
     progress,
     openBook,
     closeBook,

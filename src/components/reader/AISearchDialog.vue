@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, nextTick, onMounted, onBeforeUnmount, computed } from 'vue'
+import { ref, nextTick, onMounted, computed } from 'vue'
 import { useReaderStore } from '@/stores/reader'
 import { useToastStore } from '@/stores/toast'
 import { aiService, LENGTH_LIMIT_OPTIONS, type LengthLimitValue } from '@/services/aiService'

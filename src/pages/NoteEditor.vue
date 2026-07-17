@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted, onBeforeUnmount, nextTick, defineComponent, h, computed, watch } from 'vue'
 import { Milkdown as MilkdownComponent, MilkdownProvider, useEditor } from '@milkdown/vue'
-import { Editor, rootCtx, defaultValueCtx, editorViewOptionsCtx, parserCtx, editorViewCtx } from '@milkdown/kit/core'
+import { Editor, rootCtx, defaultValueCtx, editorViewOptionsCtx, editorViewCtx } from '@milkdown/kit/core'
 import { commonmark } from '@milkdown/kit/preset/commonmark'
 import { gfm } from '@milkdown/kit/preset/gfm'
 import { history } from '@milkdown/kit/plugin/history'
@@ -354,13 +354,6 @@ function clearDraftAfterSave() {
 }
 
 // ===== 未保存更改对话框 =====
-interface UnsavedDialogState {
-  visible: boolean
-  message: string
-  messagePrefix: string
-  _resolve: ((result: 'save' | 'discard' | 'cancel') => void) | null
-}
-
 const unsavedDialog = {
   visible: false,
   message: '',

@@ -93,7 +93,7 @@ class TTSService {
    * 播放 AudioBuffer
    */
   playBuffer(buffer: AudioBuffer): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const ctx = this.getAudioCtx()
       const source = ctx.createBufferSource()
       source.buffer = buffer

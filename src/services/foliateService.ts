@@ -94,7 +94,6 @@ function mapTocItem(item: any): TocItem {
 }
 
 const COVER_IMAGE_NAMES = ['cover', 'coverimage', 'cover-image', 'frontcover', 'front-cover']
-const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg']
 
 function isImageItem(item: any): boolean {
   if (!item?.mediaType) return false

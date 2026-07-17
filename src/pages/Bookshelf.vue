@@ -4,6 +4,7 @@ import { useLibraryStore } from '@/stores/library'
 import { useToastStore } from '@/stores/toast'
 import BookCard from '@/components/book/BookCard.vue'
 import BookImport from '@/components/book/BookImport.vue'
+import ConfirmDialog from '@/components/common/ConfirmDialog.vue'
 import { Search, Plus, ArrowUpDown, CheckSquare, Trash2, X, GripVertical, ListChecks } from 'lucide-vue-next'
 import type { SortBy } from '@/types'
 import { compressCoverToJpeg } from '@/utils/cover'
@@ -17,6 +18,8 @@ const selectedIds = ref<Set<string>>(new Set())
 const showDeleteConfirm = ref(false)
 const gridRef = ref<HTMLElement | null>(null)
 const colsPerRow = ref(5)
+
+const deleteConfirmMessage = computed(() => `确定删除选中的 ${selectedIds.value.size} 本书籍吗？`)
 
 function updateColsPerRow() {
   if (!gridRef.value) return
@@ -355,15 +358,13 @@ function handleBookDragEnd() {
       </template>
     </div>
 
-    <div v-if="showDeleteConfirm" class="confirm-overlay" @click.self="cancelBatchDelete">
-      <div class="confirm-dialog">
-        <div class="confirm-text">确定删除选中的 {{ selectedIds.size }} 本书籍吗？</div>
-        <div class="confirm-actions">
-          <button class="confirm-btn cancel" @click="cancelBatchDelete">取消</button>
-          <button class="confirm-btn danger" @click="executeBatchDelete">确定删除</button>
-        </div>
-      </div>
-    </div>
+    <ConfirmDialog
+      v-if="showDeleteConfirm"
+      :message="deleteConfirmMessage"
+      confirm-text="确定删除"
+      @confirm="executeBatchDelete"
+      @cancel="cancelBatchDelete"
+    />
   </div>
 </template>
 
@@ -530,64 +531,6 @@ function handleBookDragEnd() {
   background: var(--bg-secondary);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
-}
-
-.confirm-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-}
-
-.confirm-dialog {
-  background: var(--bg-secondary);
-  border-radius: 12px;
-  padding: 24px;
-  min-width: 280px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-}
-
-.confirm-text {
-  font-size: 15px;
-  color: var(--text-primary);
-  text-align: center;
-  margin-bottom: 20px;
-  line-height: 1.5;
-}
-
-.confirm-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-}
-
-.confirm-btn {
-  padding: 8px 24px;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: opacity 0.2s;
-
-  &:hover {
-    opacity: 0.9;
-  }
-
-  &.cancel {
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
-  }
-
-  &.danger {
-    background: #ef4444;
-    color: #fff;
-  }
 }
 
 .bookshelf-loading {

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, toRaw, isRef } from 'vue'
+import { ref, toRaw } from 'vue'
 import { electronStore } from '@/services/electronStore'
 
 const HISTORY_STORAGE_KEY = 'note:file-history'

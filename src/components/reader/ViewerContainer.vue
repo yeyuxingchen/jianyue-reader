@@ -16,7 +16,6 @@ const library = useLibraryStore()
 const ttsStore = useTTSStore()
 const containerRef = ref<HTMLDivElement>()
 let viewInstance: any = null
-let isAutoTurning = false
 let ttsPlayer: TTSPlayer | null = null
 const showNextChapter = ref(false)
 const showPrevChapter = ref(false)
@@ -47,8 +46,8 @@ onMounted(async () => {
     view.addEventListener('draw-annotation', (e: CustomEvent) => {
       handleDrawAnnotation(e.detail)
     })
-    view.addEventListener('create-overlay', (e: CustomEvent) => {
-      handleCreateOverlay(e.detail)
+    view.addEventListener('create-overlay', () => {
+      handleCreateOverlay()
     })
     view.addEventListener('show-annotation', (e: CustomEvent) => {
       handleShowAnnotation(e.detail)
@@ -260,8 +259,7 @@ function handleDrawAnnotation(detail: any) {
   }
 }
 
-function handleCreateOverlay(detail: any) {
-  const { index } = detail
+function handleCreateOverlay() {
   const bookId = reader.currentBook?.id
   if (!bookId) return
   const anns = annotations.annotations.filter(
@@ -401,7 +399,7 @@ async function handleLoad(detail: any) {
       const target = e.target as HTMLElement
       const img = target.closest('img') || (target.tagName === 'IMG' ? target : null) as HTMLImageElement | null
       if (img) {
-        handleImageClick(img, doc)
+        handleImageClick(img)
         e.preventDefault()
         return
       }
@@ -433,7 +431,7 @@ async function handleLoad(detail: any) {
   }
 }
 
-function handleImageClick(img: HTMLImageElement, doc: Document) {
+function handleImageClick(img: HTMLImageElement) {
   // 直接使用 img.src，避免复杂转换可能带来的问题
   console.log('Image clicked:', img.src)
   openImageViewer(img.src)
@@ -542,7 +540,7 @@ function wrapTextInNode(doc: Document, textNode: Text, searchText: string): bool
  * 高亮当前播放的句子
  * 在 iframe DOM 中精确定位句子文本，用 <span class="tts-highlight"> 包裹
  */
-function highlightCurrentSentence(index: number, originalText: string) {
+function highlightCurrentSentence(originalText: string) {
   if (!viewInstance) return
   try {
     const contents = viewInstance.renderer?.getContents?.()
@@ -605,9 +603,9 @@ function handleTTSToggle() {
  */
 function startTTSPlayback() {
   ttsPlayer = new TTSPlayer()
-  ttsPlayer.onSentenceChange = (index, originalText) => {
+  ttsPlayer.onSentenceChange = (_index, originalText) => {
     if (ttsStore.settings.highlightSync) {
-      highlightCurrentSentence(index, originalText)
+      highlightCurrentSentence(originalText)
     }
   }
   ttsPlayer.onChapterEnd = () => {
