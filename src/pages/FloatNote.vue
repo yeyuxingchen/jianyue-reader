@@ -312,7 +312,35 @@ onMounted(() => {
 .float-milkdown-body h3 { font-size: 1.2em; font-weight: 600; margin: 0.6em 0 0.3em; }
 .float-milkdown-body p { margin: 0.5em 0; }
 .float-milkdown-body blockquote { border-left: 3px solid rgba(100,180,255,0.5); padding: 0.4em 1em; margin: 0.5em 0; background: rgba(255,255,255,0.04); border-radius: 0 4px 4px 0; color: rgba(255,255,255,0.65); }
-.float-milkdown-body pre { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 10px 14px; margin: 0.5em 0; overflow-x: auto; font-size: 0.9em; }
+.float-milkdown-body pre {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin: 0.5em 0;
+  overflow-x: auto;
+  font-size: 0.9em;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+.float-milkdown-body pre::-webkit-scrollbar {
+  height: 10px;
+}
+.float-milkdown-body pre::-webkit-scrollbar-track {
+  background: transparent;
+}
+.float-milkdown-body pre::-webkit-scrollbar-track-piece {
+  background-color: transparent;
+}
+.float-milkdown-body pre::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  background-clip: padding-box;
+  border: 3px solid transparent;
+  border-radius: 5px;
+}
+.float-milkdown-body pre::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
 .float-milkdown-body code { background: rgba(255,255,255,0.08); padding: 1px 5px; border-radius: 3px; font-size: 0.9em; font-family: 'Consolas', 'Monaco', 'Courier New', monospace; }
 .float-milkdown-body pre code { background: none; padding: 0; }
 .float-milkdown-body ul, .float-milkdown-body ol { padding-left: 1.8em; margin: 0.4em 0; }
