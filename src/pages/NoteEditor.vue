@@ -268,6 +268,7 @@ let autoSaveTimer: ReturnType<typeof setTimeout> | null = null
 const AUTO_SAVE_DEBOUNCE = 2000
 
 function scheduleAutoSave() {
+  if (!noteStore.currentFilePath) return
   if (autoSaveTimer) clearTimeout(autoSaveTimer)
   autoSaveTimer = setTimeout(() => {
     autoSaveTimer = null
@@ -400,6 +401,7 @@ function onSourceInput() {
     noteStore.syncBaseline(sourceContent.value)
   } else if (!isMarkdownContentEqual(sourceContent.value, noteStore.lastSavedContent)) {
     noteStore.markModified()
+    scheduleAutoSave()
   } else {
     noteStore.markSaved()
   }
@@ -429,6 +431,7 @@ async function syncFromFloatNote(content: string) {
       noteStore.syncBaseline(content)
     } else if (!isMarkdownContentEqual(content, noteStore.lastSavedContent)) {
       noteStore.markModified()
+      scheduleAutoSave()
     } else {
       noteStore.markSaved()
     }
@@ -461,6 +464,7 @@ const MilkdownEditor = defineComponent({
                 noteStore.syncBaseline(normalized)
               } else if (!isMarkdownContentEqual(normalized, noteStore.lastSavedContent)) {
                 noteStore.markModified()
+                scheduleAutoSave()
               } else {
                 noteStore.markSaved()
               }
@@ -1068,16 +1072,6 @@ onMounted(() => {
   watch(() => noteStore.currentFilePath, () => {
     clearChapterImages()
     currentChapterId.value = null
-  })
-  watch(() => noteStore.isModified, (modified) => {
-    if (!modified) {
-      if (autoSaveTimer) {
-        clearTimeout(autoSaveTimer)
-        autoSaveTimer = null
-      }
-      return
-    }
-    if (noteStore.currentFilePath) scheduleAutoSave()
   })
 })
 
