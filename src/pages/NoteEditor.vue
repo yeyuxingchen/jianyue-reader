@@ -263,6 +263,38 @@ function saveCurrentDraft() {
   }
 }
 
+// 自动保存到磁盘（防抖）：仅在文件路径已知时触发
+let autoSaveTimer: ReturnType<typeof setTimeout> | null = null
+const AUTO_SAVE_DEBOUNCE = 2000
+
+function scheduleAutoSave() {
+  if (autoSaveTimer) clearTimeout(autoSaveTimer)
+  autoSaveTimer = setTimeout(() => {
+    autoSaveTimer = null
+    void performAutoSave()
+  }, AUTO_SAVE_DEBOUNCE)
+}
+
+async function performAutoSave() {
+  if (!noteStore.currentFilePath || !noteStore.isModified || isSaving) return
+  isSaving = true
+  try {
+    const content = noteStore.sourceMode ? sourceContent.value : getMarkdownContent()
+    if (!content && content !== '') return
+    const savedPath = await window.services.writeToFile(noteStore.currentFilePath, content)
+    if (savedPath) {
+      noteStore.markSaved()
+      noteStore.lastSavedContent = content
+      sidebar.addToHistory(noteStore.currentFilePath, noteStore.currentFileName, content)
+      clearDraftAfterSave()
+    }
+  } catch (err) {
+    console.error('自动保存失败:', err)
+  } finally {
+    isSaving = false
+  }
+}
+
 function handleBeforeUnload(e: BeforeUnloadEvent) {
   if (isClosingAfterDialog) {
     saveCurrentDraft()
@@ -1037,6 +1069,16 @@ onMounted(() => {
     clearChapterImages()
     currentChapterId.value = null
   })
+  watch(() => noteStore.isModified, (modified) => {
+    if (!modified) {
+      if (autoSaveTimer) {
+        clearTimeout(autoSaveTimer)
+        autoSaveTimer = null
+      }
+      return
+    }
+    if (noteStore.currentFilePath) scheduleAutoSave()
+  })
 })
 
 onBeforeUnmount(() => {
@@ -1055,6 +1097,10 @@ onBeforeUnmount(() => {
   if (draftTimer) {
     clearTimeout(draftTimer)
     draftTimer = null
+  }
+  if (autoSaveTimer) {
+    clearTimeout(autoSaveTimer)
+    autoSaveTimer = null
   }
   if (unsubFloatNote) {
     unsubFloatNote()
