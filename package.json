@@ -1,6 +1,6 @@
 {
   "name": "jianyue-reader",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "简阅 - 本地电子书阅读器",
   "author": "jianyue",
   "main": "dist-electron/main.js",
