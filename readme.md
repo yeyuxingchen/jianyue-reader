@@ -35,6 +35,9 @@
   </tr>
   <tr>
     <td><img src="screenshots/笔记.png" alt="笔记" style="height:300px; width:100%; object-fit:contain;" /></td>
+    <td><img src="screenshots/源码编辑.png" alt="源码模式" style="height:300px; width:100%; object-fit:contain;" /></td>
+  </tr>
+  <tr>
     <td><img src="screenshots/悬浮.png" alt="镜像悬浮" style="height:300px; width:100%; object-fit:contain;" /></td>
   </tr>
 </table>
@@ -76,6 +79,8 @@
 | **镜像笔记浮窗** | 从阅读器中提取文字生成浮动笔记窗口，可拖拽、可置顶、可调透明度 |
 | **源码模式** | 支持切换到 Markdown 源码编辑，大纲快速跳转 |
 | **代码块语法高亮** | 支持 100+ 编程语言高亮，代码块语言切换器 |
+| **Raw HTML 渲染** | 支持 Markdown 中嵌入原始 HTML 标签，所见即所得渲染（含 XSS 清理） |
+| **文字颜色 / 背景色** | 工具栏一键应用预设色或自定义颜色，清除颜色标记 |
 | **文件树管理** | 侧边栏文件目录，章节新建/重命名/排序，EPUB 目录自动收敛 |
 | **章节图片插入** | 支持粘贴/选择图片插入章节，自动管理图片资源 |
 | **EPUB 导出** | 笔记目录一键导出为 EPUB 电子书，支持封面设置 |
@@ -152,7 +157,9 @@
 │   │   └── useExternalFileOpen.ts  # 外部文件打开
 │   ├── editor/                # 编辑器扩展
 │   │   ├── codeHighlight.ts   # 代码高亮配置
-│   │   └── codeLanguages.ts   # 支持的语言列表
+│   │   ├── codeLanguages.ts   # 支持的语言列表
+│   │   ├── htmlNodeView.ts    # Raw HTML 标签渲染（nodeView + input rule + remark transformer）
+│   │   └── colorMarks.ts     # 文字颜色 / 背景色 mark
 │   ├── pages/
 │   │   ├── Bookshelf.vue      # 书架页面
 │   │   ├── Reader.vue         # 阅读器页面
