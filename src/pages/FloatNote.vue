@@ -12,6 +12,12 @@ import { getMarkdown } from '@milkdown/kit/utils'
 import type { Editor as EditorType } from '@milkdown/kit/core'
 import '@/editor/codeHighlight' // 副作用导入：注册代码块语法高亮语言
 import { CODE_LANGS } from '@/editor/codeLanguages'
+import { htmlNodeView, remarkHtmlExtractor, htmlInputRule } from '@/editor/htmlNodeView'
+import {
+  textColorSchema, textColorAttr, toggleTextColorCommand,
+  bgColorSchema, bgColorAttr, toggleBgColorCommand,
+  colorRemarkTransformer, setupColorStringifyHandlers,
+} from '@/editor/colorMarks'
 import { Code, Monitor, Pin } from 'lucide-vue-next'
 
 // ===== 状态 =====
@@ -283,6 +289,8 @@ const MilkdownEditor = defineComponent({
           ctx.set(prismConfig.key, {
             configureRefractor: (r) => r,
           })
+          // 注册 color mark 的序列化 handler
+          setupColorStringifyHandlers(ctx)
         })
         .use(commonmark)
         .use(gfm)
@@ -290,6 +298,16 @@ const MilkdownEditor = defineComponent({
         .use(clipboard)
         .use(prism)
         .use(listener)
+        .use(htmlNodeView)
+        .use(remarkHtmlExtractor)
+        .use(htmlInputRule)
+        .use(textColorSchema)
+        .use(textColorAttr)
+        .use(bgColorSchema)
+        .use(bgColorAttr)
+        .use(toggleTextColorCommand)
+        .use(toggleBgColorCommand)
+        .use(colorRemarkTransformer)
     )
 
     const checkEditor = setInterval(() => {

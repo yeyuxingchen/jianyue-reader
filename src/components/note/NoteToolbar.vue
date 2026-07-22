@@ -19,9 +19,11 @@ import {
   toggleStrikethroughCommand,
   insertTableCommand,
 } from '@milkdown/kit/preset/gfm'
+import { toggleTextColorCommand, toggleBgColorCommand } from '@/editor/colorMarks'
 import {
   Bold, Italic, Strikethrough, Code, Link2, Image as ImageIcon,
   Table as TableIcon, Minus, Quote, List, ListOrdered, Code2,
+  Palette, Highlighter, RemoveFormatting,
 } from 'lucide-vue-next'
 import { useNoteEditorStore } from '@/stores/appMode'
 import { useToastStore } from '@/stores/toast'
@@ -107,11 +109,45 @@ function exec(cmd: { run: (payload?: any) => boolean }, payload?: any) {
   nextTick(updateActive)
 }
 
-// ===== 弹出面板（链接 / 表格 / 代码语言）=====
-type PopoverType = 'link' | 'table' | 'codeLang' | null
+// ===== 弹出面板（链接 / 表格 / 代码语言 / 颜色）=====
+type PopoverType = 'link' | 'table' | 'codeLang' | 'textColor' | 'bgColor' | null
 const popover = ref<PopoverType>(null)
 const toolbarRef = ref<HTMLElement | null>(null)
 const popoverLeft = ref(10)
+
+// 预设颜色面板
+const PRESET_COLORS = [
+  '#dc2626', '#ea580c', '#d97706', '#65a30d', '#16a34a', '#059669',
+  '#0891b2', '#0284c7', '#2563eb', '#4f46e5', '#7c3aed', '#c026d3',
+  '#db2777', '#e11d48', '#000000', '#4b5563', '#9ca3af', '#ffffff',
+]
+
+function applyTextColor(color: string) {
+  exec(toggleTextColorCommand, color)
+  popover.value = null
+}
+
+function applyBgColor(color: string) {
+  exec(toggleBgColorCommand, color)
+  popover.value = null
+}
+
+function clearColorMarks() {
+  const view = getView()
+  if (!view) return
+  view.focus()
+  const { state } = view
+  const { from, to } = state.selection
+  if (from === to) {
+    toast.show('请先选中文字')
+    return
+  }
+  const tr = state.tr.removeMark(from, to, state.schema.marks.textColor)
+    .removeMark(from, to, state.schema.marks.bgColor)
+  view.dispatch(tr)
+  popover.value = null
+  nextTick(updateActive)
+}
 
 // 点击工具栏时阻止默认行为以保留编辑器选区，但放行 select/input/弹出面板本身
 function onToolbarMouseDown(e: MouseEvent) {
@@ -331,6 +367,21 @@ onBeforeUnmount(() => {
 
     <span class="tb-sep"></span>
 
+    <!-- 颜色 -->
+    <div class="tb-group">
+      <button class="tb-btn" :class="{ open: popover === 'textColor' }" title="文字颜色" @click="openPopover('textColor', $event)">
+        <Palette :size="15" :stroke-width="2" />
+      </button>
+      <button class="tb-btn" :class="{ open: popover === 'bgColor' }" title="背景颜色" @click="openPopover('bgColor', $event)">
+        <Highlighter :size="15" :stroke-width="2" />
+      </button>
+      <button class="tb-btn" title="清除颜色" @click="clearColorMarks">
+        <RemoveFormatting :size="15" :stroke-width="2" />
+      </button>
+    </div>
+
+    <span class="tb-sep"></span>
+
     <!-- 插入 -->
     <div class="tb-group">
       <button class="tb-btn" :class="{ active: active.link, open: popover === 'link' }" title="插入链接" @click="openPopover('link', $event)">
@@ -411,6 +462,42 @@ onBeforeUnmount(() => {
         <button class="tb-pop-btn cancel" @click="popover = null">取消</button>
         <button class="tb-pop-btn ok" @click="confirmCodeLang">确定</button>
       </div>
+    </div>
+
+    <div v-if="popover === 'textColor'" class="tb-popover tb-popover-color" :style="{ left: popoverLeft + 'px' }" @mousedown.stop>
+      <div class="tb-popover-title">文字颜色</div>
+      <div class="tb-color-grid">
+        <button
+          v-for="color in PRESET_COLORS"
+          :key="color"
+          class="tb-color-cell"
+          :style="{ background: color }"
+          :title="color"
+          @click="applyTextColor(color)"
+        ></button>
+      </div>
+      <label class="tb-field tb-color-custom">
+        <span>自定义</span>
+        <input type="color" @input="(e) => applyTextColor((e.target as HTMLInputElement).value)" />
+      </label>
+    </div>
+
+    <div v-if="popover === 'bgColor'" class="tb-popover tb-popover-color" :style="{ left: popoverLeft + 'px' }" @mousedown.stop>
+      <div class="tb-popover-title">背景颜色</div>
+      <div class="tb-color-grid">
+        <button
+          v-for="color in PRESET_COLORS"
+          :key="color"
+          class="tb-color-cell"
+          :style="{ background: color }"
+          :title="color"
+          @click="applyBgColor(color)"
+        ></button>
+      </div>
+      <label class="tb-field tb-color-custom">
+        <span>自定义</span>
+        <input type="color" @input="(e) => applyBgColor((e.target as HTMLInputElement).value)" />
+      </label>
     </div>
   </div>
 </template>
@@ -604,5 +691,55 @@ onBeforeUnmount(() => {
   font-size: 12px;
   color: var(--text-secondary);
   text-align: center;
+}
+
+/* 颜色面板 */
+.tb-popover-color {
+  min-width: 200px;
+  padding: 12px;
+}
+
+.tb-color-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.tb-color-cell {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.12s;
+
+  &:hover {
+    transform: scale(1.15);
+    border-color: var(--accent-color);
+  }
+}
+
+.tb-color-custom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0;
+
+  span {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  input[type="color"] {
+    width: 32px;
+    height: 24px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 0;
+    background: transparent;
+  }
 }
 </style>
